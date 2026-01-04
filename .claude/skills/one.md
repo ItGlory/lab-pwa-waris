@@ -49,6 +49,17 @@ The Master Orchestrator for WARIS Platform Development.
 /one backup                    # Orchestrate backup procedures
 ```
 
+### Developer Experience (DevEx)
+```
+/one dx setup                  # Setup local development environment
+/one dx check                  # Health check all services
+/one dx doctor                 # Diagnose and fix issues
+/one dx clean                  # Clean caches and artifacts
+/one dx optimize               # Optimize build performance
+/one dx format                 # Format all code
+/one dx lint                   # Lint and fix all code
+```
+
 ## Director Capabilities
 
 ### 1. Intelligent Task Delegation

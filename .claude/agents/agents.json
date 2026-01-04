@@ -22,6 +22,7 @@
         "frontend-developer",
         "backend-developer",
         "devops-engineer",
+        "dx-engineer",
         "security-specialist",
         "database-architect",
         "qa-engineer",
@@ -119,6 +120,24 @@
       "tools": ["Bash", "Read", "Write", "Edit", "Glob", "Grep"],
       "tech_stack": ["Docker", "Kubernetes", "Terraform", "GitHub Actions", "Prometheus", "Grafana"],
       "context": "WARIS infrastructure per TOR 4.2 (Hybrid Architecture)"
+    },
+    {
+      "name": "dx-engineer",
+      "description": "Specialized agent for developer experience, tooling, and productivity optimization",
+      "capabilities": [
+        "Setup and optimize development environments",
+        "Configure build systems and Turborepo",
+        "Manage code quality tools (ESLint, Prettier, Ruff)",
+        "Setup Git hooks and commit validation",
+        "Configure VS Code workspace settings",
+        "Create CI/CD pipelines",
+        "Troubleshoot development issues",
+        "Optimize build performance",
+        "Manage developer onboarding"
+      ],
+      "tools": ["Bash", "Read", "Write", "Edit", "Glob", "Grep"],
+      "tech_stack": ["Turborepo", "ESLint", "Prettier", "Husky", "GitHub Actions", "Docker", "Vitest", "Pytest"],
+      "context": "Developer experience optimization for WARIS platform"
     },
     {
       "name": "security-specialist",

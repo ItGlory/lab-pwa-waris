@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# WARIS Commit Message Hook
+# Validates commit message format (Conventional Commits)
+
+echo "📝 Validating commit message..."
+
+npx --no -- commitlint --edit "$1"
+
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "❌ Commit message does not follow Conventional Commits format."
+  echo ""
+  echo "Format: <type>(<scope>): <description>"
+  echo ""
+  echo "Types: feat, fix, docs, style, refactor, perf, test, build, ci, chore"
+  echo ""
+  echo "Examples:"
+  echo "  feat(api): add water loss prediction endpoint"
+  echo "  fix(web): resolve Thai date formatting issue"
+  echo "  docs: update API documentation"
+  echo ""
+  exit 1
+fi
+
+echo "✅ Commit message is valid!"
