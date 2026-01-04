@@ -20,14 +20,76 @@
   --color-water-dark: #1565c0;
 }
 
+/* shadcn/ui CSS Variables */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 210 100% 40%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 210 100% 40%;
+    --radius: 0.5rem;
+    --chart-1: 210 100% 40%;
+    --chart-2: 152 76% 36%;
+    --chart-3: 45 93% 47%;
+    --chart-4: 0 84% 60%;
+    --chart-5: 210 40% 60%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 100% 50%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 210 100% 50%;
+    --chart-1: 210 100% 60%;
+    --chart-2: 152 76% 46%;
+    --chart-3: 45 93% 57%;
+    --chart-4: 0 84% 70%;
+    --chart-5: 210 40% 70%;
+  }
+}
+
 /* Base styles */
 @layer base {
+  * {
+    @apply border-border;
+  }
+
   html {
     font-family: var(--font-sans);
   }
 
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
+    @apply bg-background text-foreground antialiased;
   }
 
   /* Thai number formatting */
@@ -36,17 +98,119 @@
   }
 }
 
+/* Status colors for water loss indicators */
+@layer utilities {
+  .status-normal {
+    @apply text-green-600 dark:text-green-400;
+  }
+
+  .status-warning {
+    @apply text-yellow-600 dark:text-yellow-400;
+  }
+
+  .status-critical {
+    @apply text-red-600 dark:text-red-400;
+  }
+
+  .bg-status-normal {
+    @apply bg-green-100 dark:bg-green-900/30;
+  }
+
+  .bg-status-warning {
+    @apply bg-yellow-100 dark:bg-yellow-900/30;
+  }
+
+  .bg-status-critical {
+    @apply bg-red-100 dark:bg-red-900/30;
+  }
+}
+
 /* Component styles */
 @layer components {
   .btn-primary {
-    @apply bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors;
+    @apply bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors;
   }
 
-  .card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6;
+  .card-waris {
+    @apply bg-card rounded-xl shadow-sm border border-border p-6;
   }
 
   .dashboard-widget {
-    @apply card hover:shadow-md transition-shadow;
+    @apply card-waris hover:shadow-md transition-shadow;
+  }
+
+  /* KPI Card specific styles */
+  .kpi-value {
+    @apply text-3xl font-bold tracking-tight thai-number;
+  }
+
+  .kpi-label {
+    @apply text-sm text-muted-foreground;
+  }
+
+  .kpi-trend-up {
+    @apply text-green-600 dark:text-green-400;
+  }
+
+  .kpi-trend-down {
+    @apply text-red-600 dark:text-red-400;
+  }
+
+  /* Sidebar styles */
+  .sidebar-item {
+    @apply flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors;
+  }
+
+  .sidebar-item-active {
+    @apply bg-accent text-accent-foreground font-medium;
+  }
+}
+
+/* Leaflet map fixes for dark mode */
+.dark .leaflet-tile-pane {
+  filter: brightness(0.8) contrast(1.1) saturate(0.9);
+}
+
+.dark .leaflet-popup-content-wrapper,
+.dark .leaflet-popup-tip {
+  background-color: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+}
+
+/* Chart tooltip styles */
+.recharts-tooltip-wrapper {
+  outline: none !important;
+}
+
+.recharts-default-tooltip {
+  background-color: hsl(var(--popover)) !important;
+  border-color: hsl(var(--border)) !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+}
+
+/* Scrollbar styles */
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted));
+    border-radius: 4px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground));
   }
 }

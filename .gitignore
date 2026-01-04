@@ -1,0 +1,221 @@
+# ============================================
+# WARIS Project .gitignore
+# ============================================
+
+# --------------------------------------------
+# Dependencies
+# --------------------------------------------
+node_modules/
+.pnpm-store/
+.yarn/
+.npm/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+venv/
+.venv/
+ENV/
+env/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# --------------------------------------------
+# Environment & Secrets
+# --------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+credentials/
+*.credentials
+.secrets/
+
+# --------------------------------------------
+# Build Outputs
+# --------------------------------------------
+# Next.js
+.next/
+out/
+.turbo/
+
+# Python
+*.pyc
+*.pyo
+*.pyd
+.cache/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# TypeScript
+*.tsbuildinfo
+
+# General
+dist/
+build/
+coverage/
+.nyc_output/
+
+# --------------------------------------------
+# IDE & Editor
+# --------------------------------------------
+.idea/
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# --------------------------------------------
+# OS Files
+# --------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# --------------------------------------------
+# Testing
+# --------------------------------------------
+coverage/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+junit.xml
+test-results/
+
+# --------------------------------------------
+# AI/ML
+# --------------------------------------------
+# Model files (large binaries)
+*.pt
+*.pth
+*.onnx
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.joblib
+*.bin
+!*.bin.example
+
+# MLflow
+mlruns/
+mlartifacts/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Data files
+*.csv
+!**/fixtures/*.csv
+!**/test_data/*.csv
+*.parquet
+*.arrow
+*.feather
+
+# Vector DB
+milvus_data/
+
+# --------------------------------------------
+# Docker & Infrastructure
+# --------------------------------------------
+# Docker
+.docker/
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Kubernetes secrets (but not configs)
+**/kubernetes/secrets/
+*.kubeconfig
+
+# --------------------------------------------
+# Logs & Temp Files
+# --------------------------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.tmp
+*.temp
+tmp/
+temp/
+
+# --------------------------------------------
+# Misc
+# --------------------------------------------
+.vercel
+.netlify
+*.local
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+
+# Storybook
+storybook-static/
+
+# Package manager locks (keep only one)
+# Uncomment the ones you don't use:
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
