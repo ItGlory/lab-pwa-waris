@@ -1,0 +1,120 @@
+{
+  "mcpServers": {
+    "waris-database": {
+      "command": "node",
+      "args": ["mcp-servers/database/index.js"],
+      "description": "MCP server for WARIS centralized database access",
+      "env": {
+        "DATABASE_URL": "${WARIS_DATABASE_URL}",
+        "DATABASE_TYPE": "postgresql"
+      },
+      "capabilities": [
+        "Query water loss data",
+        "Access DMA information",
+        "Retrieve user consumption data",
+        "Get pipe repair records"
+      ]
+    },
+    "waris-dmama": {
+      "command": "python",
+      "args": ["-m", "mcp_servers.dmama"],
+      "description": "MCP server for DMAMA system integration",
+      "env": {
+        "DMAMA_API_URL": "${DMAMA_API_URL}",
+        "DMAMA_API_KEY": "${DMAMA_API_KEY}"
+      },
+      "capabilities": [
+        "Connect to DMAMA API",
+        "Fetch flow meter readings",
+        "Get pressure sensor data",
+        "Retrieve DMA boundaries"
+      ]
+    },
+    "waris-vector-db": {
+      "command": "python",
+      "args": ["-m", "mcp_servers.vector_db"],
+      "description": "MCP server for Vector Database (Milvus) operations",
+      "env": {
+        "MILVUS_HOST": "${MILVUS_HOST}",
+        "MILVUS_PORT": "${MILVUS_PORT}"
+      },
+      "capabilities": [
+        "Store document embeddings",
+        "Perform semantic search",
+        "Manage vector collections",
+        "Update knowledge base"
+      ]
+    },
+    "waris-ai-models": {
+      "command": "python",
+      "args": ["-m", "mcp_servers.ai_models"],
+      "description": "MCP server for AI model inference",
+      "env": {
+        "MODEL_SERVER_URL": "${MODEL_SERVER_URL}"
+      },
+      "capabilities": [
+        "Run anomaly detection",
+        "Execute pattern recognition",
+        "Perform classification",
+        "Generate predictions"
+      ]
+    },
+    "waris-llm": {
+      "command": "python",
+      "args": ["-m", "mcp_servers.llm"],
+      "description": "MCP server for LLM interaction (70B+ Thai-capable)",
+      "env": {
+        "LLM_SERVER_URL": "${LLM_SERVER_URL}",
+        "LLM_MODEL_NAME": "${LLM_MODEL_NAME}"
+      },
+      "capabilities": [
+        "Process Thai language queries",
+        "Generate reports",
+        "Answer questions",
+        "Summarize documents"
+      ]
+    },
+    "waris-gis": {
+      "command": "python",
+      "args": ["-m", "mcp_servers.gis"],
+      "description": "MCP server for GIS data access",
+      "env": {
+        "GIS_API_URL": "${GIS_API_URL}"
+      },
+      "capabilities": [
+        "Access pipeline maps",
+        "Get DMA boundaries",
+        "Retrieve asset locations",
+        "Query spatial data"
+      ]
+    },
+    "waris-notifications": {
+      "command": "node",
+      "args": ["mcp-servers/notifications/index.js"],
+      "description": "MCP server for alert and notification management",
+      "env": {
+        "NOTIFICATION_SERVICE_URL": "${NOTIFICATION_SERVICE_URL}"
+      },
+      "capabilities": [
+        "Send alerts",
+        "Manage notification preferences",
+        "Track alert history",
+        "Configure thresholds"
+      ]
+    },
+    "waris-reports": {
+      "command": "python",
+      "args": ["-m", "mcp_servers.reports"],
+      "description": "MCP server for report generation",
+      "env": {
+        "REPORT_TEMPLATE_PATH": "${REPORT_TEMPLATE_PATH}"
+      },
+      "capabilities": [
+        "Generate daily reports",
+        "Create executive summaries",
+        "Export to PDF/DOCX",
+        "Schedule automated reports"
+      ]
+    }
+  }
+}

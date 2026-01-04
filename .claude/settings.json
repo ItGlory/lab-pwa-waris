@@ -1,0 +1,31 @@
+{
+  "name": "WARIS - Water Loss Intelligent Analysis System",
+  "description": "AI-powered water loss analysis and reporting system with LLM for Provincial Waterworks Authority (กปภ.)",
+  "version": "1.0.0",
+  "language": "th,en",
+  "project": {
+    "type": "fullstack",
+    "architecture": "hybrid",
+    "stack": {
+      "frontend": ["Next.js", "React", "TailwindCSS", "shadcn/ui"],
+      "backend": ["FastAPI", "Python", "Node.js"],
+      "database": ["PostgreSQL", "MongoDB", "Milvus", "Redis"],
+      "ai_ml": ["PyTorch", "TensorFlow", "LangChain", "Ollama"],
+      "infrastructure": ["Docker", "Kubernetes", "Terraform"]
+    }
+  },
+  "directories": {
+    "frontend": "apps/web",
+    "backend": "apps/api",
+    "ai_services": "apps/ai",
+    "shared": "packages/shared",
+    "docs": "docs",
+    "infra": "infra"
+  },
+  "conventions": {
+    "commit_style": "conventional",
+    "code_style": "eslint+prettier",
+    "testing": "pytest+jest",
+    "documentation": "markdown"
+  }
+}

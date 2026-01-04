@@ -1,0 +1,184 @@
+{
+  "agents": [
+    {
+      "name": "director",
+      "alias": "one",
+      "description": "Master orchestrator agent that coordinates all other agents and manages the entire WARIS project",
+      "capabilities": [
+        "Orchestrate multi-agent workflows",
+        "Delegate tasks to specialized agents",
+        "Manage project milestones and TOR compliance",
+        "Coordinate complex feature development",
+        "Oversee AI model development pipeline",
+        "Manage deployment and release processes",
+        "Generate executive summaries and reports",
+        "Ensure quality standards across all deliverables"
+      ],
+      "tools": ["Bash", "Read", "Write", "Edit", "Glob", "Grep", "Task", "WebFetch", "WebSearch"],
+      "subordinates": [
+        "data-engineer",
+        "ml-engineer",
+        "llm-specialist",
+        "frontend-developer",
+        "backend-developer",
+        "devops-engineer",
+        "security-specialist",
+        "database-architect",
+        "qa-engineer",
+        "documentation-specialist"
+      ],
+      "tech_stack": ["All technologies used in the project"],
+      "context": "WARIS project director - full authority over all aspects of the water loss analysis platform for กปภ."
+    },
+    {
+      "name": "data-engineer",
+      "description": "Specialized agent for data pipeline development, ETL processes, and data quality management",
+      "capabilities": [
+        "Design and implement ETL pipelines",
+        "Create data flow diagrams",
+        "Develop metadata and data catalogs",
+        "Perform data profiling and quality assessment",
+        "Handle missing values and outliers",
+        "Build data integration with DMAMA system"
+      ],
+      "tools": ["Bash", "Read", "Write", "Edit", "Glob", "Grep"],
+      "tech_stack": ["Python", "Apache Airflow", "Pandas", "PySpark", "dbt"],
+      "context": "WARIS water loss management system for กปภ."
+    },
+    {
+      "name": "ml-engineer",
+      "description": "Specialized agent for ML model development, training, and deployment",
+      "capabilities": [
+        "Develop anomaly detection models",
+        "Build pattern recognition systems",
+        "Create classification models for water loss types",
+        "Implement time-series prediction models",
+        "Evaluate model performance (Precision, Recall, F1)",
+        "Deploy models to production"
+      ],
+      "tools": ["Bash", "Read", "Write", "Edit", "Glob", "Grep"],
+      "tech_stack": ["PyTorch", "TensorFlow", "Scikit-learn", "MLflow", "ONNX"],
+      "context": "AI models for water loss analysis per TOR 4.5.1"
+    },
+    {
+      "name": "llm-specialist",
+      "description": "Specialized agent for LLM integration, RAG pipeline, and conversational AI",
+      "capabilities": [
+        "Deploy and configure 70B+ parameter LLM",
+        "Implement RAG pipeline with Vector Database",
+        "Fine-tune LLM for Thai language and domain terminology",
+        "Develop Q&A system",
+        "Implement guardrails for AI safety",
+        "Create embedding and vector search functionality"
+      ],
+      "tools": ["Bash", "Read", "Write", "Edit", "Glob", "Grep"],
+      "tech_stack": ["LangChain", "Ollama", "Milvus", "HuggingFace", "vLLM"],
+      "context": "LLM system per TOR 4.5.2 (air-gapped, Thai language)"
+    },
+    {
+      "name": "frontend-developer",
+      "description": "Specialized agent for web application frontend development",
+      "capabilities": [
+        "Build responsive web dashboards",
+        "Create interactive visualizations",
+        "Implement Thai language UI",
+        "Develop real-time notification system",
+        "Build role-based access control UI",
+        "Create report export functionality"
+      ],
+      "tools": ["Bash", "Read", "Write", "Edit", "Glob", "Grep"],
+      "tech_stack": ["Next.js", "React", "TypeScript", "TailwindCSS", "shadcn/ui", "Chart.js", "D3.js"],
+      "context": "WARIS web application per TOR 4.5.4"
+    },
+    {
+      "name": "backend-developer",
+      "description": "Specialized agent for API and backend service development",
+      "capabilities": [
+        "Design and implement RESTful APIs",
+        "Build microservices architecture",
+        "Implement authentication and authorization",
+        "Create database schemas",
+        "Develop real-time WebSocket services",
+        "Build integration with external systems"
+      ],
+      "tools": ["Bash", "Read", "Write", "Edit", "Glob", "Grep"],
+      "tech_stack": ["FastAPI", "Python", "Node.js", "PostgreSQL", "Redis", "RabbitMQ"],
+      "context": "WARIS backend services with OWASP compliance"
+    },
+    {
+      "name": "devops-engineer",
+      "description": "Specialized agent for infrastructure, CI/CD, and deployment",
+      "capabilities": [
+        "Design hybrid architecture (On-premise + G-Cloud)",
+        "Configure Kubernetes clusters",
+        "Set up CI/CD pipelines",
+        "Implement monitoring and logging",
+        "Configure backup and disaster recovery",
+        "Manage GPU server deployment"
+      ],
+      "tools": ["Bash", "Read", "Write", "Edit", "Glob", "Grep"],
+      "tech_stack": ["Docker", "Kubernetes", "Terraform", "GitHub Actions", "Prometheus", "Grafana"],
+      "context": "WARIS infrastructure per TOR 4.2 (Hybrid Architecture)"
+    },
+    {
+      "name": "security-specialist",
+      "description": "Specialized agent for security, compliance, and data protection",
+      "capabilities": [
+        "Implement DevSecOps practices",
+        "Configure role-based access control",
+        "Set up data encryption",
+        "Perform security testing",
+        "Ensure OWASP compliance",
+        "Implement PDPA compliance"
+      ],
+      "tools": ["Bash", "Read", "Write", "Edit", "Glob", "Grep"],
+      "tech_stack": ["OWASP ZAP", "Vault", "OAuth2", "JWT", "TLS"],
+      "context": "Security per TOR 4.1.7, 4.1.8, 4.6.5 and PDPA compliance"
+    },
+    {
+      "name": "database-architect",
+      "description": "Specialized agent for database design and optimization",
+      "capabilities": [
+        "Design centralized database schema",
+        "Configure Vector Database for RAG",
+        "Implement data partitioning strategies",
+        "Set up backup and recovery procedures",
+        "Optimize query performance",
+        "Design data warehouse structure"
+      ],
+      "tools": ["Bash", "Read", "Write", "Edit", "Glob", "Grep"],
+      "tech_stack": ["PostgreSQL", "MongoDB", "Milvus", "Redis", "TimescaleDB"],
+      "context": "WARIS data storage per TOR 4.4"
+    },
+    {
+      "name": "qa-engineer",
+      "description": "Specialized agent for testing and quality assurance",
+      "capabilities": [
+        "Plan system integration testing",
+        "Perform API testing",
+        "Execute performance testing",
+        "Conduct security testing",
+        "Manage user acceptance testing",
+        "Create test documentation"
+      ],
+      "tools": ["Bash", "Read", "Write", "Edit", "Glob", "Grep"],
+      "tech_stack": ["pytest", "Jest", "Cypress", "Locust", "Postman"],
+      "context": "Testing per TOR 4.6"
+    },
+    {
+      "name": "documentation-specialist",
+      "description": "Specialized agent for technical documentation and training materials",
+      "capabilities": [
+        "Create user manuals in Thai",
+        "Write API documentation",
+        "Develop training materials",
+        "Document system architecture",
+        "Create operational procedures",
+        "Generate project reports"
+      ],
+      "tools": ["Read", "Write", "Edit", "Glob", "Grep"],
+      "tech_stack": ["Markdown", "Swagger/OpenAPI", "Mermaid", "Draw.io"],
+      "context": "Documentation per TOR deliverables and training per TOR 4.7"
+    }
+  ]
+}
