@@ -80,40 +80,46 @@ mea-waris/
 │   ├── skills/                # Slash commands (/one, /analyze, etc.)
 │   ├── agents/                # Specialized agents
 │   └── mcp/                   # MCP server configs
-├── apps/
-│   ├── web/                   # Next.js frontend (apps/web)
-│   │   ├── app/              # App router pages
-│   │   ├── components/       # React components
-│   │   ├── hooks/            # Custom hooks
-│   │   ├── lib/              # Utilities
-│   │   └── stores/           # State management
-│   ├── api/                   # FastAPI backend (apps/api)
-│   │   ├── routers/          # API routes
-│   │   ├── services/         # Business logic
-│   │   ├── models/           # Pydantic models
-│   │   ├── schemas/          # Database schemas
-│   │   └── core/             # Config, security
-│   └── ai/                    # AI services (apps/ai)
-│       ├── models/           # ML models
-│       ├── inference/        # Inference services
-│       ├── training/         # Training pipelines
-│       └── rag/              # RAG pipeline
-├── packages/
-│   └── shared/               # Shared types, utils
-│       ├── types/            # TypeScript types
-│       └── utils/            # Common utilities
-├── infra/
-│   ├── docker/               # Dockerfiles
-│   ├── kubernetes/           # K8s manifests
-│   └── terraform/            # IaC
-├── docs/                      # Documentation
-│   ├── project-management/   # PM docs
-│   ├── architecture/         # Architecture
-│   ├── api/                  # API specs
-│   ├── database/             # DB design
-│   ├── ai-ml/                # AI/ML docs
-│   └── security/             # Security
-└── scripts/                   # Build/deploy scripts
+├── platform/                   # ALL CODE AND DEVELOPMENT HERE
+│   ├── apps/
+│   │   ├── web/              # Next.js 16 frontend
+│   │   │   ├── app/          # App router pages
+│   │   │   ├── components/   # React 19.2 components
+│   │   │   ├── hooks/        # Custom hooks
+│   │   │   ├── lib/          # Utilities
+│   │   │   └── stores/       # State management
+│   │   ├── api/              # FastAPI backend
+│   │   │   ├── routers/      # API routes
+│   │   │   ├── services/     # Business logic
+│   │   │   ├── models/       # Pydantic models
+│   │   │   ├── schemas/      # Database schemas
+│   │   │   └── core/         # Config, security
+│   │   └── ai/               # AI/ML services
+│   │       ├── models/       # ML models
+│   │       ├── inference/    # Inference services
+│   │       ├── training/     # Training pipelines
+│   │       ├── rag/          # RAG pipeline
+│   │       └── notebooks/    # Jupyter notebooks
+│   ├── packages/
+│   │   └── shared/           # Shared types, utils
+│   │       ├── types/        # TypeScript types
+│   │       └── utils/        # Common utilities
+│   ├── mcp-servers/          # MCP server implementations
+│   ├── infra/
+│   │   ├── docker/           # Docker Compose, Dockerfiles
+│   │   ├── kubernetes/       # K8s manifests
+│   │   └── terraform/        # Infrastructure as Code
+│   ├── scripts/              # Build/deploy scripts
+│   ├── package.json          # Monorepo root (Turborepo)
+│   ├── turbo.json            # Turborepo config
+│   └── .env.example          # Environment template
+└── docs/                      # Documentation (outside platform)
+    ├── project-management/   # PM docs
+    ├── architecture/         # Architecture
+    ├── api/                  # API specs
+    ├── database/             # DB design
+    ├── ai-ml/                # AI/ML docs
+    └── security/             # Security
 ```
 
 ---
@@ -255,47 +261,47 @@ git checkout -b feature/WARIS-XXX-feature-name
 ### Component Development (Frontend)
 ```bash
 # 1. Create component file
-apps/web/components/dashboard/water-loss-card.tsx
+platform/apps/web/components/dashboard/water-loss-card.tsx
 
 # 2. Create types
-packages/shared/types/water-loss.ts
+platform/packages/shared/types/water-loss.ts
 
 # 3. Create hook if needed
-apps/web/hooks/use-water-loss.ts
+platform/apps/web/hooks/use-water-loss.ts
 
 # 4. Add to Storybook (if visual component)
-apps/web/stories/water-loss-card.stories.tsx
+platform/apps/web/stories/water-loss-card.stories.tsx
 ```
 
 ### API Development (Backend)
 ```bash
 # 1. Define schema
-apps/api/schemas/water_loss.py
+platform/apps/api/schemas/water_loss.py
 
 # 2. Create Pydantic models
-apps/api/models/water_loss.py
+platform/apps/api/models/water_loss.py
 
 # 3. Implement service
-apps/api/services/water_loss_service.py
+platform/apps/api/services/water_loss_service.py
 
 # 4. Create router
-apps/api/routers/water_loss.py
+platform/apps/api/routers/water_loss.py
 
 # 5. Write tests
-apps/api/tests/test_water_loss.py
+platform/apps/api/tests/test_water_loss.py
 ```
 
 ### AI Model Development
 ```bash
 # 1. Document approach in docs/ai-ml/
 # 2. Create notebook for exploration
-apps/ai/notebooks/anomaly_detection_exploration.ipynb
+platform/apps/ai/notebooks/anomaly_detection_exploration.ipynb
 
 # 3. Implement training pipeline
-apps/ai/training/anomaly_detection/
+platform/apps/ai/training/anomaly_detection/
 
 # 4. Create inference service
-apps/ai/inference/anomaly_detection_service.py
+platform/apps/ai/inference/anomaly_detection_service.py
 
 # 5. Register in MLflow
 # 6. Write evaluation tests
@@ -402,13 +408,15 @@ JWT_SECRET=your-secret-key
 ## Common Commands
 
 ```bash
-# Development
-npm run dev              # Start frontend dev server
-uvicorn main:app --reload  # Start backend dev server
+# Development (from platform/ directory)
+cd platform
+npm run dev              # Start all services via Turborepo
+npm run dev:web          # Start frontend only
+npm run dev:api          # Start backend only
 
 # Testing
-npm test                 # Frontend tests
-pytest                   # Backend tests
+npm test                 # All tests via Turborepo
+pytest apps/api/         # Backend tests
 pytest apps/ai/tests/    # AI tests
 
 # Linting
@@ -423,9 +431,10 @@ mypy apps/api/           # Backend types
 alembic upgrade head     # Run migrations
 alembic revision -m "msg" # Create migration
 
-# Docker
+# Docker (from platform/infra/docker/)
 docker-compose up -d     # Start all services
 docker-compose logs -f   # View logs
+docker-compose down      # Stop all services
 ```
 
 ---

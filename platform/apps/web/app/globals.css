@@ -1,0 +1,52 @@
+/* TailwindCSS 4.0 - CSS-first configuration */
+@import "tailwindcss";
+
+/* Thai font support */
+@theme {
+  --font-sans: "Noto Sans Thai", "Inter", system-ui, sans-serif;
+
+  /* WARIS Brand Colors */
+  --color-primary: #0066cc;
+  --color-primary-dark: #004d99;
+  --color-secondary: #00a86b;
+  --color-accent: #ffc107;
+  --color-danger: #dc3545;
+  --color-warning: #fd7e14;
+  --color-success: #28a745;
+
+  /* Water-themed colors */
+  --color-water-light: #e3f2fd;
+  --color-water: #2196f3;
+  --color-water-dark: #1565c0;
+}
+
+/* Base styles */
+@layer base {
+  html {
+    font-family: var(--font-sans);
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
+
+  /* Thai number formatting */
+  .thai-number {
+    font-feature-settings: "tnum";
+  }
+}
+
+/* Component styles */
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6;
+  }
+
+  .dashboard-widget {
+    @apply card hover:shadow-md transition-shadow;
+  }
+}
