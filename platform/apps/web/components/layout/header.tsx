@@ -28,12 +28,12 @@ export function Header({ alertCount = 0, onMenuClick }: HeaderProps) {
   }, []);
 
   return (
-    <header className="flex h-14 items-center justify-between border-b bg-card px-3 sm:h-16 sm:px-4 lg:px-6">
+    <header className="relative flex h-14 items-center justify-between border-b bg-white px-3 sm:h-16 sm:px-4 lg:px-6">
       {/* Mobile Search Overlay */}
       {mobileSearchOpen && (
-        <div className="absolute inset-x-0 top-0 z-50 flex h-14 items-center gap-2 border-b bg-card px-3 sm:hidden">
+        <div className="absolute inset-x-0 top-0 z-50 flex h-14 items-center gap-2 border-b bg-white px-3 sm:hidden">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <Input
               type="search"
               placeholder="ค้นหา DMA, รายงาน..."
@@ -74,7 +74,7 @@ export function Header({ alertCount = 0, onMenuClick }: HeaderProps) {
 
         {/* Desktop Search */}
         <div className="relative hidden sm:block">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
             type="search"
             placeholder="ค้นหา DMA, รายงาน..."
@@ -142,8 +142,8 @@ export function Header({ alertCount = 0, onMenuClick }: HeaderProps) {
             <AvatarFallback>สช</AvatarFallback>
           </Avatar>
           <div className="hidden flex-col md:flex">
-            <span className="text-sm font-medium">สมชาย ใจดี</span>
-            <span className="text-xs text-muted-foreground">ผู้ดูแลระบบ</span>
+            <span className="text-sm font-medium text-slate-900">สมชาย ใจดี</span>
+            <span className="text-xs text-slate-500">ผู้ดูแลระบบ</span>
           </div>
         </div>
       </div>
