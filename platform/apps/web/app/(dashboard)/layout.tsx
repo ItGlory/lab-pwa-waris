@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
+import { FloatingChat } from '@/components/chat/floating-chat';
 import { useAlerts } from '@/hooks/use-alerts';
 
 export default function DashboardLayout({
@@ -50,6 +51,9 @@ export default function DashboardLayout({
           {children}
         </main>
       </div>
+
+      {/* Floating Chat Widget */}
+      <FloatingChat />
     </div>
   );
 }
