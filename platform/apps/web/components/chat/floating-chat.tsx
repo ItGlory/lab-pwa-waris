@@ -137,14 +137,14 @@ export function FloatingChat() {
 
   if (!isOpen) {
     return (
-      <Button
+      <button
+        type="button"
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full bg-primary shadow-lg hover:bg-primary/90 hover:scale-105 transition-transform sm:bottom-6 sm:right-6 sm:h-14 sm:w-14"
-        size="icon"
+        className="fixed bottom-4 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 hover:scale-105 transition-all sm:bottom-6 sm:right-6 sm:h-14 sm:w-14"
       >
         <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6" />
         <span className="sr-only">เปิดแชท</span>
-      </Button>
+      </button>
     );
   }
 
@@ -207,16 +207,15 @@ export function FloatingChat() {
 
             {/* Quick Prompts */}
             <div className="mt-4 flex flex-wrap justify-center gap-2">
-              {quickPrompts.map((qp, i) => (
-                <Button
-                  key={i}
-                  variant="outline"
-                  size="sm"
-                  className="h-8 text-xs"
+              {quickPrompts.map((qp) => (
+                <button
+                  key={qp.label}
+                  type="button"
+                  className="h-8 rounded-md border border-slate-300 bg-white px-3 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                   onClick={() => handleQuickPrompt(qp.prompt)}
                 >
                   {qp.label}
-                </Button>
+                </button>
               ))}
             </div>
           </div>
