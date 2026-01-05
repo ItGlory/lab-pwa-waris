@@ -1,42 +1,108 @@
 /* TailwindCSS 4.0 */
 @import "tailwindcss";
 
-/* shadcn/ui CSS Variables - Clean Professional Theme */
+/*
+ * TailwindCSS 4.0 Theme Configuration
+ * Define static theme values for Tailwind utilities
+ */
+@theme inline {
+  /* Font family */
+  --font-sans: "Noto Sans Thai", "Inter", system-ui, sans-serif;
+
+  /* Border radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  /*
+   * Colors defined with CSS variable references
+   * These use var() which resolves at runtime
+   */
+  --color-background: var(--tw-color-background);
+  --color-foreground: var(--tw-color-foreground);
+  --color-card: var(--tw-color-card);
+  --color-card-foreground: var(--tw-color-card-foreground);
+  --color-popover: var(--tw-color-popover);
+  --color-popover-foreground: var(--tw-color-popover-foreground);
+  --color-primary: var(--tw-color-primary);
+  --color-primary-foreground: var(--tw-color-primary-foreground);
+  --color-secondary: var(--tw-color-secondary);
+  --color-secondary-foreground: var(--tw-color-secondary-foreground);
+  --color-muted: var(--tw-color-muted);
+  --color-muted-foreground: var(--tw-color-muted-foreground);
+  --color-accent: var(--tw-color-accent);
+  --color-accent-foreground: var(--tw-color-accent-foreground);
+  --color-destructive: var(--tw-color-destructive);
+  --color-destructive-foreground: var(--tw-color-destructive-foreground);
+  --color-border: var(--tw-color-border);
+  --color-input: var(--tw-color-input);
+  --color-ring: var(--tw-color-ring);
+
+  /* Chart colors */
+  --color-chart-1: var(--tw-color-chart-1);
+  --color-chart-2: var(--tw-color-chart-2);
+  --color-chart-3: var(--tw-color-chart-3);
+  --color-chart-4: var(--tw-color-chart-4);
+  --color-chart-5: var(--tw-color-chart-5);
+}
+
+/*
+ * Runtime color values using CSS custom properties
+ * These are the actual color definitions that change with theme
+ */
 :root {
   --font-sans: "Noto Sans Thai", "Inter", system-ui, sans-serif;
 
-  /* Light Mode - High contrast */
+  /* Light Mode Colors - Actual HSL values resolved at runtime */
+  --tw-color-background: hsl(0 0% 100%);
+  --tw-color-foreground: hsl(222 47% 11%);
+  --tw-color-card: hsl(0 0% 100%);
+  --tw-color-card-foreground: hsl(222 47% 11%);
+  --tw-color-popover: hsl(0 0% 100%);
+  --tw-color-popover-foreground: hsl(222 47% 11%);
+  --tw-color-primary: hsl(221 83% 53%);
+  --tw-color-primary-foreground: hsl(210 40% 98%);
+  --tw-color-secondary: hsl(210 40% 96%);
+  --tw-color-secondary-foreground: hsl(222 47% 11%);
+  --tw-color-muted: hsl(210 40% 96%);
+  --tw-color-muted-foreground: hsl(215 16% 47%);
+  --tw-color-accent: hsl(210 40% 96%);
+  --tw-color-accent-foreground: hsl(222 47% 11%);
+  --tw-color-destructive: hsl(0 84% 60%);
+  --tw-color-destructive-foreground: hsl(0 0% 100%);
+  --tw-color-border: hsl(214 32% 85%);
+  --tw-color-input: hsl(214 32% 85%);
+  --tw-color-ring: hsl(221 83% 53%);
+
+  /* Chart colors */
+  --tw-color-chart-1: hsl(221 83% 53%);
+  --tw-color-chart-2: hsl(142 71% 45%);
+  --tw-color-chart-3: hsl(38 92% 50%);
+  --tw-color-chart-4: hsl(0 84% 60%);
+  --tw-color-chart-5: hsl(262 83% 58%);
+
+  /* Legacy variables for backwards compatibility */
   --background: 0 0% 100%;
   --foreground: 222 47% 11%;
-
   --card: 0 0% 100%;
   --card-foreground: 222 47% 11%;
-
   --popover: 0 0% 100%;
   --popover-foreground: 222 47% 11%;
-
   --primary: 221 83% 53%;
   --primary-foreground: 210 40% 98%;
-
   --secondary: 210 40% 96%;
   --secondary-foreground: 222 47% 11%;
-
   --muted: 210 40% 96%;
-  --muted-foreground: 215 16% 35%;
-
+  --muted-foreground: 215 16% 47%;
   --accent: 210 40% 96%;
   --accent-foreground: 222 47% 11%;
-
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-
   --border: 214 32% 85%;
   --input: 214 32% 85%;
   --ring: 221 83% 53%;
-
   --radius: 0.5rem;
-
-  /* Chart colors */
   --chart-1: 221 83% 53%;
   --chart-2: 142 71% 45%;
   --chart-3: 38 92% 50%;
@@ -45,36 +111,54 @@
 }
 
 .dark {
-  /* Dark Mode - Dark slate background */
+  /* Dark Mode Colors */
+  --tw-color-background: hsl(224 71% 4%);
+  --tw-color-foreground: hsl(213 31% 91%);
+  --tw-color-card: hsl(224 71% 4%);
+  --tw-color-card-foreground: hsl(213 31% 91%);
+  --tw-color-popover: hsl(224 71% 4%);
+  --tw-color-popover-foreground: hsl(213 31% 91%);
+  --tw-color-primary: hsl(220 90% 56%);
+  --tw-color-primary-foreground: hsl(0 0% 100%);
+  --tw-color-secondary: hsl(215 28% 17%);
+  --tw-color-secondary-foreground: hsl(213 31% 91%);
+  --tw-color-muted: hsl(215 28% 17%);
+  --tw-color-muted-foreground: hsl(215 20% 65%);
+  --tw-color-accent: hsl(215 28% 17%);
+  --tw-color-accent-foreground: hsl(213 31% 91%);
+  --tw-color-destructive: hsl(0 63% 31%);
+  --tw-color-destructive-foreground: hsl(0 0% 100%);
+  --tw-color-border: hsl(215 28% 17%);
+  --tw-color-input: hsl(215 28% 17%);
+  --tw-color-ring: hsl(220 90% 56%);
+
+  /* Chart colors - brighter for dark mode */
+  --tw-color-chart-1: hsl(220 90% 60%);
+  --tw-color-chart-2: hsl(160 60% 55%);
+  --tw-color-chart-3: hsl(30 80% 60%);
+  --tw-color-chart-4: hsl(0 70% 60%);
+  --tw-color-chart-5: hsl(270 60% 60%);
+
+  /* Legacy variables */
   --background: 224 71% 4%;
   --foreground: 213 31% 91%;
-
   --card: 224 71% 4%;
   --card-foreground: 213 31% 91%;
-
   --popover: 224 71% 4%;
   --popover-foreground: 213 31% 91%;
-
   --primary: 220 90% 56%;
   --primary-foreground: 0 0% 100%;
-
   --secondary: 215 28% 17%;
   --secondary-foreground: 213 31% 91%;
-
   --muted: 215 28% 17%;
   --muted-foreground: 215 20% 65%;
-
   --accent: 215 28% 17%;
   --accent-foreground: 213 31% 91%;
-
   --destructive: 0 63% 31%;
   --destructive-foreground: 0 0% 100%;
-
   --border: 215 28% 17%;
   --input: 215 28% 17%;
   --ring: 220 90% 56%;
-
-  /* Chart colors - brighter for dark mode */
   --chart-1: 220 90% 60%;
   --chart-2: 160 60% 55%;
   --chart-3: 30 80% 60%;
