@@ -7,11 +7,8 @@ const nextConfig: NextConfig = {
   // Turbopack is now stable in Next.js 16
   // No need to configure, it's the default
 
-  // Internationalization for Thai language support
-  i18n: {
-    locales: ['th', 'en'],
-    defaultLocale: 'th',
-  },
+  // Note: i18n is handled via next-intl in App Router
+  // The Pages Router i18n config is not supported in App Router
 
   // Image optimization
   images: {
@@ -26,12 +23,6 @@ const nextConfig: NextConfig = {
   // Environment variables
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
-  },
-
-  // Experimental features
-  experimental: {
-    // Enable Partial Pre-Rendering
-    ppr: true,
   },
 };
 

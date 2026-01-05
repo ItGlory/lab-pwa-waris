@@ -1,216 +1,128 @@
-/* TailwindCSS 4.0 - CSS-first configuration */
+/* TailwindCSS 4.0 */
 @import "tailwindcss";
 
-/* Thai font support */
-@theme {
+/* shadcn/ui CSS Variables - Clean Professional Theme */
+:root {
   --font-sans: "Noto Sans Thai", "Inter", system-ui, sans-serif;
 
-  /* WARIS Brand Colors */
-  --color-primary: #0066cc;
-  --color-primary-dark: #004d99;
-  --color-secondary: #00a86b;
-  --color-accent: #ffc107;
-  --color-danger: #dc3545;
-  --color-warning: #fd7e14;
-  --color-success: #28a745;
+  /* Light Mode - High contrast */
+  --background: 0 0% 100%;
+  --foreground: 222 47% 11%;
 
-  /* Water-themed colors */
-  --color-water-light: #e3f2fd;
-  --color-water: #2196f3;
-  --color-water-dark: #1565c0;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+
+  --primary: 221 83% 53%;
+  --primary-foreground: 210 40% 98%;
+
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222 47% 11%;
+
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 35%;
+
+  --accent: 210 40% 96%;
+  --accent-foreground: 222 47% 11%;
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 214 32% 85%;
+  --input: 214 32% 85%;
+  --ring: 221 83% 53%;
+
+  --radius: 0.5rem;
+
+  /* Chart colors */
+  --chart-1: 221 83% 53%;
+  --chart-2: 142 71% 45%;
+  --chart-3: 38 92% 50%;
+  --chart-4: 0 84% 60%;
+  --chart-5: 262 83% 58%;
 }
 
-/* shadcn/ui CSS Variables */
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 210 100% 40%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 210 100% 40%;
-    --radius: 0.5rem;
-    --chart-1: 210 100% 40%;
-    --chart-2: 152 76% 36%;
-    --chart-3: 45 93% 47%;
-    --chart-4: 0 84% 60%;
-    --chart-5: 210 40% 60%;
-  }
+.dark {
+  /* Dark Mode - Dark slate background */
+  --background: 224 71% 4%;
+  --foreground: 213 31% 91%;
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 100% 50%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 210 100% 50%;
-    --chart-1: 210 100% 60%;
-    --chart-2: 152 76% 46%;
-    --chart-3: 45 93% 57%;
-    --chart-4: 0 84% 70%;
-    --chart-5: 210 40% 70%;
-  }
+  --card: 224 71% 4%;
+  --card-foreground: 213 31% 91%;
+
+  --popover: 224 71% 4%;
+  --popover-foreground: 213 31% 91%;
+
+  --primary: 220 90% 56%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 215 28% 17%;
+  --secondary-foreground: 213 31% 91%;
+
+  --muted: 215 28% 17%;
+  --muted-foreground: 215 20% 65%;
+
+  --accent: 215 28% 17%;
+  --accent-foreground: 213 31% 91%;
+
+  --destructive: 0 63% 31%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 215 28% 17%;
+  --input: 215 28% 17%;
+  --ring: 220 90% 56%;
+
+  /* Chart colors - brighter for dark mode */
+  --chart-1: 220 90% 60%;
+  --chart-2: 160 60% 55%;
+  --chart-3: 30 80% 60%;
+  --chart-4: 0 70% 60%;
+  --chart-5: 270 60% 60%;
 }
 
 /* Base styles */
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  html {
-    font-family: var(--font-sans);
-  }
-
-  body {
-    @apply bg-background text-foreground antialiased;
-  }
-
-  /* Thai number formatting */
-  .thai-number {
-    font-feature-settings: "tnum";
-  }
+* {
+  border-color: hsl(var(--border));
 }
 
-/* Status colors for water loss indicators */
-@layer utilities {
-  .status-normal {
-    @apply text-green-600 dark:text-green-400;
-  }
-
-  .status-warning {
-    @apply text-yellow-600 dark:text-yellow-400;
-  }
-
-  .status-critical {
-    @apply text-red-600 dark:text-red-400;
-  }
-
-  .bg-status-normal {
-    @apply bg-green-100 dark:bg-green-900/30;
-  }
-
-  .bg-status-warning {
-    @apply bg-yellow-100 dark:bg-yellow-900/30;
-  }
-
-  .bg-status-critical {
-    @apply bg-red-100 dark:bg-red-900/30;
-  }
+html {
+  font-family: var(--font-sans);
 }
 
-/* Component styles */
-@layer components {
-  .btn-primary {
-    @apply bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors;
-  }
-
-  .card-waris {
-    @apply bg-card rounded-xl shadow-sm border border-border p-6;
-  }
-
-  .dashboard-widget {
-    @apply card-waris hover:shadow-md transition-shadow;
-  }
-
-  /* KPI Card specific styles */
-  .kpi-value {
-    @apply text-3xl font-bold tracking-tight thai-number;
-  }
-
-  .kpi-label {
-    @apply text-sm text-muted-foreground;
-  }
-
-  .kpi-trend-up {
-    @apply text-green-600 dark:text-green-400;
-  }
-
-  .kpi-trend-down {
-    @apply text-red-600 dark:text-red-400;
-  }
-
-  /* Sidebar styles */
-  .sidebar-item {
-    @apply flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors;
-  }
-
-  .sidebar-item-active {
-    @apply bg-accent text-accent-foreground font-medium;
-  }
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Leaflet map fixes for dark mode */
-.dark .leaflet-tile-pane {
-  filter: brightness(0.8) contrast(1.1) saturate(0.9);
-}
-
-.dark .leaflet-popup-content-wrapper,
-.dark .leaflet-popup-tip {
-  background-color: hsl(var(--card));
-  color: hsl(var(--card-foreground));
-}
-
-/* Chart tooltip styles */
-.recharts-tooltip-wrapper {
-  outline: none !important;
-}
-
-.recharts-default-tooltip {
-  background-color: hsl(var(--popover)) !important;
-  border-color: hsl(var(--border)) !important;
-  border-radius: 0.5rem !important;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+/* Thai number formatting */
+.thai-number {
+  font-feature-settings: "tnum";
 }
 
 /* Scrollbar styles */
-@layer utilities {
-  .scrollbar-thin {
-    scrollbar-width: thin;
-    scrollbar-color: hsl(var(--muted)) transparent;
-  }
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+}
 
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
 
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: transparent;
-  }
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
 
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: hsl(var(--muted));
-    border-radius: 4px;
-  }
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 3px;
+}
 
-  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background-color: hsl(var(--muted-foreground));
-  }
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--muted-foreground) / 0.5);
 }

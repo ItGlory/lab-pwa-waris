@@ -44,7 +44,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="th" suppressHydrationWarning>
+    <html lang="th" className="light" suppressHydrationWarning>
       <body
         className={`${notoSansThai.variable} ${inter.variable} font-sans antialiased`}
       >
