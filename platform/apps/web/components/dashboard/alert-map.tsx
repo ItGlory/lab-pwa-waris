@@ -138,15 +138,26 @@ export function AlertMap({
     );
   }
 
-  // Thailand center coordinates
-  const center: [number, number] = [13.7563, 100.5018];
+  // Thailand bounds and center
+  // Thailand approximately spans: lat 5.6°N to 20.5°N, lng 97.3°E to 105.6°E
+  const thailandBounds: [[number, number], [number, number]] = [
+    [5.0, 96.5],   // Southwest corner (with padding)
+    [21.0, 106.5], // Northeast corner (with padding)
+  ];
+  const center: [number, number] = [13.2, 101.0]; // Center of Thailand
   const zoom = 6;
+  const minZoom = 5;
+  const maxZoom = 18;
 
   return (
     <div className={`relative overflow-hidden rounded-lg border border-slate-200 ${className}`} style={{ height }}>
       <MapContainer
         center={center}
         zoom={zoom}
+        minZoom={minZoom}
+        maxZoom={maxZoom}
+        maxBounds={thailandBounds}
+        maxBoundsViscosity={1.0}
         style={{ height: '100%', width: '100%' }}
         scrollWheelZoom={true}
       >
