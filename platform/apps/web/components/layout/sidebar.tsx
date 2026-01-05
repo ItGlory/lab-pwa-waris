@@ -90,7 +90,7 @@ export function Sidebar({ collapsed = false, onCollapse, alertCount = 0, onNavig
   return (
     <aside
       className={cn(
-        'relative flex h-screen flex-col border-r bg-card transition-all duration-300',
+        'relative flex h-screen flex-col border-r bg-white transition-all duration-300',
         collapsed ? 'w-16' : 'w-64'
       )}
     >
