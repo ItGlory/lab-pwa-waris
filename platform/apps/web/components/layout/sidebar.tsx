@@ -95,15 +95,18 @@ export function Sidebar({ collapsed = false, onCollapse, alertCount = 0, onNavig
       )}
     >
       {/* Logo */}
-      <div className="flex h-16 items-center justify-center border-b px-4">
+      <div className={cn(
+        "flex h-16 items-center border-b px-4",
+        collapsed ? "justify-center" : "justify-start"
+      )}>
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white">
             <Droplets className="h-5 w-5" />
           </div>
           {!collapsed && (
-            <div className="flex flex-col">
-              <span className="text-lg font-bold text-primary">WARIS</span>
-              <span className="text-[10px] text-muted-foreground">กปภ.</span>
+            <div className="flex flex-col text-left">
+              <span className="text-lg font-bold text-blue-600">WARIS</span>
+              <span className="text-[10px] text-slate-500">กปภ.</span>
             </div>
           )}
         </Link>
