@@ -28,7 +28,7 @@
     "dx:doctor": "node scripts/dx-doctor.js"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.6.0",
+    "@commitlint/cli": "^20.3.0",
     "@commitlint/config-conventional": "^19.6.0",
     "@eslint/js": "^9.17.0",
     "@next/eslint-plugin-next": "^16.0.0",
