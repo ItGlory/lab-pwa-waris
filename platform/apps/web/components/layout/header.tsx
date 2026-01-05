@@ -1,10 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import { Bell, Search, Sun, Moon, Menu, X } from 'lucide-react';
+import { Bell, Search, Sun, Moon, Menu } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Tooltip,
   TooltipContent,
@@ -16,41 +15,32 @@ import { Separator } from '@/components/ui/separator';
 interface HeaderProps {
   alertCount?: number;
   onMenuClick?: () => void;
+  onSearchClick?: () => void;
 }
 
-export function Header({ alertCount = 0, onMenuClick }: HeaderProps) {
+export function Header({ alertCount = 0, onMenuClick, onSearchClick }: HeaderProps) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
-  const [mobileSearchOpen, setMobileSearchOpen] = React.useState(false);
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Trigger command palette with keyboard shortcut
+  const handleSearchClick = () => {
+    // Dispatch keyboard event to trigger command palette
+    const event = new KeyboardEvent('keydown', {
+      key: 'k',
+      metaKey: true,
+      ctrlKey: true,
+      bubbles: true,
+    });
+    document.dispatchEvent(event);
+    onSearchClick?.();
+  };
+
   return (
     <header className="relative flex h-14 items-center justify-between border-b bg-white px-3 sm:h-16 sm:px-4 lg:px-6">
-      {/* Mobile Search Overlay */}
-      {mobileSearchOpen && (
-        <div className="absolute inset-x-0 top-0 z-50 flex h-14 items-center gap-2 border-b bg-white px-3 sm:hidden">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input
-              type="search"
-              placeholder="ค้นหา DMA, รายงาน..."
-              className="w-full pl-9"
-              autoFocus
-            />
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setMobileSearchOpen(false)}
-          >
-            <X className="h-5 w-5" />
-          </Button>
-        </div>
-      )}
-
       {/* Left: Mobile menu + Search */}
       <div className="flex items-center gap-2 sm:gap-4">
         <Button
@@ -67,20 +57,23 @@ export function Header({ alertCount = 0, onMenuClick }: HeaderProps) {
           variant="ghost"
           size="icon"
           className="h-9 w-9 sm:hidden"
-          onClick={() => setMobileSearchOpen(true)}
+          onClick={handleSearchClick}
         >
           <Search className="h-5 w-5" />
         </Button>
 
-        {/* Desktop Search */}
-        <div className="relative hidden sm:block">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <Input
-            type="search"
-            placeholder="ค้นหา DMA, รายงาน..."
-            className="w-48 pl-9 md:w-64"
-          />
-        </div>
+        {/* Desktop Search - Click to open Command Palette */}
+        <button
+          type="button"
+          onClick={handleSearchClick}
+          className="relative hidden h-9 w-48 items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 text-sm text-slate-500 transition-colors hover:border-slate-300 hover:bg-slate-100 sm:flex md:w-64"
+        >
+          <Search className="h-4 w-4" />
+          <span className="flex-1 text-left">ค้นหา...</span>
+          <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border border-slate-200 bg-white px-1.5 font-mono text-[10px] font-medium text-slate-500 sm:flex">
+            <span className="text-xs">⌘</span>K
+          </kbd>
+        </button>
       </div>
 
       {/* Right: Actions */}
