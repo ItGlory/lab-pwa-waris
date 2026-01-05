@@ -76,9 +76,10 @@ interface SidebarProps {
   collapsed?: boolean;
   onCollapse?: (collapsed: boolean) => void;
   alertCount?: number;
+  onNavigate?: () => void;
 }
 
-export function Sidebar({ collapsed = false, onCollapse, alertCount = 0 }: SidebarProps) {
+export function Sidebar({ collapsed = false, onCollapse, alertCount = 0, onNavigate }: SidebarProps) {
   const pathname = usePathname();
 
   // Update alert badge for alerts nav item
@@ -119,6 +120,7 @@ export function Sidebar({ collapsed = false, onCollapse, alertCount = 0 }: Sideb
             const linkContent = (
               <Link
                 href={item.href}
+                onClick={onNavigate}
                 className={cn(
                   'flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors',
                   isActive && 'bg-accent text-accent-foreground font-medium'
@@ -165,6 +167,7 @@ export function Sidebar({ collapsed = false, onCollapse, alertCount = 0 }: Sideb
           <TooltipTrigger asChild>
             <Link
               href="/settings"
+              onClick={onNavigate}
               className={cn(
                 'flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors',
                 pathname === '/settings' && 'bg-accent text-accent-foreground font-medium'

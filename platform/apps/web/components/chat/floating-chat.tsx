@@ -139,10 +139,10 @@ export function FloatingChat() {
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-primary shadow-lg hover:bg-primary/90 hover:scale-105 transition-transform"
+        className="fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full bg-primary shadow-lg hover:bg-primary/90 hover:scale-105 transition-transform sm:bottom-6 sm:right-6 sm:h-14 sm:w-14"
         size="icon"
       >
-        <MessageSquare className="h-6 w-6" />
+        <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6" />
         <span className="sr-only">เปิดแชท</span>
       </Button>
     );
@@ -151,10 +151,14 @@ export function FloatingChat() {
   return (
     <div
       className={cn(
-        'fixed z-50 flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl transition-all duration-300',
+        'fixed z-50 flex flex-col overflow-hidden bg-white shadow-2xl transition-all duration-300',
+        // Mobile: full screen when open
+        'inset-0 rounded-none border-0',
+        // Tablet and up: floating window
+        'sm:inset-auto sm:bottom-4 sm:right-4 sm:rounded-2xl sm:border sm:border-slate-200',
         isExpanded
-          ? 'bottom-4 right-4 left-4 top-4 sm:left-auto sm:top-auto sm:h-[600px] sm:w-[450px]'
-          : 'bottom-6 right-6 h-[500px] w-[380px]'
+          ? 'sm:left-4 sm:top-4 md:left-auto md:top-auto md:h-[600px] md:w-[450px]'
+          : 'sm:h-[450px] sm:w-[340px] md:h-[500px] md:w-[380px]'
       )}
     >
       {/* Header */}
@@ -169,10 +173,11 @@ export function FloatingChat() {
           </div>
         </div>
         <div className="flex items-center gap-1">
+          {/* Hide expand on mobile since it's already fullscreen */}
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-white/80 hover:bg-white/20 hover:text-white"
+            className="hidden h-8 w-8 text-white/80 hover:bg-white/20 hover:text-white sm:flex"
             onClick={() => setIsExpanded(!isExpanded)}
           >
             {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}

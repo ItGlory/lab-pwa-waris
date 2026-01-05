@@ -250,9 +250,9 @@ export default function DocumentsPage() {
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-10 w-32" />
         </div>
-        <div className="grid gap-4 md:grid-cols-5">
+        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="h-24" />
+            <Skeleton key={i} className="h-20 sm:h-24" />
           ))}
         </div>
         <Skeleton className="h-96" />
@@ -277,7 +277,7 @@ export default function DocumentsPage() {
       </div>
 
       {/* Folder Cards */}
-      <div className="grid gap-4 md:grid-cols-5">
+      <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {folders.map((folder) => {
           const Icon = folder.icon;
           const isSelected = selectedFolder === folder.id;
@@ -291,13 +291,13 @@ export default function DocumentsPage() {
                 setSelectedFolder(isSelected ? 'all' : folder.id)
               }
             >
-              <CardContent className="flex items-center gap-3 p-4">
-                <div className="rounded-lg bg-primary/10 p-2">
-                  <Icon className="h-5 w-5 text-primary" />
+              <CardContent className="flex items-center gap-2 p-3 sm:gap-3 sm:p-4">
+                <div className="rounded-lg bg-primary/10 p-1.5 sm:p-2">
+                  <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">{folder.name}</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="truncate text-xs sm:text-sm font-medium">{folder.name}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">
                     {folder.count} ไฟล์
                   </p>
                 </div>
