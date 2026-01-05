@@ -167,7 +167,7 @@ export function FloatingChat() {
           <div className="grid h-9 w-9 place-items-center rounded-full bg-white/20">
             <Sparkles className="h-5 w-5 text-white" />
           </div>
-          <div>
+          <div className="text-left">
             <h3 className="font-semibold text-white">WARIS AI</h3>
             <p className="text-xs text-white/80">พร้อมช่วยเหลือ</p>
           </div>
