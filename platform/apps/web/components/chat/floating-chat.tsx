@@ -162,7 +162,7 @@ export function FloatingChat() {
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between border-b bg-primary px-4 py-3">
+      <div className="flex items-center justify-between border-b bg-blue-600 px-4 py-3">
         <div className="flex items-center gap-3">
           <div className="grid h-9 w-9 place-items-center rounded-full bg-white/20">
             <Sparkles className="h-5 w-5 text-white" />
@@ -197,8 +197,8 @@ export function FloatingChat() {
       <ScrollArea className="flex-1 p-4" ref={scrollRef}>
         {messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center text-center">
-            <div className="grid h-14 w-14 place-items-center rounded-2xl bg-primary/10">
-              <Bot className="h-7 w-7 text-primary" />
+            <div className="grid h-14 w-14 place-items-center rounded-2xl bg-blue-100">
+              <Bot className="h-7 w-7 text-blue-600" />
             </div>
             <h4 className="mt-4 font-semibold text-slate-900">สวัสดีครับ!</h4>
             <p className="mt-1 text-sm text-slate-500">
@@ -230,7 +230,7 @@ export function FloatingChat() {
                   <AvatarFallback
                     className={cn(
                       'text-xs',
-                      msg.role === 'assistant' ? 'bg-primary text-white' : 'bg-slate-200'
+                      msg.role === 'assistant' ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-700'
                     )}
                   >
                     {msg.role === 'assistant' ? <Bot className="h-4 w-4" /> : <User className="h-4 w-4" />}
@@ -240,7 +240,7 @@ export function FloatingChat() {
                   className={cn(
                     'max-w-[80%] rounded-2xl px-3 py-2 text-sm',
                     msg.role === 'user'
-                      ? 'bg-primary text-white'
+                      ? 'bg-blue-600 text-white'
                       : 'bg-slate-100 text-slate-900'
                   )}
                 >
