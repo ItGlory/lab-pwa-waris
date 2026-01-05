@@ -201,7 +201,7 @@ export function FloatingChat() {
               <Bot className="h-7 w-7 text-primary" />
             </div>
             <h4 className="mt-4 font-semibold text-slate-900">สวัสดีครับ!</h4>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-1 text-sm text-slate-500">
               ถามเกี่ยวกับน้ำสูญเสียหรือ DMA ได้เลย
             </p>
 
@@ -250,7 +250,7 @@ export function FloatingChat() {
                     msg.role === 'assistant' &&
                     msg.id === messages[messages.length - 1]?.id &&
                     !msg.content && (
-                      <div className="flex items-center gap-1 text-muted-foreground">
+                      <div className="flex items-center gap-1 text-slate-500">
                         <Loader2 className="h-3 w-3 animate-spin" />
                         <span className="text-xs">กำลังพิมพ์...</span>
                       </div>
