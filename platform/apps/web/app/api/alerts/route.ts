@@ -1,6 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const alerts = [
+interface AlertData {
+  id: string;
+  dma_id: string;
+  dma_name: string;
+  type: string;
+  severity: string;
+  status: string;
+  title_th: string;
+  title_en: string;
+  description_th: string;
+  triggered_at: string;
+  acknowledged_at: string | null;
+  resolved_at: string | null;
+}
+
+const alerts: AlertData[] = [
   {
     id: 'alert-001',
     dma_id: 'dma-001',
@@ -73,15 +88,6 @@ const alerts = [
   },
 ];
 
-interface Alert {
-  id: string;
-  dma_id: string;
-  severity: string;
-  status: string;
-  triggered_at: string;
-  acknowledged_at: string | null;
-  resolved_at: string | null;
-}
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -126,7 +132,7 @@ export async function PATCH(request: NextRequest) {
   const body = await request.json();
   const { id, action } = body;
 
-  const alertIndex = alerts.findIndex((a: Alert) => a.id === id);
+  const alertIndex = alerts.findIndex((a) => a.id === id);
   if (alertIndex === -1) {
     return NextResponse.json(
       {

@@ -24,6 +24,8 @@ import { Progress } from '@/components/ui/progress';
 import { useDMA } from '@/hooks/use-dmas';
 import { formatNumber, formatPercent } from '@/lib/formatting';
 import { cn } from '@/lib/utils';
+import { WaterLossChart } from '@/components/charts/water-loss-chart';
+import { PredictionChart } from '@/components/charts/prediction-chart';
 
 function getStatusVariant(status: string): 'success' | 'warning' | 'critical' {
   switch (status) {
@@ -188,6 +190,9 @@ export default function DMADetailPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Water Loss Chart */}
+      <WaterLossChart dmaId={id} />
 
       {/* Details Grid */}
       <div className="grid gap-6 lg:grid-cols-2">
@@ -384,6 +389,9 @@ export default function DMADetailPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* AI Prediction Chart */}
+      <PredictionChart dmaId={id} />
 
       {/* Last Updated */}
       <p className="text-center text-sm text-muted-foreground">
