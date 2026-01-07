@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Bell, Search, Sun, Moon, Menu } from 'lucide-react';
+import { Bell, Search, Sun, Moon, Menu, Wifi, WifiOff } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/tooltip';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
+import { useConnectionStatus } from '@/hooks/use-connection-status';
 
 interface HeaderProps {
   alertCount?: number;
@@ -21,6 +22,7 @@ interface HeaderProps {
 export function Header({ alertCount = 0, onMenuClick, onSearchClick }: HeaderProps) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
+  const isConnected = useConnectionStatus((state) => state.isConnected);
 
   React.useEffect(() => {
     setMounted(true);
@@ -108,6 +110,22 @@ export function Header({ alertCount = 0, onMenuClick, onSearchClick }: HeaderPro
           </TooltipTrigger>
           <TooltipContent>
             {mounted && theme === 'dark' ? 'โหมดสว่าง' : 'โหมดมืด'}
+          </TooltipContent>
+        </Tooltip>
+
+        {/* Connection Status */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex h-9 w-9 items-center justify-center">
+              {isConnected ? (
+                <Wifi className="h-4 w-4 text-green-500" />
+              ) : (
+                <WifiOff className="h-4 w-4 text-slate-400" />
+              )}
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            {isConnected ? 'เชื่อมต่อแล้ว' : 'ไม่ได้เชื่อมต่อ'}
           </TooltipContent>
         </Tooltip>
 

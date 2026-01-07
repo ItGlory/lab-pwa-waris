@@ -5,6 +5,7 @@ import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from 'sonner';
+import { AuthProvider } from '@/lib/auth-context';
 
 function makeQueryClient() {
   return new QueryClient({
@@ -45,19 +46,21 @@ export function Providers({ children }: ProvidersProps) {
         enableSystem={false}
         disableTransitionOnChange
       >
-        <TooltipProvider>
-          {children}
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              classNames: {
-                toast: 'bg-background border-border',
-                title: 'text-foreground',
-                description: 'text-muted-foreground',
-              },
-            }}
-          />
-        </TooltipProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            {children}
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                classNames: {
+                  toast: 'bg-background border-border',
+                  title: 'text-foreground',
+                  description: 'text-muted-foreground',
+                },
+              }}
+            />
+          </TooltipProvider>
+        </AuthProvider>
       </NextThemesProvider>
     </QueryClientProvider>
   );

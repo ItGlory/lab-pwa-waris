@@ -23,7 +23,20 @@
       "Bash(git remote set-url:*)",
       "Bash(gh auth:*)",
       "Bash(npm run build:*)",
-      "Bash(timeout 15 npm run dev:*)"
+      "Bash(timeout 15 npm run dev:*)",
+      "Bash(npm run test:run:*)",
+      "Bash(python -c:*)",
+      "Bash(python3:*)",
+      "Bash(source .venv/bin/activate)",
+      "Bash(pip install:*)",
+      "Bash(timeout 5 uvicorn:*)",
+      "Bash(uvicorn:*)",
+      "Bash(alembic init:*)",
+      "Bash(alembic revision:*)",
+      "Bash(docker-compose:*)",
+      "Bash(docker stop:*)",
+      "Bash(docker start:*)",
+      "Bash(docker logs:*)"
     ]
   }
 }

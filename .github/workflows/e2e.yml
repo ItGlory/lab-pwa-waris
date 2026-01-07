@@ -1,0 +1,117 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Allow manual trigger
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '22'
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  e2e:
+    name: E2E Tests (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: waris
+          POSTGRES_PASSWORD: waris
+          POSTGRES_DB: waris
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: platform/package-lock.json
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install frontend dependencies
+        working-directory: platform
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: platform/apps/web
+        run: npx playwright install --with-deps chromium
+
+      - name: Install backend dependencies
+        working-directory: platform/apps/api
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio httpx
+
+      - name: Start API server
+        working-directory: platform/apps/api
+        run: |
+          uvicorn main:app --host 0.0.0.0 --port 8000 &
+          sleep 5
+        env:
+          DATABASE_URL: postgresql+asyncpg://waris:waris@localhost:5432/waris
+          REDIS_URL: redis://localhost:6379
+          SECRET_KEY: test-secret-key-for-e2e
+          CORS_ORIGINS: '["http://localhost:3000"]'
+
+      - name: Build and start frontend
+        working-directory: platform
+        run: |
+          npm run build --workspace=apps/web
+          npm run start --workspace=apps/web &
+          sleep 10
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:8000
+
+      - name: Run E2E tests
+        working-directory: platform/apps/web
+        run: npx playwright test --reporter=html
+        env:
+          BASE_URL: http://localhost:3000
+          API_URL: http://localhost:8000
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: platform/apps/web/playwright-report/
+          retention-days: 7
+
+      - name: Upload test screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-screenshots
+          path: platform/apps/web/test-results/
+          retention-days: 7

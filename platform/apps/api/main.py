@@ -59,9 +59,13 @@ async def health_check() -> dict[str, str]:
 
 
 # Import and include routers
-# from routers import dma, water_loss, reports, alerts, chat
-# app.include_router(dma.router, prefix="/api/v1/dma", tags=["DMA"])
-# app.include_router(water_loss.router, prefix="/api/v1/water-loss", tags=["Water Loss"])
-# app.include_router(reports.router, prefix="/api/v1/reports", tags=["Reports"])
-# app.include_router(alerts.router, prefix="/api/v1/alerts", tags=["Alerts"])
-# app.include_router(chat.router, prefix="/api/v1/chat", tags=["Chat"])
+from routers import auth_router, dma_router, alerts_router, reports_router, dashboard_router, chat_router
+from routers.ws import router as ws_router
+
+app.include_router(auth_router, prefix="/api/v1")
+app.include_router(dma_router, prefix="/api/v1")
+app.include_router(alerts_router, prefix="/api/v1")
+app.include_router(reports_router, prefix="/api/v1")
+app.include_router(dashboard_router, prefix="/api/v1")
+app.include_router(chat_router, prefix="/api/v1")
+app.include_router(ws_router, prefix="/api/v1")

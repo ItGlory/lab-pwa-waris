@@ -5,6 +5,7 @@ import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
 import { FloatingChat } from '@/components/chat/floating-chat';
 import { CommandPalette } from '@/components/command-palette';
+import { AlertNotifications } from '@/components/alerts/alert-notifications';
 import { useAlerts } from '@/hooks/use-alerts';
 
 export default function DashboardLayout({
@@ -64,6 +65,9 @@ export default function DashboardLayout({
 
       {/* Command Palette (Ctrl/Cmd+K) */}
       <CommandPalette />
+
+      {/* Real-time Alert Notifications via WebSocket */}
+      <AlertNotifications />
     </div>
   );
 }

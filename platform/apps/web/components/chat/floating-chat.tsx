@@ -11,18 +11,15 @@ import {
   Minimize2,
   Maximize2,
   Sparkles,
+  StopCircle,
+  Trash2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
-
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-}
+import { useChat } from '@/hooks/use-chat';
 
 // Quick prompts for easy access
 const quickPrompts = [
@@ -31,70 +28,25 @@ const quickPrompts = [
   { label: 'คำแนะนำ', prompt: 'แนะนำการลดน้ำสูญเสีย' },
 ];
 
-// Mock streaming response
-async function* streamResponse(prompt: string): AsyncGenerator<string> {
-  const responses: Record<string, string[]> = {
-    default: [
-      'สวัสดีครับ ',
-      'ผมเป็น WARIS AI Assistant\n\n',
-      '**สรุปสถานะ:**\n',
-      '- พื้นที่ปกติ: 54 DMA\n',
-      '- เฝ้าระวัง: 8 DMA\n',
-      '- วิกฤต: 3 DMA\n\n',
-      'มีอะไรให้ช่วยเพิ่มเติมครับ?',
-    ],
-    วิเคราะห์: [
-      '📊 **วิเคราะห์สถานะล่าสุด**\n\n',
-      'อัตราน้ำสูญเสียเฉลี่ย: **15.5%**\n\n',
-      '**พื้นที่ต้องเฝ้าระวัง:**\n',
-      '1. DMA ชลบุรี-01: 28.5% 🔴\n',
-      '2. DMA เชียงใหม่-03: 22.1% 🟡\n',
-      '3. DMA สุราษฎร์ธานี-01: 18.2% 🟡',
-    ],
-    สรุป: [
-      '🔔 **การแจ้งเตือนวันนี้**\n\n',
-      '- วิกฤต: 1 รายการ\n',
-      '- สูง: 1 รายการ\n',
-      '- ปานกลาง: 2 รายการ\n\n',
-      'ควรตรวจสอบ DMA ชลบุรี-01 ก่อน',
-    ],
-    แนะนำ: [
-      '💡 **คำแนะนำ**\n\n',
-      '1. ตรวจจุดรั่วใน DMA วิกฤต\n',
-      '2. ปรับแรงดันช่วงกลางคืน\n',
-      '3. เปลี่ยนท่อเก่าอายุ 30+ ปี\n\n',
-      'คาดลดน้ำสูญเสียได้ 8-12%',
-    ],
-  };
-
-  let selected = responses.default;
-  for (const [key, val] of Object.entries(responses)) {
-    if (prompt.includes(key)) {
-      selected = val;
-      break;
-    }
-  }
-
-  for (const chunk of selected) {
-    await new Promise((r) => setTimeout(r, 40 + Math.random() * 60));
-    yield chunk;
-  }
-}
-
 export function FloatingChat() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [isExpanded, setIsExpanded] = React.useState(false);
-  const [messages, setMessages] = React.useState<Message[]>([]);
   const [input, setInput] = React.useState('');
-  const [isLoading, setIsLoading] = React.useState(false);
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
-  React.useEffect(() => {
+  const { messages, isLoading, sendMessage, stopGeneration, clearMessages } = useChat({
+    onError: (error) => {
+      console.error('Chat error:', error);
+    },
+  });
+
+  // Scroll to bottom when messages change
+  React.useLayoutEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  });
 
   React.useEffect(() => {
     if (isOpen && inputRef.current) {
@@ -106,28 +58,9 @@ export function FloatingChat() {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
-    const userMsg: Message = {
-      id: `u-${Date.now()}`,
-      role: 'user',
-      content: input.trim(),
-    };
-
-    setMessages((prev) => [...prev, userMsg]);
+    const message = input.trim();
     setInput('');
-    setIsLoading(true);
-
-    const assistantId = `a-${Date.now()}`;
-    setMessages((prev) => [...prev, { id: assistantId, role: 'assistant', content: '' }]);
-
-    try {
-      for await (const chunk of streamResponse(userMsg.content)) {
-        setMessages((prev) =>
-          prev.map((m) => (m.id === assistantId ? { ...m, content: m.content + chunk } : m))
-        );
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    await sendMessage(message);
   };
 
   const handleQuickPrompt = (prompt: string) => {
@@ -173,6 +106,18 @@ export function FloatingChat() {
           </div>
         </div>
         <div className="flex items-center gap-1">
+          {/* Clear chat button */}
+          {messages.length > 0 && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-white/80 hover:bg-white/20 hover:text-white"
+              onClick={clearMessages}
+              title="ล้างการสนทนา"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
           {/* Hide expand on mobile since it's already fullscreen */}
           <Button
             variant="ghost"
@@ -272,18 +217,27 @@ export function FloatingChat() {
             disabled={isLoading}
             className="flex-1 bg-slate-50 border-slate-200"
           />
-          <Button
-            type="submit"
-            size="icon"
-            disabled={isLoading || !input.trim()}
-            className="shrink-0"
-          >
-            {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
+          {isLoading ? (
+            <Button
+              type="button"
+              size="icon"
+              variant="destructive"
+              onClick={stopGeneration}
+              className="shrink-0"
+              title="หยุดการตอบ"
+            >
+              <StopCircle className="h-4 w-4" />
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              size="icon"
+              disabled={!input.trim()}
+              className="shrink-0"
+            >
               <Send className="h-4 w-4" />
-            )}
-          </Button>
+            </Button>
+          )}
         </form>
       </div>
     </div>

@@ -1,0 +1,112 @@
+version: "3.9"
+
+# Development environment for WARIS
+# Usage: docker-compose -f docker-compose.dev.yml up -d
+
+services:
+  # PostgreSQL 17 (Latest)
+  postgres:
+    image: postgres:17
+    container_name: waris-postgres
+    environment:
+      POSTGRES_USER: waris
+      POSTGRES_PASSWORD: waris
+      POSTGRES_DB: waris
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U waris"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis 7 (Latest stable)
+  redis:
+    image: redis:7-alpine
+    container_name: waris-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # MongoDB 8 (For document storage)
+  mongodb:
+    image: mongo:8
+    container_name: waris-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: waris
+      MONGO_INITDB_ROOT_PASSWORD: waris
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # pgAdmin for PostgreSQL management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: waris-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@waris.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+  # WARIS API (FastAPI) - for full stack dev
+  api:
+    build:
+      context: ../../apps/api
+      dockerfile: Dockerfile
+    container_name: waris-api
+    environment:
+      DATABASE_URL: postgresql+asyncpg://waris:waris@postgres:5432/waris
+      MONGODB_URL: mongodb://waris:waris@mongodb:27017
+      MONGODB_DB_NAME: waris
+      REDIS_URL: redis://redis:6379
+      SECRET_KEY: dev-secret-key-change-in-production
+      CORS_ORIGINS: '["http://localhost:3000","http://localhost:8000"]'
+      DEBUG: "true"
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - ../../apps/api:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgres_data:
+  redis_data:
+  mongodb_data:
+  pgadmin_data:
+
+networks:
+  default:
+    name: waris-dev-network
