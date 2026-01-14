@@ -36,7 +36,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -358,7 +357,8 @@ export function NotificationDetail({
                     <DialogTitle className="mb-1 line-clamp-2 text-lg font-semibold leading-tight text-white sm:text-xl">
                       {notification.title_th}
                     </DialogTitle>
-                    <DialogDescription className="flex flex-wrap items-center gap-2 text-sm text-white/80">
+                    {/* Use div instead of DialogDescription to avoid p > div hydration error */}
+                    <div className="flex flex-wrap items-center gap-2 text-sm text-white/80">
                       <Badge
                         variant="outline"
                         className="border-white/50 bg-white/10 text-white"
@@ -375,7 +375,7 @@ export function NotificationDetail({
                       <span className="text-white/80">
                         {formatRelativeTime(notification.createdAt)}
                       </span>
-                    </DialogDescription>
+                    </div>
                   </div>
                 </div>
 

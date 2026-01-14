@@ -14,6 +14,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Droplets,
+  Upload,
+  Brain,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -69,6 +71,18 @@ const navItems: NavItem[] = [
     labelEn: 'Documents',
     href: '/documents',
     icon: FolderOpen,
+  },
+  {
+    label: 'นำเข้าข้อมูล',
+    labelEn: 'Data Import',
+    href: '/data-import',
+    icon: Upload,
+  },
+  {
+    label: 'AI Insights',
+    labelEn: 'AI Insights',
+    href: '/ai-insights',
+    icon: Brain,
   },
 ];
 

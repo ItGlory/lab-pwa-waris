@@ -61,6 +61,8 @@ async def health_check() -> dict[str, str]:
 # Import and include routers
 from routers import auth_router, dma_router, alerts_router, reports_router, dashboard_router, chat_router
 from routers.ws import router as ws_router
+from routers.etl import router as etl_router
+from routers.ai import router as ai_router
 
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(dma_router, prefix="/api/v1")
@@ -69,3 +71,5 @@ app.include_router(reports_router, prefix="/api/v1")
 app.include_router(dashboard_router, prefix="/api/v1")
 app.include_router(chat_router, prefix="/api/v1")
 app.include_router(ws_router, prefix="/api/v1")
+app.include_router(etl_router)  # ETL routes for DMAMA integration
+app.include_router(ai_router)  # AI inference routes

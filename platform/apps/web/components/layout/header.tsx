@@ -1,7 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { Bell, Search, Sun, Moon, Menu, Wifi, WifiOff } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Search, Sun, Moon, Menu, Wifi, WifiOff } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,6 +13,10 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { useConnectionStatus } from '@/hooks/use-connection-status';
+import {
+  NotificationPopover,
+  sampleNotifications,
+} from '@/components/notifications/notification-popover';
 
 interface HeaderProps {
   alertCount?: number;
@@ -20,13 +25,42 @@ interface HeaderProps {
 }
 
 export function Header({ alertCount = 0, onMenuClick, onSearchClick }: HeaderProps) {
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
+  const [notifications, setNotifications] = React.useState(sampleNotifications);
   const isConnected = useConnectionStatus((state) => state.isConnected);
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Calculate unread count
+  const unreadCount = notifications.filter((n) => n.status === 'unread').length;
+
+  // Handle notification click - open detail modal or navigate
+  const handleNotificationClick = (notification: typeof sampleNotifications[0]) => {
+    // Mark as read
+    setNotifications((prev) =>
+      prev.map((n) =>
+        n.id === notification.id ? { ...n, status: 'read' as const } : n
+      )
+    );
+    // Navigate to notifications page with selected notification
+    router.push(`/notifications?id=${notification.id}`);
+  };
+
+  // Handle mark all as read
+  const handleMarkAllAsRead = () => {
+    setNotifications((prev) =>
+      prev.map((n) => ({ ...n, status: 'read' as const }))
+    );
+  };
+
+  // Handle view all notifications
+  const handleViewAll = () => {
+    router.push('/notifications');
+  };
 
   // Trigger command palette with keyboard shortcut
   const handleSearchClick = () => {
@@ -42,7 +76,7 @@ export function Header({ alertCount = 0, onMenuClick, onSearchClick }: HeaderPro
   };
 
   return (
-    <header className="relative flex h-14 items-center justify-between border-b bg-white px-3 sm:h-16 sm:px-4 lg:px-6">
+    <header className="relative flex h-14 items-center justify-between border-b bg-background px-3 sm:h-16 sm:px-4 lg:px-6">
       {/* Left: Mobile menu + Search */}
       <div className="flex items-center gap-2 sm:gap-4">
         <Button
@@ -68,11 +102,11 @@ export function Header({ alertCount = 0, onMenuClick, onSearchClick }: HeaderPro
         <button
           type="button"
           onClick={handleSearchClick}
-          className="relative hidden h-9 w-48 items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 text-sm text-slate-500 transition-colors hover:border-slate-300 hover:bg-slate-100 sm:flex md:w-64"
+          className="relative hidden h-9 w-48 items-center gap-2 rounded-md border border-input bg-muted px-3 text-sm text-muted-foreground transition-colors hover:border-ring hover:bg-accent sm:flex md:w-64"
         >
           <Search className="h-4 w-4" />
           <span className="flex-1 text-left">ค้นหา...</span>
-          <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border border-slate-200 bg-white px-1.5 font-mono text-[10px] font-medium text-slate-500 sm:flex">
+          <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border border-input bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground sm:flex">
             <span className="text-xs">⌘</span>K
           </kbd>
         </button>
@@ -129,20 +163,14 @@ export function Header({ alertCount = 0, onMenuClick, onSearchClick }: HeaderPro
           </TooltipContent>
         </Tooltip>
 
-        {/* Notifications */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative h-9 w-9">
-              <Bell className="h-5 w-5" />
-              {alertCount > 0 && (
-                <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white shadow-sm">
-                  {alertCount > 99 ? '99+' : alertCount}
-                </span>
-              )}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>การแจ้งเตือน</TooltipContent>
-        </Tooltip>
+        {/* Notifications Popover */}
+        <NotificationPopover
+          notifications={notifications}
+          unreadCount={unreadCount}
+          onNotificationClick={handleNotificationClick}
+          onMarkAllAsRead={handleMarkAllAsRead}
+          onViewAll={handleViewAll}
+        />
 
         <Separator orientation="vertical" className="hidden h-6 sm:block" />
 
@@ -153,8 +181,8 @@ export function Header({ alertCount = 0, onMenuClick, onSearchClick }: HeaderPro
             <AvatarFallback>สช</AvatarFallback>
           </Avatar>
           <div className="hidden flex-col md:flex">
-            <span className="text-sm font-medium text-slate-900">สมชาย ใจดี</span>
-            <span className="text-xs text-slate-500">ผู้ดูแลระบบ</span>
+            <span className="text-sm font-medium">สมชาย ใจดี</span>
+            <span className="text-xs text-muted-foreground">ผู้ดูแลระบบ</span>
           </div>
         </div>
       </div>

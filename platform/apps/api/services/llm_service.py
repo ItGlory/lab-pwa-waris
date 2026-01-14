@@ -1,43 +1,77 @@
 """
 LLM Service for AI Chat functionality
-Supports Ollama for local development and can be extended for production LLMs
+Supports OpenRouter (default) and Ollama (optional fallback)
 """
 
-import os
 import httpx
 from typing import AsyncGenerator, Optional
 import json
+from enum import Enum
+
+from core.llm_config import llm_settings, WARIS_SYSTEM_PROMPT, DEFAULT_MODEL_PRIORITY
 
 
-# Configuration
-OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
-LLM_MODEL = os.getenv("LLM_MODEL", "llama3.2")  # Default model
-
-# System prompt for WARIS context
-WARIS_SYSTEM_PROMPT = """คุณคือ WARIS AI Assistant ผู้ช่วยอัจฉริยะสำหรับระบบวิเคราะห์และรายงานข้อมูลน้ำสูญเสีย
-ของการประปาส่วนภูมิภาค (กปภ.) ประเทศไทย
-
-หน้าที่ของคุณ:
-1. วิเคราะห์ข้อมูลน้ำสูญเสียในแต่ละพื้นที่จ่ายน้ำย่อย (DMA)
-2. ให้คำแนะนำในการลดน้ำสูญเสีย
-3. อธิบายสถานะการแจ้งเตือนและความผิดปกติ
-4. ตอบคำถามเกี่ยวกับระบบประปาและการบริหารจัดการน้ำ
-
-กฎการตอบ:
-- ตอบเป็นภาษาไทยเสมอ ยกเว้นคำศัพท์เทคนิค
-- ตอบกระชับ ตรงประเด็น
-- ใช้ข้อมูลจริงที่มีเท่านั้น ไม่แต่งข้อมูลขึ้นมา
-- ถ้าไม่แน่ใจหรือไม่มีข้อมูล ให้บอกตรงๆ
-"""
+class LLMProvider(str, Enum):
+    """Available LLM providers"""
+    OPENROUTER = "openrouter"
+    OLLAMA = "ollama"
+    AUTO = "auto"  # Try OpenRouter first, fallback to Ollama
 
 
 class LLMService:
-    """Service for interacting with LLM backends"""
+    """Service for interacting with LLM backends (OpenRouter and Ollama)"""
 
     def __init__(self):
-        self.ollama_url = OLLAMA_URL
-        self.model = LLM_MODEL
-        self.timeout = httpx.Timeout(60.0, connect=10.0)
+        # Provider configuration
+        self.provider = LLMProvider(llm_settings.LLM_PROVIDER.lower())
+
+        # OpenRouter configuration
+        self.openrouter_base_url = llm_settings.OPENROUTER_BASE_URL
+        self.openrouter_api_key = llm_settings.OPENROUTER_API_KEY
+        self.openrouter_model = llm_settings.OPENROUTER_DEFAULT_MODEL
+
+        # Ollama configuration (fallback)
+        self.ollama_url = llm_settings.OLLAMA_BASE_URL
+        self.ollama_model = llm_settings.OLLAMA_DEFAULT_MODEL
+
+        # General settings
+        self.max_tokens = llm_settings.LLM_MAX_TOKENS
+        self.temperature = llm_settings.LLM_TEMPERATURE
+        self.timeout = httpx.Timeout(float(llm_settings.LLM_TIMEOUT), connect=10.0)
+
+        # Current model info
+        self._current_provider: Optional[LLMProvider] = None
+        self._current_model: Optional[str] = None
+
+    @property
+    def model(self) -> str:
+        """Get current active model name"""
+        if self._current_model:
+            return self._current_model
+        if self.provider == LLMProvider.OLLAMA:
+            return self.ollama_model
+        return self.openrouter_model
+
+    @property
+    def active_provider(self) -> str:
+        """Get current active provider"""
+        if self._current_provider:
+            return self._current_provider.value
+        return self.provider.value
+
+    async def check_openrouter_available(self) -> bool:
+        """Check if OpenRouter API is available"""
+        if not self.openrouter_api_key:
+            return False
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.get(
+                    f"{self.openrouter_base_url}/models",
+                    headers={"Authorization": f"Bearer {self.openrouter_api_key}"}
+                )
+                return response.status_code == 200
+        except Exception:
+            return False
 
     async def check_ollama_available(self) -> bool:
         """Check if Ollama server is available"""
@@ -49,16 +83,47 @@ class LLMService:
             return False
 
     async def get_available_models(self) -> list[str]:
-        """Get list of available models from Ollama"""
-        try:
-            async with httpx.AsyncClient(timeout=self.timeout) as client:
-                response = await client.get(f"{self.ollama_url}/api/tags")
-                if response.status_code == 200:
-                    data = response.json()
-                    return [m["name"] for m in data.get("models", [])]
-        except Exception:
-            pass
-        return []
+        """Get list of available models based on provider"""
+        models = []
+
+        # Check OpenRouter models
+        if self.provider in [LLMProvider.OPENROUTER, LLMProvider.AUTO]:
+            if await self.check_openrouter_available():
+                models.extend(DEFAULT_MODEL_PRIORITY)
+
+        # Check Ollama models
+        if self.provider in [LLMProvider.OLLAMA, LLMProvider.AUTO]:
+            try:
+                async with httpx.AsyncClient(timeout=self.timeout) as client:
+                    response = await client.get(f"{self.ollama_url}/api/tags")
+                    if response.status_code == 200:
+                        data = response.json()
+                        ollama_models = [f"ollama/{m['name']}" for m in data.get("models", [])]
+                        models.extend(ollama_models)
+            except Exception:
+                pass
+
+        return models
+
+    async def get_status(self) -> dict:
+        """Get LLM service status"""
+        openrouter_available = await self.check_openrouter_available()
+        ollama_available = await self.check_ollama_available()
+
+        return {
+            "provider": self.provider.value,
+            "openrouter": {
+                "available": openrouter_available,
+                "model": self.openrouter_model,
+                "has_api_key": bool(self.openrouter_api_key),
+            },
+            "ollama": {
+                "available": ollama_available,
+                "model": self.ollama_model,
+                "url": self.ollama_url,
+            },
+            "active_model": self.model,
+        }
 
     async def stream_chat(
         self,
@@ -91,14 +156,80 @@ class LLMService:
         # Add current message
         messages.append({"role": "user", "content": message})
 
-        # Try Ollama first
-        if await self.check_ollama_available():
-            async for chunk in self._stream_ollama(messages):
-                yield chunk
-        else:
-            # Fallback to mock response when Ollama is not available
-            async for chunk in self._mock_response(message):
-                yield chunk
+        # Select provider based on configuration
+        if self.provider == LLMProvider.OPENROUTER:
+            # Use OpenRouter only
+            if await self.check_openrouter_available():
+                async for chunk in self._stream_openrouter(messages):
+                    yield chunk
+            else:
+                yield "ขออภัย OpenRouter API ไม่พร้อมใช้งาน กรุณาตรวจสอบ API key หรือการเชื่อมต่อ"
+
+        elif self.provider == LLMProvider.OLLAMA:
+            # Use Ollama only
+            if await self.check_ollama_available():
+                async for chunk in self._stream_ollama(messages):
+                    yield chunk
+            else:
+                yield "ขออภัย Ollama server ไม่พร้อมใช้งาน กรุณาตรวจสอบว่า Ollama กำลังทำงานอยู่"
+
+        else:  # AUTO mode - try OpenRouter first, fallback to Ollama
+            if await self.check_openrouter_available():
+                self._current_provider = LLMProvider.OPENROUTER
+                self._current_model = self.openrouter_model
+                async for chunk in self._stream_openrouter(messages):
+                    yield chunk
+            elif await self.check_ollama_available():
+                self._current_provider = LLMProvider.OLLAMA
+                self._current_model = self.ollama_model
+                async for chunk in self._stream_ollama(messages):
+                    yield chunk
+            else:
+                # Fallback to mock response when no LLM is available
+                async for chunk in self._mock_response(message):
+                    yield chunk
+
+    async def _stream_openrouter(self, messages: list[dict]) -> AsyncGenerator[str, None]:
+        """Stream response from OpenRouter API"""
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                async with client.stream(
+                    "POST",
+                    f"{self.openrouter_base_url}/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {self.openrouter_api_key}",
+                        "Content-Type": "application/json",
+                        "HTTP-Referer": "https://waris.pwa.co.th",
+                        "X-Title": "WARIS - Water Loss Analysis System",
+                    },
+                    json={
+                        "model": self.openrouter_model,
+                        "messages": messages,
+                        "stream": True,
+                        "max_tokens": self.max_tokens,
+                        "temperature": self.temperature,
+                    },
+                ) as response:
+                    if response.status_code != 200:
+                        error_body = await response.aread()
+                        yield f"OpenRouter API error: {response.status_code} - {error_body.decode()}"
+                        return
+
+                    async for line in response.aiter_lines():
+                        if line.startswith("data: "):
+                            data_str = line[6:]
+                            if data_str.strip() == "[DONE]":
+                                break
+                            try:
+                                data = json.loads(data_str)
+                                if "choices" in data and len(data["choices"]) > 0:
+                                    delta = data["choices"][0].get("delta", {})
+                                    if "content" in delta:
+                                        yield delta["content"]
+                            except json.JSONDecodeError:
+                                continue
+        except Exception as e:
+            yield f"เกิดข้อผิดพลาดในการเชื่อมต่อ OpenRouter: {str(e)}"
 
     async def _stream_ollama(self, messages: list[dict]) -> AsyncGenerator[str, None]:
         """Stream response from Ollama"""
@@ -108,9 +239,13 @@ class LLMService:
                     "POST",
                     f"{self.ollama_url}/api/chat",
                     json={
-                        "model": self.model,
+                        "model": self.ollama_model,
                         "messages": messages,
                         "stream": True,
+                        "options": {
+                            "num_predict": self.max_tokens,
+                            "temperature": self.temperature,
+                        },
                     },
                 ) as response:
                     async for line in response.aiter_lines():
@@ -122,10 +257,10 @@ class LLMService:
                             except json.JSONDecodeError:
                                 continue
         except Exception as e:
-            yield f"เกิดข้อผิดพลาดในการเชื่อมต่อ LLM: {str(e)}"
+            yield f"เกิดข้อผิดพลาดในการเชื่อมต่อ Ollama: {str(e)}"
 
     async def _mock_response(self, message: str) -> AsyncGenerator[str, None]:
-        """Provide mock responses when LLM is not available"""
+        """Provide mock responses when no LLM is available"""
         import asyncio
 
         # Thai mock responses based on keywords
@@ -173,7 +308,7 @@ class LLMService:
                 "- สรุปการแจ้งเตือน\n",
                 "- คำแนะนำในการลดน้ำสูญเสีย\n\n",
                 "มีอะไรให้ช่วยครับ?\n",
-                "\n_หมายเหตุ: ขณะนี้ระบบใช้โหมด Offline_",
+                "\n_หมายเหตุ: ขณะนี้ระบบใช้โหมด Offline - กรุณาตั้งค่า OpenRouter API key หรือเปิด Ollama_",
             ]
 
         # Stream the response

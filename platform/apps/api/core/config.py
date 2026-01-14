@@ -15,6 +15,7 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=True,
+        extra="ignore",  # Ignore extra fields from .env
     )
 
     # Application
@@ -27,11 +28,13 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
-    # CORS
-    CORS_ORIGINS: List[str] = [
-        "http://localhost:3000",
-        "http://localhost:8000",
-    ]
+    # CORS - comma-separated string
+    CORS_ORIGINS_STR: str = "http://localhost:3000,http://localhost:8000"
+
+    @property
+    def CORS_ORIGINS(self) -> List[str]:
+        """Parse CORS origins from comma-separated string."""
+        return [origin.strip() for origin in self.CORS_ORIGINS_STR.split(",") if origin.strip()]
 
     # Database - PostgreSQL
     DATABASE_URL: str = "postgresql+asyncpg://waris:waris@localhost:5432/waris"

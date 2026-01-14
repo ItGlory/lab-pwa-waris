@@ -61,7 +61,14 @@
       "Bash(docker network:*)",
       "Bash(ping:*)",
       "Bash(/bin/bash:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(jq:*)",
+      "Bash(PYTHONPATH=/Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/apps/api python3:*)",
+      "Bash(PYTHONPATH=/Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/apps/api /usr/bin/python3:*)",
+      "Bash(pip3 install:*)",
+      "Bash(docker rm:*)",
+      "Bash(/opt/homebrew/bin/python3:*)",
+      "Bash(docker run:*)"
     ]
   }
 }
