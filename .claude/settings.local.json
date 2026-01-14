@@ -58,7 +58,10 @@
       "Bash(docker context:*)",
       "Bash(./fix-traefik-macos.sh:*)",
       "Bash(/Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/infra/docker/fix-traefik-macos.sh)",
-      "Bash(docker network:*)"
+      "Bash(docker network:*)",
+      "Bash(ping:*)",
+      "Bash(/bin/bash:*)",
+      "Bash(wc:*)"
     ]
   }
 }

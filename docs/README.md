@@ -1,131 +1,254 @@
 # WARIS Documentation
 
+> **ระบบวิเคราะห์และรายงานข้อมูลน้ำสูญเสียอัจฉริยะ**
 > Water Loss Intelligent Analysis and Reporting System
+> สำหรับ การประปาส่วนภูมิภาค (กปภ.)
 
-## Overview
+---
 
-WARIS is an AI-powered platform for analyzing and reporting water loss data for the Provincial Waterworks Authority (กปภ.) of Thailand.
+## Quick Start
+
+| เริ่มต้น | คำอธิบาย |
+|----------|----------|
+| [QUICKSTART](./setup/QUICKSTART.md) | เริ่มต้นใช้งานภายใน 5 นาที |
+| [LOCAL_SETUP](./setup/LOCAL_SETUP.md) | การติดตั้งแบบละเอียด |
+| [STATUS](./setup/STATUS.md) | สถานะระบบปัจจุบัน |
+| [URLS](./setup/URLS.md) | รายการ URL ทั้งหมด |
+
+---
 
 ## Documentation Index
 
-### Requirements
+### Project Management (การจัดการโครงการ)
 
-| Document | Description |
-|----------|-------------|
-| [TOR Requirements](./requirements/tor.csv) | Terms of Reference (ข้อกำหนดขอบเขตงาน) |
-| [Functional Requirements](./requirements/functional.md) | Feature specifications |
-| [Non-Functional Requirements](./requirements/non-functional.md) | Performance, security, scalability |
+| เอกสาร | คำอธิบาย |
+|--------|----------|
+| [Project Overview](./project-management/01-project-overview.md) | ภาพรวมโครงการ งบประมาณ ไทม์ไลน์ |
+| [TOR Summary](./project-management/02-tor-summary.md) | สรุป TOR และการ mapping |
+| [Timeline](./project-management/03-timeline.md) | แผนงานและกำหนดการ 270 วัน |
+| [Team Structure](./project-management/04-team-structure.md) | โครงสร้างทีมและบทบาท |
 
-### Architecture
+### Architecture (สถาปัตยกรรม)
 
-| Document | Description |
-|----------|-------------|
-| [System Overview](./architecture/overview.md) | High-level system architecture |
-| [Component Design](./architecture/components.md) | Detailed component specifications |
-| [Data Flow](./architecture/data-flow.md) | Data pipeline and flow diagrams |
-| [Integration](./architecture/integration.md) | External system integrations (DMAMA) |
+| เอกสาร | คำอธิบาย |
+|--------|----------|
+| [System Overview](./architecture/01-overview.md) | ภาพรวมสถาปัตยกรรมระบบ 7 layers |
+| [Hybrid Infrastructure](./architecture/02-hybrid-infrastructure.md) | On-Premise + G-Cloud |
+| [Components](./architecture/components.md) | รายละเอียด components |
+| [Data Flow](./architecture/data-flow.md) | การไหลของข้อมูล |
+| [Integration](./architecture/integration.md) | การเชื่อมต่อระบบภายนอก (DMAMA, GIS) |
+| [Tech Stack 2026](./architecture/tech-stack-2026.md) | เทคโนโลยีที่ใช้ (อัพเดท 2026) |
 
-### API
+### API (Application Programming Interface)
 
-| Document | Description |
-|----------|-------------|
-| [API Overview](./api/overview.md) | REST API design principles |
-| [Authentication](./api/authentication.md) | Auth flow and security |
-| [Endpoints](./api/endpoints.md) | API endpoint specifications |
-| [OpenAPI Spec](./api/openapi.yaml) | OpenAPI 3.0 specification |
+| เอกสาร | คำอธิบาย |
+|--------|----------|
+| [API Overview](./api/01-overview.md) | ออกแบบ REST API, Auth, Rate Limiting |
+| [Endpoints](./api/endpoints.md) | รายละเอียด endpoints ทั้งหมด |
 
-### Database
+### Database (ฐานข้อมูล)
 
-| Document | Description |
-|----------|-------------|
-| [Schema Overview](./database/overview.md) | Database architecture |
-| [ERD](./database/erd.md) | Entity relationship diagrams |
-| [Tables](./database/tables.md) | Table definitions |
-| [Migrations](./database/migrations.md) | Migration strategy |
+| เอกสาร | คำอธิบาย |
+|--------|----------|
+| [Database Overview](./database/01-overview.md) | Polyglot persistence strategy |
+| [ERD](./database/erd.md) | Entity Relationship Diagrams |
+| [Tables](./database/tables.md) | นิยามตารางและ columns |
 
-### AI/ML
+### AI/ML (ปัญญาประดิษฐ์)
 
-| Document | Description |
-|----------|-------------|
-| [AI Overview](./ai-ml/overview.md) | AI/ML system architecture |
-| [Models](./ai-ml/models.md) | AI Shadowing models (4 types) |
-| [LLM](./ai-ml/llm.md) | LLM 70B+ Thai language |
-| [RAG](./ai-ml/rag.md) | RAG engine with Milvus |
-| [Training](./ai-ml/training.md) | Model training pipeline |
+| เอกสาร | คำอธิบาย |
+|--------|----------|
+| [AI Overview](./ai-ml/01-overview.md) | 4 Shadowing Models, LLM 70B+, RAG |
+| [Models](./ai-ml/models.md) | รายละเอียดโมเดล AI |
 
-### Infrastructure
+### Frontend (หน้าบ้าน)
 
-| Document | Description |
-|----------|-------------|
-| [Overview](./infrastructure/overview.md) | Infrastructure architecture |
-| [On-Premise](./infrastructure/on-premise.md) | GPU server setup |
-| [G-Cloud](./infrastructure/g-cloud.md) | Government cloud backup |
-| [Docker](./infrastructure/docker.md) | Container configurations |
-| [Kubernetes](./infrastructure/kubernetes.md) | K8s deployment |
+| เอกสาร | คำอธิบาย |
+|--------|----------|
+| [Frontend Overview](./frontend/01-overview.md) | Next.js 16, React 19, สถาปัตยกรรม UI |
 
-### Setup & Troubleshooting
+### Design System (ระบบออกแบบ)
 
-| Document | Description |
-|----------|-------------|
-| [QUICKSTART](./setup/QUICKSTART.md) | Quick start guide (5 minutes) |
-| [LOCAL_SETUP](./setup/LOCAL_SETUP.md) | Detailed local setup |
-| [TRAEFIK_SETUP](./setup/TRAEFIK_SETUP.md) | Traefik configuration |
-| **[TROUBLESHOOTING](./TROUBLESHOOTING.md) ⭐** | **Problem-solving guide** |
-| **[QUICK_REFERENCE](./QUICK_REFERENCE.md) ⭐** | **Common commands** |
-| **[LESSONS_LEARNED](./LESSONS_LEARNED.md)** | **Experience & insights** |
-| [URLS](./URLS.md) | Service URLs |
-| [STATUS](./STATUS.md) | System status |
-| [FRONTEND_BACKEND_FIX](./FRONTEND_BACKEND_FIX.md) | Specific fixes |
+| เอกสาร | คำอธิบาย |
+|--------|----------|
+| [Design Overview](./design/00-overview.md) | หลักการออกแบบ, design tokens |
+| [Color System](./design/01-color-system.md) | ระบบสี, status colors |
+| [Components](./design/02-components.md) | UI components |
+| [UI Guidelines](./design/03-ui-guidelines.md) | แนวทางการออกแบบ UI |
+| [Brand Guidelines](./design/brand-guidelines.md) | แบรนด์ กปภ. |
 
-### Guides
+### Security (ความปลอดภัย)
 
-| Document | Description |
-|----------|-------------|
-| [Getting Started](./guides/getting-started.md) | Quick start guide |
-| [Development](./guides/development.md) | Development workflow |
-| [Deployment](./guides/deployment.md) | Deployment procedures |
-| [Contributing](./guides/contributing.md) | Contribution guidelines |
+| เอกสาร | คำอธิบาย |
+|--------|----------|
+| [Security Overview](./security/01-overview.md) | OWASP, PDPA, Authentication |
 
-### Testing
+### Deployment (การ Deploy)
 
-| Document | Description |
-|----------|-------------|
-| [Testing Strategy](./testing/strategy.md) | Overall testing approach |
-| [Unit Tests](./testing/unit.md) | Unit testing guidelines |
-| [Integration Tests](./testing/integration.md) | Integration testing |
-| [E2E Tests](./testing/e2e.md) | End-to-end testing |
+| เอกสาร | คำอธิบาย |
+|--------|----------|
+| [Deployment Overview](./deployment/01-overview.md) | กระบวนการ deploy |
 
-### Design
+### Setup & Troubleshooting (การติดตั้งและแก้ไขปัญหา)
 
-| Document | Description |
-|----------|-------------|
-| [Brand Guidelines](./design/brand-guidelines.md) | PWA branding |
-| [UI/UX](./design/ui-ux.md) | Design system |
-| [Components](./design/components.md) | UI component library |
+| เอกสาร | คำอธิบาย |
+|--------|----------|
+| [QUICKSTART](./setup/QUICKSTART.md) | เริ่มต้นอย่างรวดเร็ว |
+| [LOCAL_SETUP](./setup/LOCAL_SETUP.md) | การติดตั้ง local แบบละเอียด |
+| [TRAEFIK_SETUP](./setup/TRAEFIK_SETUP.md) | การตั้งค่า Traefik v3.3 |
+| [QUICK_START_TRAEFIK](./setup/QUICK_START_TRAEFIK.md) | Traefik quick reference |
+| [START_WARIS](./setup/START_WARIS.md) | วิธีเริ่มต้น services |
+| [TROUBLESHOOTING](./setup/TROUBLESHOOTING.md) | **คู่มือแก้ไขปัญหา** |
+| [QUICK_REFERENCE](./setup/QUICK_REFERENCE.md) | **คำสั่งที่ใช้บ่อย** |
+| [LESSONS_LEARNED](./setup/LESSONS_LEARNED.md) | บทเรียนและประสบการณ์ |
+| [STATUS](./setup/STATUS.md) | สถานะระบบปัจจุบัน |
+| [URLS](./setup/URLS.md) | รายการ URLs ทั้งหมด |
+| [FRONTEND_BACKEND_FIX](./setup/FRONTEND_BACKEND_FIX.md) | วิธีแก้ไข frontend/backend |
+
+### Guides (คู่มือ)
+
+| เอกสาร | คำอธิบาย |
+|--------|----------|
+| [Development](./guides/development.md) | workflow การพัฒนา |
+| [Deployment](./guides/deployment.md) | ขั้นตอนการ deploy |
+
+### Development Planning (การวางแผนพัฒนา)
+
+| เอกสาร | คำอธิบาย |
+|--------|----------|
+| [Feature Map](./plan/01-feature-map.md) | รายการ features |
+| [Page Structure](./plan/02-page-structure.md) | โครงสร้างหน้าเว็บ |
+| [Component Library](./plan/03-component-library.md) | รายการ components |
+| [Mock Data Schema](./plan/04-mock-data-schema.md) | โครงสร้าง mock data |
+| [Development Phases](./plan/05-development-phases.md) | เฟสการพัฒนา |
+
+### Requirements (ข้อกำหนด)
+
+| เอกสาร | คำอธิบาย |
+|--------|----------|
+| [TOR Requirements](./requirements/tor.csv) | ข้อกำหนดขอบเขตงาน (CSV) |
+
+---
 
 ## TOR Compliance Matrix
 
-| TOR Section | Document | Status |
-|-------------|----------|--------|
-| 4.1 Project Management | [Architecture](./architecture/overview.md) | Planned |
-| 4.2 Hybrid Architecture | [Infrastructure](./infrastructure/overview.md) | Planned |
+| TOR Section | เอกสารที่เกี่ยวข้อง | สถานะ |
+|-------------|-------------------|--------|
+| 4.1 Project Management | [Project Overview](./project-management/01-project-overview.md) | Planned |
+| 4.2 Hybrid Architecture | [Architecture](./architecture/01-overview.md) | Planned |
 | 4.3 DMAMA Integration | [Integration](./architecture/integration.md) | Planned |
-| 4.4 Centralized Database | [Database](./database/overview.md) | Planned |
+| 4.4 Centralized Database | [Database](./database/01-overview.md) | Planned |
 | 4.5.1 AI Shadowing | [AI Models](./ai-ml/models.md) | Planned |
-| 4.5.2 LLM 70B+ Thai | [LLM](./ai-ml/llm.md) | Planned |
-| 4.5.3 Notifications | [API](./api/endpoints.md) | Planned |
+| 4.5.2 LLM 70B+ Thai | [AI Overview](./ai-ml/01-overview.md) | Planned |
+| 4.5.3 Notifications | [API Endpoints](./api/endpoints.md) | Planned |
 | 4.5.4 Dashboard/Reports | [Components](./architecture/components.md) | Planned |
-| 4.5.5 ISO/IEC 42001 | [AI Overview](./ai-ml/overview.md) | Planned |
-| 4.5.6 AI Guardrails | [AI Overview](./ai-ml/overview.md) | Planned |
-| 4.6 System Testing | [Testing](./testing/strategy.md) | Planned |
-| 4.7 Training (40 users) | [Guides](./guides/getting-started.md) | Planned |
+| 4.5.5 ISO/IEC 42001 | [AI Overview](./ai-ml/01-overview.md) | Planned |
+| 4.5.6 AI Guardrails | [AI Overview](./ai-ml/01-overview.md) | Planned |
+| 4.6 System Testing | [Development](./guides/development.md) | Planned |
+| 4.7 Training (40 users) | [Deployment](./guides/deployment.md) | Planned |
 
-## Quick Links
+---
 
-- **Source Code:** [GitHub Repository](#)
-- **API Docs:** [Swagger UI](#)
-- **Design System:** [Storybook](#)
+## Directory Structure
+
+```
+docs/
+├── README.md                 # หน้านี้ - สารบัญเอกสาร
+├── project-management/       # การจัดการโครงการ
+│   ├── 01-project-overview.md
+│   ├── 02-tor-summary.md
+│   ├── 03-timeline.md
+│   └── 04-team-structure.md
+├── architecture/             # สถาปัตยกรรมระบบ
+│   ├── 01-overview.md
+│   ├── 02-hybrid-infrastructure.md
+│   ├── components.md
+│   ├── data-flow.md
+│   ├── integration.md
+│   └── tech-stack-2026.md
+├── api/                      # API specification
+│   ├── 01-overview.md
+│   └── endpoints.md
+├── database/                 # ฐานข้อมูล
+│   ├── 01-overview.md
+│   ├── erd.md
+│   └── tables.md
+├── ai-ml/                    # AI/ML
+│   ├── 01-overview.md
+│   └── models.md
+├── frontend/                 # Frontend
+│   └── 01-overview.md
+├── design/                   # Design system
+│   ├── 00-overview.md
+│   ├── 01-color-system.md
+│   ├── 02-components.md
+│   ├── 03-ui-guidelines.md
+│   └── brand-guidelines.md
+├── security/                 # ความปลอดภัย
+│   └── 01-overview.md
+├── deployment/               # การ deploy
+│   └── 01-overview.md
+├── setup/                    # การติดตั้งและแก้ไขปัญหา
+│   ├── QUICKSTART.md
+│   ├── LOCAL_SETUP.md
+│   ├── TRAEFIK_SETUP.md
+│   ├── TROUBLESHOOTING.md
+│   ├── QUICK_REFERENCE.md
+│   ├── LESSONS_LEARNED.md
+│   ├── STATUS.md
+│   └── URLS.md
+├── guides/                   # คู่มือ
+│   ├── development.md
+│   └── deployment.md
+├── plan/                     # แผนพัฒนา
+│   ├── 01-feature-map.md
+│   ├── 02-page-structure.md
+│   ├── 03-component-library.md
+│   ├── 04-mock-data-schema.md
+│   └── 05-development-phases.md
+└── requirements/             # ข้อกำหนด
+    └── tor.csv
+```
+
+---
+
+## Documentation Flow
+
+### สำหรับผู้เริ่มต้น (Getting Started)
+1. [QUICKSTART](./setup/QUICKSTART.md) - เริ่มต้นภายใน 5 นาที
+2. [STATUS](./setup/STATUS.md) - ตรวจสอบสถานะระบบ
+3. [URLS](./setup/URLS.md) - รายการ URLs ที่ใช้งาน
+
+### สำหรับเข้าใจ Project (Understanding the Project)
+1. [Project Overview](./project-management/01-project-overview.md) - ภาพรวม
+2. [TOR Summary](./project-management/02-tor-summary.md) - ข้อกำหนด
+3. [Timeline](./project-management/03-timeline.md) - แผนงาน
+
+### สำหรับนักพัฒนา (For Developers)
+1. [Architecture](./architecture/01-overview.md) - สถาปัตยกรรม
+2. [API](./api/01-overview.md) - การออกแบบ API
+3. [Database](./database/01-overview.md) - ฐานข้อมูล
+4. [Development Guide](./guides/development.md) - workflow
+
+### สำหรับงาน AI/ML
+1. [AI Overview](./ai-ml/01-overview.md) - ภาพรวม AI
+2. [Models](./ai-ml/models.md) - รายละเอียดโมเดล
+
+### สำหรับแก้ไขปัญหา (Troubleshooting)
+1. [TROUBLESHOOTING](./setup/TROUBLESHOOTING.md) - วิธีแก้ไขปัญหา
+2. [QUICK_REFERENCE](./setup/QUICK_REFERENCE.md) - คำสั่งที่ใช้บ่อย
+3. [LESSONS_LEARNED](./setup/LESSONS_LEARNED.md) - บทเรียน
+
+---
+
+## Related Links
+
+- **Source Code**: `platform/` directory
+- **Claude Instructions**: `.claude/CLAUDE.md`
+- **API Documentation**: http://localhost:8000/docs (เมื่อรัน API)
+- **Traefik Dashboard**: http://localhost:8888
 
 ---
 
 *Provincial Waterworks Authority (การประปาส่วนภูมิภาค)*
+*Updated: 2026-01-14*
