@@ -39,11 +39,14 @@ export default function DashboardLayout({
       {mobileMenuOpen && (
         <>
           <div
-            className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden animate-fade-in"
             onClick={handleMobileMenuClose}
             onKeyDown={(e) => e.key === 'Escape' && handleMobileMenuClose()}
+            aria-label="ปิดเมนู"
+            role="button"
+            tabIndex={0}
           />
-          <div className="fixed inset-y-0 left-0 z-50 lg:hidden">
+          <div className="fixed inset-y-0 left-0 z-50 lg:hidden animate-slide-in-left">
             <Sidebar alertCount={activeAlertCount} onNavigate={handleMobileMenuClose} />
           </div>
         </>
@@ -59,8 +62,10 @@ export default function DashboardLayout({
           alertCount={activeAlertCount}
           onMenuClick={() => setMobileMenuOpen(true)}
         />
-        <main className="flex-1 overflow-auto bg-background p-3 sm:p-4 lg:p-6">
-          {children}
+        <main className="flex-1 overflow-auto bg-gradient-to-br from-background to-muted/30 p-3 sm:p-4 lg:p-6 safe-area-inset">
+          <div className="mx-auto max-w-7xl animate-fade-in">
+            {children}
+          </div>
         </main>
       </div>
 

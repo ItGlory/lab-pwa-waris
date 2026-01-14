@@ -31,16 +31,16 @@ services:
       timeout: 10s
       retries: 3
 
-  # PostgreSQL 18
+  # PostgreSQL 17
   postgres:
-    image: postgres:18
+    image: postgres:17
     container_name: waris-postgres
     environment:
       POSTGRES_USER: waris
       POSTGRES_PASSWORD: waris
       POSTGRES_DB: waris
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -57,7 +57,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: waris
       MONGO_INITDB_ROOT_PASSWORD: waris
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
       - mongodb_data:/data/db
     healthcheck:
@@ -71,7 +71,7 @@ services:
     image: redis:8
     container_name: waris-redis
     ports:
-      - "6379:6379"
+      - "6381:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -84,6 +84,7 @@ services:
   milvus:
     image: milvusdb/milvus:v2.6.5
     container_name: waris-milvus
+    command: ["milvus", "run", "standalone"]
     environment:
       ETCD_ENDPOINTS: etcd:2379
       MINIO_ADDRESS: minio:9000
@@ -115,8 +116,8 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "9010:9000"
+      - "9011:9001"
     volumes:
       - minio_data:/data
     command: minio server /data --console-address ":9001"
@@ -154,3 +155,4 @@ volumes:
 networks:
   default:
     name: waris-network
+    external: true

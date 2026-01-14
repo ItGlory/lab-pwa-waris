@@ -87,7 +87,8 @@ RUN pip install --no-cache-dir --upgrade pip && \
     python-multipart>=0.0.18 \
     httpx>=0.28.0 \
     orjson>=3.10.0 \
-    email-validator>=2.0.0
+    email-validator>=2.0.0 \
+    pymilvus>=2.4.0
 
 # Copy application code
 COPY --chown=waris:waris . .

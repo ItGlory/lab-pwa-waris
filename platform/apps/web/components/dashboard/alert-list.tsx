@@ -19,30 +19,31 @@ interface AlertListProps {
   showViewAll?: boolean;
 }
 
+// Severity config using CSS variables for PWA brand consistency
 const severityConfig = {
   critical: {
     icon: AlertCircle,
     variant: 'critical' as const,
     color: 'text-white',
-    bg: 'bg-red-500',
+    bg: 'bg-[var(--status-critical)]',
   },
   high: {
     icon: AlertTriangle,
-    variant: 'warning' as const,
+    variant: 'high' as const,
     color: 'text-white',
     bg: 'bg-orange-500',
   },
   medium: {
     icon: AlertTriangle,
-    variant: 'warning' as const,
+    variant: 'medium' as const,
     color: 'text-white',
-    bg: 'bg-amber-500',
+    bg: 'bg-[var(--status-warning)]',
   },
   low: {
     icon: Info,
-    variant: 'secondary' as const,
+    variant: 'low' as const,
     color: 'text-white',
-    bg: 'bg-blue-500',
+    bg: 'bg-[var(--status-info)]',
   },
 };
 

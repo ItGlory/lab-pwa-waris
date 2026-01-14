@@ -15,12 +15,22 @@ const badgeVariants = cva(
         destructive:
           'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
         outline: 'text-foreground',
+        // Status Badges - High contrast as per design docs
         success:
           'border-emerald-500 bg-emerald-500 text-white font-bold dark:border-emerald-600 dark:bg-emerald-600 dark:text-white',
         warning:
           'border-amber-500 bg-amber-500 text-white font-bold dark:border-amber-600 dark:bg-amber-600 dark:text-white',
         critical:
           'border-red-500 bg-red-500 text-white font-bold dark:border-red-600 dark:bg-red-600 dark:text-white',
+        info:
+          'border-blue-500 bg-blue-500 text-white font-bold dark:border-blue-600 dark:bg-blue-600 dark:text-white',
+        // Alert Severity Badges
+        high:
+          'border-orange-500 bg-orange-500 text-white font-bold dark:border-orange-600 dark:bg-orange-600 dark:text-white',
+        medium:
+          'border-amber-500 bg-amber-500 text-white font-bold dark:border-amber-600 dark:bg-amber-600 dark:text-white',
+        low:
+          'border-blue-500 bg-blue-500 text-white font-bold dark:border-blue-600 dark:bg-blue-600 dark:text-white',
       },
     },
     defaultVariants: {

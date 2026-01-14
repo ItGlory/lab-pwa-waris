@@ -1,17 +1,35 @@
 import type { Metadata } from 'next';
-import { Noto_Sans_Thai, Inter } from 'next/font/google';
+import { Sarabun, Prompt, Inter, Noto_Sans_Thai } from 'next/font/google';
 import { Providers } from '@/components/providers';
 import './globals.css';
 
-const notoSansThai = Noto_Sans_Thai({
+// Primary Thai body font (PWA standard)
+const sarabun = Sarabun({
+  weight: ['400', '500', '600', '700'],
   subsets: ['thai', 'latin'],
   variable: '--font-sans',
   display: 'swap',
 });
 
+// Thai heading font (PWA standard)
+const prompt = Prompt({
+  weight: ['400', '500', '600', '700'],
+  subsets: ['thai', 'latin'],
+  variable: '--font-heading',
+  display: 'swap',
+});
+
+// English/Numbers font
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
+  display: 'swap',
+});
+
+// Fallback Thai font
+const notoSansThai = Noto_Sans_Thai({
+  subsets: ['thai', 'latin'],
+  variable: '--font-noto',
   display: 'swap',
 });
 
@@ -46,7 +64,7 @@ export default function RootLayout({
   return (
     <html lang="th" className="light" suppressHydrationWarning>
       <body
-        className={`${notoSansThai.variable} ${inter.variable} font-sans antialiased`}
+        className={`${sarabun.variable} ${prompt.variable} ${inter.variable} ${notoSansThai.variable} font-sans antialiased`}
       >
         <Providers>{children}</Providers>
       </body>

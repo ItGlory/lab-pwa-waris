@@ -1,0 +1,49 @@
+# Milvus Standalone for Development
+# Usage: docker-compose -f docker-compose.milvus.yml up -d
+#
+# This is a lightweight Milvus setup for local development.
+# For production, use the full docker-compose.yml with etcd and minio.
+
+services:
+  # Milvus Standalone (all-in-one) - v2.5.x for better ARM64 support
+  milvus:
+    image: milvusdb/milvus:v2.5.0-beta
+    container_name: waris-milvus-standalone
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      ETCD_USE_EMBED: "true"
+      ETCD_DATA_DIR: /var/lib/milvus/etcd
+      ETCD_CONFIG_PATH: /milvus/configs/embedEtcd.yaml
+      COMMON_STORAGETYPE: local
+    ports:
+      - "19530:19530"  # gRPC
+      - "9091:9091"    # Metrics
+    volumes:
+      - milvus_data:/var/lib/milvus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+    command: ["milvus", "run", "standalone"]
+
+  # Attu - Milvus GUI Management
+  attu:
+    image: zilliz/attu:latest
+    container_name: waris-attu
+    environment:
+      MILVUS_URL: milvus:19530
+    ports:
+      - "8088:3000"
+    depends_on:
+      milvus:
+        condition: service_healthy
+
+volumes:
+  milvus_data:
+
+networks:
+  default:
+    name: waris-milvus-network

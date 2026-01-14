@@ -73,10 +73,19 @@ export function FloatingChat() {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 hover:scale-105 transition-all sm:bottom-6 sm:right-6 sm:h-14 sm:w-14"
+        className={cn(
+          'fixed bottom-4 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full text-white shadow-lg',
+          'bg-gradient-to-br from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)]',
+          'hover:shadow-xl hover:shadow-[var(--pwa-cyan)]/30 hover:scale-105',
+          'transition-all duration-300 press-effect',
+          'sm:bottom-6 sm:right-6 sm:h-14 sm:w-14',
+          'safe-area-inset'
+        )}
       >
         <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6" />
         <span className="sr-only">เปิดแชท</span>
+        {/* Pulse ring effect */}
+        <span className="absolute inset-0 rounded-full animate-ping bg-[var(--pwa-cyan)]/30" style={{ animationDuration: '2s' }} />
       </button>
     );
   }
@@ -84,18 +93,19 @@ export function FloatingChat() {
   return (
     <div
       className={cn(
-        'fixed z-50 flex flex-col overflow-hidden bg-white shadow-2xl transition-all duration-300',
+        'fixed z-50 flex flex-col overflow-hidden bg-white shadow-2xl transition-all duration-300 animate-scale-in',
+        'dark:bg-slate-900',
         // Mobile: full screen when open
-        'inset-0 rounded-none border-0',
+        'inset-0 rounded-none border-0 safe-area-inset',
         // Tablet and up: floating window
-        'sm:inset-auto sm:bottom-4 sm:right-4 sm:rounded-2xl sm:border sm:border-slate-200',
+        'sm:inset-auto sm:bottom-4 sm:right-4 sm:rounded-2xl sm:border sm:border-slate-200 dark:sm:border-slate-700',
         isExpanded
           ? 'sm:left-4 sm:top-4 md:left-auto md:top-auto md:h-[600px] md:w-[450px]'
           : 'sm:h-[450px] sm:w-[340px] md:h-[500px] md:w-[380px]'
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between border-b bg-blue-600 px-4 py-3">
+      <div className="flex items-center justify-between border-b bg-gradient-to-r from-[var(--pwa-blue-deep)] to-[var(--pwa-cyan)] px-4 py-3">
         <div className="flex items-center gap-3">
           <div className="grid h-9 w-9 place-items-center rounded-full bg-white/20">
             <Sparkles className="h-5 w-5 text-white" />
@@ -141,22 +151,28 @@ export function FloatingChat() {
       {/* Messages */}
       <ScrollArea className="flex-1 p-4" ref={scrollRef}>
         {messages.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center text-center">
-            <div className="grid h-14 w-14 place-items-center rounded-2xl bg-blue-100">
-              <Bot className="h-7 w-7 text-blue-600" />
+          <div className="flex h-full flex-col items-center justify-center text-center animate-fade-in">
+            <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-[var(--pwa-cyan-light)]/30 to-[var(--pwa-cyan)]/20">
+              <Bot className="h-7 w-7 text-[var(--pwa-blue-deep)]" />
             </div>
-            <h4 className="mt-4 font-semibold text-slate-900">สวัสดีครับ!</h4>
-            <p className="mt-1 text-sm text-slate-500">
+            <h4 className="mt-4 font-semibold text-slate-900 dark:text-white">สวัสดีครับ!</h4>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               ถามเกี่ยวกับน้ำสูญเสียหรือ DMA ได้เลย
             </p>
 
             {/* Quick Prompts */}
             <div className="mt-4 flex flex-wrap justify-center gap-2">
-              {quickPrompts.map((qp) => (
+              {quickPrompts.map((qp, index) => (
                 <button
                   key={qp.label}
                   type="button"
-                  className="h-8 rounded-md border border-slate-300 bg-white px-3 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  className={cn(
+                    'h-8 rounded-full border border-[var(--pwa-cyan)]/30 bg-[var(--pwa-cyan-light)]/10 px-4 text-xs font-medium text-[var(--pwa-blue-deep)]',
+                    'hover:bg-[var(--pwa-cyan)]/20 hover:border-[var(--pwa-cyan)] hover:scale-105',
+                    'transition-all duration-200 press-effect',
+                    'dark:border-[var(--pwa-cyan)]/50 dark:text-[var(--pwa-cyan-light)] dark:hover:bg-[var(--pwa-cyan)]/20'
+                  )}
+                  style={{ animationDelay: `${index * 100}ms` }}
                   onClick={() => handleQuickPrompt(qp.prompt)}
                 >
                   {qp.label}
@@ -175,7 +191,9 @@ export function FloatingChat() {
                   <AvatarFallback
                     className={cn(
                       'text-xs',
-                      msg.role === 'assistant' ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-700'
+                      msg.role === 'assistant'
+                        ? 'bg-gradient-to-br from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] text-white'
+                        : 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200'
                     )}
                   >
                     {msg.role === 'assistant' ? <Bot className="h-4 w-4" /> : <User className="h-4 w-4" />}
@@ -183,10 +201,10 @@ export function FloatingChat() {
                 </Avatar>
                 <div
                   className={cn(
-                    'max-w-[80%] rounded-2xl px-3 py-2 text-sm',
+                    'max-w-[80%] rounded-2xl px-3 py-2 text-sm transition-all duration-200',
                     msg.role === 'user'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-slate-100 text-slate-900'
+                      ? 'bg-gradient-to-br from-[var(--pwa-blue-deep)] to-[var(--pwa-cyan)] text-white'
+                      : 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100'
                   )}
                 >
                   <div className="whitespace-pre-wrap">{msg.content}</div>
@@ -207,7 +225,7 @@ export function FloatingChat() {
       </ScrollArea>
 
       {/* Input */}
-      <div className="border-t bg-white p-3">
+      <div className="border-t bg-white dark:bg-slate-900 p-3">
         <form onSubmit={handleSubmit} className="flex gap-2">
           <Input
             ref={inputRef}
@@ -215,7 +233,7 @@ export function FloatingChat() {
             onChange={(e) => setInput(e.target.value)}
             placeholder="พิมพ์ข้อความ..."
             disabled={isLoading}
-            className="flex-1 bg-slate-50 border-slate-200"
+            className="flex-1 bg-slate-50 border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-white focus:ring-[var(--pwa-cyan)] focus:border-[var(--pwa-cyan)]"
           />
           {isLoading ? (
             <Button
@@ -223,7 +241,7 @@ export function FloatingChat() {
               size="icon"
               variant="destructive"
               onClick={stopGeneration}
-              className="shrink-0"
+              className="shrink-0 press-effect"
               title="หยุดการตอบ"
             >
               <StopCircle className="h-4 w-4" />
@@ -233,7 +251,7 @@ export function FloatingChat() {
               type="submit"
               size="icon"
               disabled={!input.trim()}
-              className="shrink-0"
+              className="shrink-0 bg-gradient-to-r from-[var(--pwa-blue-deep)] to-[var(--pwa-cyan)] hover:opacity-90 press-effect disabled:opacity-50"
             >
               <Send className="h-4 w-4" />
             </Button>

@@ -63,6 +63,7 @@ from routers import auth_router, dma_router, alerts_router, reports_router, dash
 from routers.ws import router as ws_router
 from routers.etl import router as etl_router
 from routers.ai import router as ai_router
+from routers.knowledge import router as knowledge_router
 
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(dma_router, prefix="/api/v1")
@@ -73,3 +74,4 @@ app.include_router(chat_router, prefix="/api/v1")
 app.include_router(ws_router, prefix="/api/v1")
 app.include_router(etl_router)  # ETL routes for DMAMA integration
 app.include_router(ai_router)  # AI inference routes
+app.include_router(knowledge_router, prefix="/api/v1")  # RAG knowledge base routes
