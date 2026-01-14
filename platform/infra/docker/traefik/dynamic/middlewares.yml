@@ -1,0 +1,92 @@
+# Traefik Dynamic Configuration - Middlewares
+# Security headers and other middlewares for WARIS
+
+http:
+  middlewares:
+    # Security Headers
+    security-headers:
+      headers:
+        browserXssFilter: true
+        contentTypeNosniff: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 31536000
+        customFrameOptionsValue: "SAMEORIGIN"
+        customResponseHeaders:
+          X-Powered-By: "WARIS"
+          Server: "WARIS"
+
+    # CORS for API
+    api-cors:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - PATCH
+          - OPTIONS
+        accessControlAllowOriginList:
+          - https://waris.local
+          - https://api.waris.local
+          - http://localhost:3000
+        accessControlAllowHeaders:
+          - "*"
+        accessControlExposeHeaders:
+          - "*"
+        accessControlAllowCredentials: true
+        accessControlMaxAge: 3600
+
+    # Rate Limiting
+    rate-limit:
+      rateLimit:
+        average: 100
+        burst: 50
+        period: 1m
+
+    # API Rate Limiting (more restrictive)
+    api-rate-limit:
+      rateLimit:
+        average: 50
+        burst: 25
+        period: 1m
+
+    # Compression
+    compression:
+      compress: {}
+
+    # Retry
+    retry:
+      retry:
+        attempts: 3
+        initialInterval: 100ms
+
+    # Circuit Breaker
+    circuit-breaker:
+      circuitBreaker:
+        expression: "NetworkErrorRatio() > 0.3 || ResponseCodeRatio(500, 600, 0, 600) > 0.3"
+
+    # IP Whitelist (for admin endpoints)
+    admin-whitelist:
+      ipWhiteList:
+        sourceRange:
+          - "127.0.0.1/32"
+          - "10.0.0.0/8"
+          - "172.16.0.0/12"
+          - "192.168.0.0/16"
+
+    # Basic Auth (for development tools)
+    basic-auth:
+      basicAuth:
+        users:
+          - "admin:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/"  # admin:admin
+          - "dev:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/"     # dev:dev
+
+    # Request/Response Buffering
+    buffering:
+      buffering:
+        maxRequestBodyBytes: 10485760  # 10MB
+        memRequestBodyBytes: 2097152    # 2MB
+        maxResponseBodyBytes: 10485760  # 10MB
+        memResponseBodyBytes: 2097152   # 2MB

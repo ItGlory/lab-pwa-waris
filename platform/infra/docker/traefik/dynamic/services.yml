@@ -1,0 +1,37 @@
+# Static routes for WARIS services
+http:
+  routers:
+    web:
+      entryPoints:
+        - websecure
+      rule: "Host(`waris.local`)"
+      service: web
+      middlewares:
+        - security-headers
+        - compression
+        - rate-limit
+      tls:
+        certResolver: default
+
+    api:
+      entryPoints:
+        - websecure
+      rule: "Host(`api.waris.local`)"
+      service: api
+      middlewares:
+        - security-headers
+        - compression
+        - rate-limit
+      tls:
+        certResolver: default
+
+  services:
+    web:
+      loadBalancer:
+        servers:
+          - url: "http://waris-web:3000"
+
+    api:
+      loadBalancer:
+        servers:
+          - url: "http://waris-api:8000"

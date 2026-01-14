@@ -1,0 +1,18 @@
+# Traefik Dynamic Configuration - TLS
+# Self-signed certificates for local development
+
+tls:
+  certificates:
+    - certFile: /etc/traefik/certs/waris.local.crt
+      keyFile: /etc/traefik/certs/waris.local.key
+
+  options:
+    default:
+      minVersion: VersionTLS12
+      cipherSuites:
+        - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+
+    modern:
+      minVersion: VersionTLS13

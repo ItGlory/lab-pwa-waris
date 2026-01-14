@@ -1,0 +1,474 @@
+version: "3.9"
+
+# WARIS - Complete Stack with Traefik Reverse Proxy
+# Usage: docker compose -f docker-compose.traefik.yml up -d
+# Access: https://waris.local (add to /etc/hosts)
+
+services:
+  # =====================================================
+  # Traefik Reverse Proxy
+  # =====================================================
+  traefik:
+    image: traefik:v3.3
+    container_name: waris-traefik
+    restart: unless-stopped
+    ports:
+      - "8090:80"       # HTTP (alternative port)
+      - "8443:443"      # HTTPS (alternative port)
+      - "8888:8080"     # Dashboard (alternative port)
+    volumes:
+      - /Users/fero/.docker/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/dynamic:/etc/traefik/dynamic:ro
+      - ./traefik/certs:/etc/traefik/certs:ro
+      - traefik_letsencrypt:/letsencrypt
+      - traefik_logs:/var/log/traefik
+    labels:
+      - "traefik.enable=true"
+
+      # Dashboard
+      - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik.waris.local`)"
+      - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
+      - "traefik.http.routers.traefik-dashboard.tls=true"
+      - "traefik.http.routers.traefik-dashboard.service=api@internal"
+      - "traefik.http.routers.traefik-dashboard.middlewares=admin-whitelist"
+    networks:
+      - waris-network
+
+  # =====================================================
+  # Frontend - Next.js 16
+  # =====================================================
+  web:
+    build:
+      context: ../../apps/web
+      dockerfile: Dockerfile
+      target: development
+    container_name: waris-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"  # Direct access for development
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_TELEMETRY_DISABLED=1
+    volumes:
+      - ../../apps/web:/app
+      - /app/node_modules
+      - /app/.next
+    labels:
+      - "traefik.enable=true"
+
+      # Main frontend
+      - "traefik.http.routers.web.rule=Host(`waris.local`)"
+      - "traefik.http.routers.web.entrypoints=websecure"
+      - "traefik.http.routers.web.tls=true"
+      - "traefik.http.services.web.loadbalancer.server.port=3000"
+
+      # Middlewares
+      - "traefik.http.routers.web.middlewares=security-headers,compression,rate-limit"
+    networks:
+      - waris-network
+    depends_on:
+      - api
+
+  # =====================================================
+  # Backend API - FastAPI
+  # =====================================================
+  api:
+    build:
+      context: ../../apps/api
+      dockerfile: Dockerfile
+      target: development
+    container_name: waris-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"  # Direct access for development
+    environment:
+      DATABASE_URL: postgresql+asyncpg://waris:waris@postgres:5432/waris
+      MONGODB_URL: mongodb://waris:waris@mongodb:27017
+      MONGODB_DB_NAME: waris
+      REDIS_URL: redis://redis:6379
+      MILVUS_HOST: milvus
+      MILVUS_PORT: 19530
+      LLM_SERVER_URL: http://ollama:11434
+      SECRET_KEY: dev-secret-key-change-in-production
+      CORS_ORIGINS: '["https://waris.local","https://api.waris.local"]'
+      DEBUG: "true"
+    volumes:
+      - ../../apps/api:/app
+    labels:
+      - "traefik.enable=true"
+
+      # API endpoints
+      - "traefik.http.routers.api.rule=Host(`api.waris.local`)"
+      - "traefik.http.routers.api.entrypoints=websecure"
+      - "traefik.http.routers.api.tls=true"
+      - "traefik.http.services.api.loadbalancer.server.port=8000"
+
+      # API Docs
+      - "traefik.http.routers.api-docs.rule=Host(`api.waris.local`) && PathPrefix(`/docs`)"
+      - "traefik.http.routers.api-docs.entrypoints=websecure"
+      - "traefik.http.routers.api-docs.tls=true"
+
+      # Middlewares
+      - "traefik.http.routers.api.middlewares=security-headers,api-cors,compression,api-rate-limit,retry"
+
+      # Health check
+      - "traefik.http.routers.api-health.rule=Host(`api.waris.local`) && Path(`/health`)"
+      - "traefik.http.routers.api-health.entrypoints=websecure"
+      - "traefik.http.routers.api-health.middlewares=compression"
+    networks:
+      - waris-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # =====================================================
+  # AI Services - Python
+  # =====================================================
+  ai:
+    build:
+      context: ../../apps/ai
+      dockerfile: Dockerfile
+      target: development
+    container_name: waris-ai
+    restart: unless-stopped
+    environment:
+      MILVUS_HOST: milvus
+      MILVUS_PORT: 19530
+      LLM_SERVER_URL: http://ollama:11434
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - ../../apps/ai:/app
+      - ai_models:/app/models
+    labels:
+      - "traefik.enable=true"
+
+      # AI API
+      - "traefik.http.routers.ai.rule=Host(`ai.waris.local`)"
+      - "traefik.http.routers.ai.entrypoints=websecure"
+      - "traefik.http.routers.ai.tls=true"
+      - "traefik.http.services.ai.loadbalancer.server.port=8001"
+
+      # Middlewares
+      - "traefik.http.routers.ai.middlewares=security-headers,api-cors,compression,api-rate-limit"
+    networks:
+      - waris-network
+    depends_on:
+      - milvus
+      - ollama
+      - redis
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # =====================================================
+  # Database - PostgreSQL 17
+  # =====================================================
+  postgres:
+    image: postgres:17
+    container_name: waris-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: waris
+      POSTGRES_PASSWORD: waris
+      POSTGRES_DB: waris
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=C.UTF-8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - waris-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U waris"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # =====================================================
+  # Database - MongoDB 8.2
+  # =====================================================
+  mongodb:
+    image: mongo:8
+    container_name: waris-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: waris
+      MONGO_INITDB_ROOT_PASSWORD: waris
+      MONGO_INITDB_DATABASE: waris
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - waris-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # =====================================================
+  # Cache - Redis 8
+  # =====================================================
+  redis:
+    image: redis:8-alpine
+    container_name: waris-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass waris
+    volumes:
+      - redis_data:/data
+    networks:
+      - waris-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =====================================================
+  # Vector Database - Milvus 2.6
+  # =====================================================
+  milvus:
+    image: milvusdb/milvus:v2.6.5
+    container_name: waris-milvus
+    restart: unless-stopped
+    environment:
+      ETCD_ENDPOINTS: etcd:2379
+      MINIO_ADDRESS: minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    volumes:
+      - milvus_data:/var/lib/milvus
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.milvus.rule=Host(`milvus.waris.local`)"
+      - "traefik.http.routers.milvus.entrypoints=websecure"
+      - "traefik.http.routers.milvus.tls=true"
+      - "traefik.http.services.milvus.loadbalancer.server.port=19530"
+      - "traefik.http.routers.milvus.middlewares=admin-whitelist"
+    networks:
+      - waris-network
+    depends_on:
+      - etcd
+      - minio
+
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.16
+    container_name: waris-etcd
+    restart: unless-stopped
+    environment:
+      ETCD_AUTO_COMPACTION_MODE: revision
+      ETCD_AUTO_COMPACTION_RETENTION: "1000"
+      ETCD_QUOTA_BACKEND_BYTES: "4294967296"
+      ETCD_SNAPSHOT_COUNT: "50000"
+    volumes:
+      - etcd_data:/etcd
+    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    networks:
+      - waris-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: waris-minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+    command: minio server /data --console-address ":9001"
+    labels:
+      - "traefik.enable=true"
+
+      # MinIO Console
+      - "traefik.http.routers.minio-console.rule=Host(`minio.waris.local`)"
+      - "traefik.http.routers.minio-console.entrypoints=websecure"
+      - "traefik.http.routers.minio-console.tls=true"
+      - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
+      - "traefik.http.routers.minio-console.middlewares=admin-whitelist"
+
+      # MinIO API
+      - "traefik.http.routers.minio-api.rule=Host(`s3.waris.local`)"
+      - "traefik.http.routers.minio-api.entrypoints=websecure"
+      - "traefik.http.routers.minio-api.tls=true"
+      - "traefik.http.services.minio-api.loadbalancer.server.port=9000"
+    networks:
+      - waris-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # =====================================================
+  # LLM Server - Ollama
+  # =====================================================
+  ollama:
+    image: ollama/ollama:latest
+    container_name: waris-ollama
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ollama.rule=Host(`llm.waris.local`)"
+      - "traefik.http.routers.ollama.entrypoints=websecure"
+      - "traefik.http.routers.ollama.tls=true"
+      - "traefik.http.services.ollama.loadbalancer.server.port=11434"
+      - "traefik.http.routers.ollama.middlewares=admin-whitelist"
+    networks:
+      - waris-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # =====================================================
+  # ML Tracking - MLflow
+  # =====================================================
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:latest
+    container_name: waris-mlflow
+    restart: unless-stopped
+    command: mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri postgresql://waris:waris@postgres:5432/mlflow --default-artifact-root s3://mlflow
+    environment:
+      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+      AWS_ACCESS_KEY_ID: minioadmin
+      AWS_SECRET_ACCESS_KEY: minioadmin
+    volumes:
+      - mlflow_data:/mlflow
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mlflow.rule=Host(`mlflow.waris.local`)"
+      - "traefik.http.routers.mlflow.entrypoints=websecure"
+      - "traefik.http.routers.mlflow.tls=true"
+      - "traefik.http.services.mlflow.loadbalancer.server.port=5000"
+      - "traefik.http.routers.mlflow.middlewares=admin-whitelist,security-headers"
+    networks:
+      - waris-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+
+  # =====================================================
+  # Database Admin - pgAdmin 4
+  # =====================================================
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: waris-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@waris.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.waris.local`)"
+      - "traefik.http.routers.pgadmin.entrypoints=websecure"
+      - "traefik.http.routers.pgadmin.tls=true"
+      - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
+      - "traefik.http.routers.pgadmin.middlewares=admin-whitelist,security-headers"
+    networks:
+      - waris-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # =====================================================
+  # Database Admin - Mongo Express
+  # =====================================================
+  mongo-express:
+    image: mongo-express:latest
+    container_name: waris-mongo-express
+    restart: unless-stopped
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: waris
+      ME_CONFIG_MONGODB_ADMINPASSWORD: waris
+      ME_CONFIG_MONGODB_URL: mongodb://waris:waris@mongodb:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mongo-express.rule=Host(`mongo.waris.local`)"
+      - "traefik.http.routers.mongo-express.entrypoints=websecure"
+      - "traefik.http.routers.mongo-express.tls=true"
+      - "traefik.http.services.mongo-express.loadbalancer.server.port=8081"
+      - "traefik.http.routers.mongo-express.middlewares=admin-whitelist,security-headers"
+    networks:
+      - waris-network
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  # =====================================================
+  # Cache Admin - Redis Commander
+  # =====================================================
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: waris-redis-commander
+    restart: unless-stopped
+    environment:
+      REDIS_HOSTS: local:redis:6379:0:waris
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.redis-commander.rule=Host(`redis.waris.local`)"
+      - "traefik.http.routers.redis-commander.entrypoints=websecure"
+      - "traefik.http.routers.redis-commander.tls=true"
+      - "traefik.http.services.redis-commander.loadbalancer.server.port=8081"
+      - "traefik.http.routers.redis-commander.middlewares=admin-whitelist,security-headers"
+    networks:
+      - waris-network
+    depends_on:
+      redis:
+        condition: service_healthy
+
+# =====================================================
+# Volumes
+# =====================================================
+volumes:
+  traefik_letsencrypt:
+  traefik_logs:
+  postgres_data:
+  mongodb_data:
+  mongodb_config:
+  redis_data:
+  milvus_data:
+  etcd_data:
+  minio_data:
+  ollama_data:
+  mlflow_data:
+  pgadmin_data:
+  ai_models:
+
+# =====================================================
+# Networks
+# =====================================================
+networks:
+  waris-network:
+    name: waris-network
+    driver: bridge

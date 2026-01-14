@@ -1,0 +1,5 @@
+services:
+  traefik:
+    volumes:
+      # Use the actual Docker Desktop socket path (not the symlink)
+      - /Users/fero/.docker/run/docker.sock:/var/run/docker.sock:ro
