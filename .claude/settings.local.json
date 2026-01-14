@@ -36,7 +36,29 @@
       "Bash(docker-compose:*)",
       "Bash(docker stop:*)",
       "Bash(docker start:*)",
-      "Bash(docker logs:*)"
+      "Bash(docker logs:*)",
+      "Bash(node --version:*)",
+      "Bash(npm --version:*)",
+      "Bash(docker --version:*)",
+      "Bash(docker compose:*)",
+      "Bash(chmod:*)",
+      "Bash(./generate-certs.sh:*)",
+      "Bash(bash:*)",
+      "Bash(echo:*)",
+      "Bash(sudo tee:*)",
+      "Bash(docker volume rm:*)",
+      "Bash(docker images:*)",
+      "Bash(docker info:*)",
+      "Bash(docker build:*)",
+      "Bash(docker inspect:*)",
+      "Bash(docker restart:*)",
+      "Bash(docker exec waris-web wget -qO- http://localhost:3000)",
+      "Bash(docker exec:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker context:*)",
+      "Bash(./fix-traefik-macos.sh:*)",
+      "Bash(/Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/infra/docker/fix-traefik-macos.sh)",
+      "Bash(docker network:*)"
     ]
   }
 }
