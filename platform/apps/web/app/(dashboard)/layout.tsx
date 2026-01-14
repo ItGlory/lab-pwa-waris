@@ -26,7 +26,7 @@ export default function DashboardLayout({
 
   return (
     <div className="flex min-h-screen min-h-[100dvh]">
-      {/* Desktop Sidebar */}
+      {/* Desktop Sidebar - Fixed */}
       <div className="hidden lg:block">
         <Sidebar
           collapsed={sidebarCollapsed}
@@ -49,8 +49,12 @@ export default function DashboardLayout({
         </>
       )}
 
-      {/* Main Content */}
-      <div className="flex flex-1 flex-col min-w-0">
+      {/* Main Content - Add margin to account for fixed sidebar on desktop */}
+      <div
+        className={`flex flex-1 flex-col min-w-0 transition-all duration-300 ${
+          sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
+        }`}
+      >
         <Header
           alertCount={activeAlertCount}
           onMenuClick={() => setMobileMenuOpen(true)}

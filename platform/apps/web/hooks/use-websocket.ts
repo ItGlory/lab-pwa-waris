@@ -52,6 +52,12 @@ export function useWebSocket({
       return;
     }
 
+    // Disable WebSocket in development if API is not ready
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`WebSocket disabled in development for channel: ${channel}`);
+      return;
+    }
+
     try {
       const ws = new WebSocket(getWebSocketUrl());
 
