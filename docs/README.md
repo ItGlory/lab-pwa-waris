@@ -63,6 +63,20 @@ WARIS is an AI-powered platform for analyzing and reporting water loss data for 
 | [Docker](./infrastructure/docker.md) | Container configurations |
 | [Kubernetes](./infrastructure/kubernetes.md) | K8s deployment |
 
+### Setup & Troubleshooting
+
+| Document | Description |
+|----------|-------------|
+| [QUICKSTART](./setup/QUICKSTART.md) | Quick start guide (5 minutes) |
+| [LOCAL_SETUP](./setup/LOCAL_SETUP.md) | Detailed local setup |
+| [TRAEFIK_SETUP](./setup/TRAEFIK_SETUP.md) | Traefik configuration |
+| **[TROUBLESHOOTING](./TROUBLESHOOTING.md) ⭐** | **Problem-solving guide** |
+| **[QUICK_REFERENCE](./QUICK_REFERENCE.md) ⭐** | **Common commands** |
+| **[LESSONS_LEARNED](./LESSONS_LEARNED.md)** | **Experience & insights** |
+| [URLS](./URLS.md) | Service URLs |
+| [STATUS](./STATUS.md) | System status |
+| [FRONTEND_BACKEND_FIX](./FRONTEND_BACKEND_FIX.md) | Specific fixes |
+
 ### Guides
 
 | Document | Description |
