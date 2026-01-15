@@ -13,7 +13,7 @@ interface MarkdownRendererProps {
 
 export function MarkdownRenderer({ content, className, isUserMessage = false }: MarkdownRendererProps) {
   return (
-    <div className={cn('prose prose-sm max-w-none dark:prose-invert', className)}>
+    <div className={cn('prose prose-sm max-w-none dark:prose-invert break-words', className)}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{

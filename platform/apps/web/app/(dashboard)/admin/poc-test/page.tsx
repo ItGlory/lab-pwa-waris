@@ -31,6 +31,7 @@ import {
   Play,
   Pause,
   RotateCcw,
+  ImageIcon,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -54,6 +55,13 @@ interface Source {
   score: number;
 }
 
+interface ImageData {
+  url: string;
+  title: string;
+  source_url: string;
+  description?: string;
+}
+
 interface Message {
   id: string;
   role: 'user' | 'assistant';
@@ -61,6 +69,7 @@ interface Message {
   timestamp: Date;
   sources?: Source[];
   context_used?: boolean;
+  images?: ImageData[];
 }
 
 interface TestQuestion {
@@ -359,6 +368,7 @@ function POCTestPageContent() {
     answer: string;
     sources: Source[];
     context_used: boolean;
+    images?: ImageData[];
   }> => {
     let lastError: Error | null = null;
 
@@ -437,6 +447,7 @@ function POCTestPageContent() {
         timestamp: new Date(),
         sources: result.sources,
         context_used: result.context_used,
+        images: result.images,
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
@@ -489,25 +500,25 @@ function POCTestPageContent() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] flex-col gap-4">
+    <div className="flex h-[calc(100vh-8rem)] flex-col gap-2 sm:gap-4">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] bg-clip-text text-transparent">
-            ทดสอบ POC - Proof of Concept
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+        <div className="min-w-0">
+          <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] bg-clip-text text-transparent truncate">
+            ทดสอบ POC
           </h1>
-          <p className="text-muted-foreground">
-            ทดสอบความสามารถระบบ AI (60 คะแนน) และ RAG (40 คะแนน) ตามข้อกำหนด POC Challenge
+          <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 sm:line-clamp-none">
+            <span className="hidden sm:inline">ทดสอบความสามารถระบบ AI (60 คะแนน) และ RAG (40 คะแนน) ตามข้อกำหนด POC Challenge</span>
+            <span className="sm:hidden">AI (60) + RAG (40) คะแนน</span>
           </p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
           {/* Score Display */}
-          <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-gradient-to-br from-[var(--pwa-cyan)]/10 to-[var(--pwa-blue-deep)]/5 border">
-            <Award className="h-5 w-5 text-[var(--pwa-cyan)]" />
-            <div className="text-sm">
-              <span className="font-bold text-lg">{currentScore}</span>
+          <div className="flex items-center gap-2 sm:gap-3 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-gradient-to-br from-[var(--pwa-cyan)]/10 to-[var(--pwa-blue-deep)]/5 border">
+            <Award className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--pwa-cyan)]" />
+            <div className="text-xs sm:text-sm">
+              <span className="font-bold text-base sm:text-lg">{currentScore}</span>
               <span className="text-muted-foreground">/{totalPoints}</span>
-              <span className="ml-2 text-xs text-muted-foreground">คะแนน</span>
             </div>
           </div>
           {messages.length > 0 && (
@@ -515,32 +526,36 @@ function POCTestPageContent() {
               variant="outline"
               size="sm"
               onClick={handleClearChat}
-              className="gap-2 hover:bg-red-500/10 hover:text-red-500"
+              className="gap-1.5 sm:gap-2 hover:bg-red-500/10 hover:text-red-500 h-8 sm:h-9 px-2 sm:px-3"
             >
-              <Trash2 className="h-4 w-4" />
-              ล้างประวัติ
+              <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">ล้างประวัติ</span>
             </Button>
           )}
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-        <TabsList className="grid w-full max-w-2xl grid-cols-4">
-          <TabsTrigger value="overview" className="gap-2">
-            <Target className="h-4 w-4" />
-            ภาพรวม
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
+        <TabsList className="grid w-full max-w-2xl grid-cols-4 h-auto">
+          <TabsTrigger value="overview" className="gap-1 sm:gap-2 px-1 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-sm">
+            <Target className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">ภาพรวม</span>
+            <span className="sm:hidden">รวม</span>
           </TabsTrigger>
-          <TabsTrigger value="ai-test" className="gap-2">
-            <Brain className="h-4 w-4" />
-            AI Test (60)
+          <TabsTrigger value="ai-test" className="gap-1 sm:gap-2 px-1 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-sm">
+            <Brain className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">AI Test (60)</span>
+            <span className="sm:hidden">AI</span>
           </TabsTrigger>
-          <TabsTrigger value="rag-test" className="gap-2">
-            <Database className="h-4 w-4" />
-            RAG Test (40)
+          <TabsTrigger value="rag-test" className="gap-1 sm:gap-2 px-1 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-sm">
+            <Database className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">RAG Test (40)</span>
+            <span className="sm:hidden">RAG</span>
           </TabsTrigger>
-          <TabsTrigger value="chat" className="gap-2">
-            <MessageSquare className="h-4 w-4" />
-            แชท
+          <TabsTrigger value="chat" className="gap-1 sm:gap-2 px-1 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-sm">
+            <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">แชท</span>
+            <span className="sm:hidden">Chat</span>
           </TabsTrigger>
         </TabsList>
 
@@ -940,41 +955,43 @@ function POCTestPageContent() {
           </div>
         </TabsContent>
 
-        <TabsContent value="chat" className="flex-1 mt-4">
-          <Card className="h-full flex flex-col">
-            <CardHeader className="border-b py-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <div className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] text-white">
-                  <Sparkles className="h-4 w-4" />
+        <TabsContent value="chat" className="flex-1 mt-2 sm:mt-4 min-h-0">
+          <Card className="h-full flex flex-col overflow-hidden border-0 sm:border shadow-none sm:shadow-sm">
+            <CardHeader className="border-b py-2 sm:py-3 px-3 sm:px-6 shrink-0">
+              <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                <div className="grid h-7 w-7 sm:h-8 sm:w-8 place-items-center rounded-xl bg-gradient-to-br from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] text-white shrink-0">
+                  <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </div>
-                <span className="bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] bg-clip-text text-transparent font-semibold">
+                <span className="bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] bg-clip-text text-transparent font-semibold truncate">
                   POC RAG Test
                 </span>
-                <Badge variant="outline" className="ml-2 text-xs">
-                  Knowledge Base + LLM
+                <Badge variant="outline" className="ml-auto sm:ml-2 text-[10px] sm:text-xs shrink-0">
+                  KB + LLM
                 </Badge>
               </CardTitle>
             </CardHeader>
 
-            <CardContent className="flex-1 flex flex-col overflow-hidden p-0">
+            <CardContent className="flex-1 flex flex-col overflow-hidden p-0 min-h-0">
               {/* Messages Area */}
-              <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+              <ScrollArea className="flex-1 px-2 py-3 sm:p-4" ref={scrollRef}>
                 {messages.length === 0 ? (
-                  <div className="flex h-full flex-col items-center justify-center py-12">
-                    <div className="grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10">
-                      <BookOpen className="h-8 w-8 text-[var(--pwa-cyan)]" />
+                  <div className="flex h-full flex-col items-center justify-center py-6 sm:py-12 px-4">
+                    <div className="grid h-12 w-12 sm:h-16 sm:w-16 place-items-center rounded-2xl bg-gradient-to-br from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10">
+                      <BookOpen className="h-6 w-6 sm:h-8 sm:w-8 text-[var(--pwa-cyan)]" />
                     </div>
-                    <h2 className="mt-4 text-lg font-semibold">ทดสอบระบบ RAG</h2>
-                    <p className="mt-2 text-center text-muted-foreground text-sm max-w-md">
+                    <h2 className="mt-3 sm:mt-4 text-base sm:text-lg font-semibold">ทดสอบระบบ RAG</h2>
+                    <p className="mt-2 text-center text-muted-foreground text-xs sm:text-sm max-w-md">
                       ถามคำถามจากเอกสาร PWA67_10-3.pdf และ PWA67_10-4.pdf
-                      <br />
+                      <br className="hidden sm:block" />
+                      <span className="sm:hidden"> - </span>
                       ระบบจะดึงข้อมูลจาก Knowledge Base มาช่วยตอบ
                     </p>
-                    <div className="mt-4 flex gap-2">
+                    <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => setActiveTab('rag-test')}
+                        className="w-full sm:w-auto"
                       >
                         <Database className="h-4 w-4 mr-2" />
                         คำถาม RAG
@@ -983,6 +1000,7 @@ function POCTestPageContent() {
                         variant="outline"
                         size="sm"
                         onClick={() => setActiveTab('ai-test')}
+                        className="w-full sm:w-auto"
                       >
                         <Brain className="h-4 w-4 mr-2" />
                         คำถาม AI
@@ -990,18 +1008,18 @@ function POCTestPageContent() {
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {messages.map((message) => (
                       <div
                         key={message.id}
                         className={cn(
-                          'flex gap-3',
+                          'flex gap-2 sm:gap-3',
                           message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
                         )}
                       >
                         <Avatar
                           className={cn(
-                            'h-8 w-8 shrink-0',
+                            'h-6 w-6 sm:h-8 sm:w-8 shrink-0',
                             message.role === 'assistant'
                               ? 'bg-gradient-to-br from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)]'
                               : ''
@@ -1011,16 +1029,18 @@ function POCTestPageContent() {
                             className={message.role === 'assistant' ? 'bg-transparent text-white' : ''}
                           >
                             {message.role === 'assistant' ? (
-                              <Bot className="h-4 w-4" />
+                              <Bot className="h-3 w-3 sm:h-4 sm:w-4" />
                             ) : (
-                              <User className="h-4 w-4" />
+                              <User className="h-3 w-3 sm:h-4 sm:w-4" />
                             )}
                           </AvatarFallback>
                         </Avatar>
 
                         <div
                           className={cn(
-                            'group relative max-w-[85%] rounded-2xl px-4 py-3',
+                            'group relative rounded-xl sm:rounded-2xl px-3 py-2 sm:px-4 sm:py-3',
+                            'max-w-[85%] sm:max-w-[80%]',
+                            'break-words overflow-hidden',
                             message.role === 'user'
                               ? 'bg-gradient-to-br from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] text-white'
                               : 'bg-muted/80'
@@ -1031,22 +1051,56 @@ function POCTestPageContent() {
                                             isUserMessage={message.role === 'user'}
                                           />
 
+                          {/* Images Section for Assistant - from URL meta tags */}
+                          {message.role === 'assistant' && message.images && message.images.length > 0 && (
+                            <div className="mt-2 sm:mt-3 space-y-2">
+                              {message.images.map((img, idx) => (
+                                <a
+                                  key={idx}
+                                  href={img.source_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="block rounded-lg overflow-hidden border bg-background/50 hover:border-[var(--pwa-cyan)] transition-all"
+                                >
+                                  <div className="relative aspect-video w-full bg-muted">
+                                    <img
+                                      src={img.url}
+                                      alt={img.title || 'Article image'}
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => {
+                                        (e.target as HTMLImageElement).style.display = 'none';
+                                      }}
+                                    />
+                                  </div>
+                                  <div className="p-2">
+                                    <p className="text-xs font-medium text-foreground line-clamp-1 flex items-center gap-1">
+                                      <ImageIcon className="h-3 w-3 text-[var(--pwa-cyan)] shrink-0" />
+                                      <span className="truncate">{img.title}</span>
+                                    </p>
+                                  </div>
+                                </a>
+                              ))}
+                            </div>
+                          )}
+
                           {/* Sources Section for Assistant */}
                           {message.role === 'assistant' && message.sources && message.sources.length > 0 && (
                             <Collapsible
                               open={expandedSources.has(message.id)}
                               onOpenChange={() => toggleSources(message.id)}
-                              className="mt-3"
+                              className="mt-2 sm:mt-3"
                             >
                               <CollapsibleTrigger asChild>
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="w-full justify-between text-xs hover:bg-background/50"
+                                  className="w-full justify-between text-[10px] sm:text-xs hover:bg-background/50 h-7 sm:h-8 px-2 sm:px-3"
                                 >
                                   <span className="flex items-center gap-1">
                                     <BookOpen className="h-3 w-3" />
-                                    แหล่งอ้างอิง ({message.sources.length})
+                                    <span className="hidden sm:inline">แหล่งอ้างอิง</span>
+                                    <span className="sm:hidden">อ้างอิง</span>
+                                    ({message.sources.length})
                                   </span>
                                   {expandedSources.has(message.id) ? (
                                     <ChevronUp className="h-3 w-3" />
@@ -1055,19 +1109,19 @@ function POCTestPageContent() {
                                   )}
                                 </Button>
                               </CollapsibleTrigger>
-                              <CollapsibleContent className="mt-2 space-y-2">
+                              <CollapsibleContent className="mt-1.5 sm:mt-2 space-y-1.5 sm:space-y-2">
                                 {message.sources.map((source, idx) => (
                                   <div
                                     key={idx}
-                                    className="rounded-lg bg-background/50 p-2 text-xs border"
+                                    className="rounded-lg bg-background/50 p-1.5 sm:p-2 text-[10px] sm:text-xs border"
                                   >
-                                    <div className="flex items-center justify-between mb-1">
-                                      <span className="font-medium truncate flex-1">
+                                    <div className="flex items-center justify-between mb-0.5 sm:mb-1 gap-2">
+                                      <span className="font-medium truncate flex-1 min-w-0">
                                         {source.title || 'เอกสาร'}
                                       </span>
                                       <Badge
                                         variant="secondary"
-                                        className={cn('ml-2 text-[10px]', getScoreColor(source.score))}
+                                        className={cn('shrink-0 text-[9px] sm:text-[10px] px-1 sm:px-1.5', getScoreColor(source.score))}
                                       >
                                         {(source.score * 100).toFixed(0)}%
                                       </Badge>
@@ -1083,33 +1137,40 @@ function POCTestPageContent() {
 
                           {/* Context indicator */}
                           {message.role === 'assistant' && message.context_used !== undefined && (
-                            <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
+                            <div className="mt-1.5 sm:mt-2 flex items-center gap-1 text-[10px] sm:text-xs text-muted-foreground">
                               {message.context_used ? (
                                 <>
-                                  <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-                                  ใช้ข้อมูลจาก Knowledge Base
+                                  <CheckCircle2 className="h-3 w-3 text-emerald-500 shrink-0" />
+                                  <span className="hidden sm:inline">ใช้ข้อมูลจาก Knowledge Base</span>
+                                  <span className="sm:hidden">ใช้ KB</span>
                                 </>
                               ) : (
                                 <>
-                                  <AlertCircle className="h-3 w-3 text-amber-500" />
-                                  ไม่พบข้อมูลในฐานความรู้
+                                  <AlertCircle className="h-3 w-3 text-amber-500 shrink-0" />
+                                  <span className="hidden sm:inline">ไม่พบข้อมูลในฐานความรู้</span>
+                                  <span className="sm:hidden">ไม่พบใน KB</span>
                                 </>
                               )}
                             </div>
                           )}
 
-                          {/* Copy button */}
+                          {/* Copy button - inside bubble on mobile, outside on desktop */}
                           {message.content && message.role === 'assistant' && (
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="absolute -right-10 top-0 h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100"
+                              className={cn(
+                                'h-6 w-6 sm:h-8 sm:w-8 transition-opacity',
+                                'sm:absolute sm:-right-10 sm:top-0',
+                                'mt-2 sm:mt-0',
+                                'opacity-70 hover:opacity-100 sm:opacity-0 sm:group-hover:opacity-100'
+                              )}
                               onClick={() => handleCopy(message.content, message.id)}
                             >
                               {copiedId === message.id ? (
-                                <Check className="h-4 w-4 text-emerald-500" />
+                                <Check className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-500" />
                               ) : (
-                                <Copy className="h-4 w-4" />
+                                <Copy className="h-3 w-3 sm:h-4 sm:w-4" />
                               )}
                             </Button>
                           )}
@@ -1119,9 +1180,12 @@ function POCTestPageContent() {
                             message.role === 'assistant' &&
                             message.id === messages[messages.length - 1]?.id &&
                             !message.content && (
-                              <div className="flex items-center gap-2">
-                                <Loader2 className="h-4 w-4 animate-spin text-[var(--pwa-cyan)]" />
-                                <span className="text-sm text-muted-foreground">กำลังค้นหาและประมวลผล...</span>
+                              <div className="flex items-center gap-1.5 sm:gap-2">
+                                <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin text-[var(--pwa-cyan)]" />
+                                <span className="text-xs sm:text-sm text-muted-foreground">
+                                  <span className="hidden sm:inline">กำลังค้นหาและประมวลผล...</span>
+                                  <span className="sm:hidden">กำลังค้นหา...</span>
+                                </span>
                               </div>
                             )}
                         </div>
@@ -1132,31 +1196,32 @@ function POCTestPageContent() {
               </ScrollArea>
 
               {/* Input Area */}
-              <div className="border-t p-4">
-                <form onSubmit={handleSubmit} className="flex gap-2">
+              <div className="border-t p-2 sm:p-4 shrink-0">
+                <form onSubmit={handleSubmit} className="flex gap-1.5 sm:gap-2">
                   <Input
                     ref={inputRef}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="พิมพ์คำถามเพื่อทดสอบ RAG..."
+                    placeholder="พิมพ์คำถาม..."
                     disabled={isLoading}
-                    className="flex-1"
+                    className="flex-1 h-9 sm:h-10 text-sm"
                   />
                   <Button
                     type="submit"
                     disabled={isLoading || !input.trim()}
-                    className="gap-2 bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)]"
+                    className="gap-1 sm:gap-2 bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] h-9 sm:h-10 px-3 sm:px-4"
                   >
                     {isLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <Send className="h-4 w-4" />
                     )}
-                    ส่ง
+                    <span className="hidden sm:inline">ส่ง</span>
                   </Button>
                 </form>
-                <p className="mt-2 text-center text-xs text-muted-foreground">
-                  POC Test Mode - ตอบจาก Knowledge Base เท่านั้น
+                <p className="mt-1.5 sm:mt-2 text-center text-[10px] sm:text-xs text-muted-foreground">
+                  <span className="hidden sm:inline">POC Test Mode - ตอบจาก Knowledge Base เท่านั้น</span>
+                  <span className="sm:hidden">ตอบจาก Knowledge Base</span>
                 </p>
               </div>
             </CardContent>
