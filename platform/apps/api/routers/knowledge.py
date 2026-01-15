@@ -67,6 +67,7 @@ class RAGChatResponse(BaseModel):
     provider: Optional[str]
     sources: List[dict]
     context_used: bool
+    images: Optional[List[dict]] = None  # List of {url, title, source_url}
 
 
 @router.get("/status")
@@ -665,9 +666,10 @@ def _keyword_search(query: str, documents: List[dict], top_k: int = 5) -> List[d
 
 
 async def _fetch_url_content(url: str) -> dict:
-    """Fetch content from external URL"""
+    """Fetch content from external URL with meta image extraction"""
     import httpx
     from bs4 import BeautifulSoup
+    from urllib.parse import urljoin
 
     try:
         async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
@@ -680,12 +682,90 @@ async def _fetch_url_content(url: str) -> dict:
             # Parse HTML
             soup = BeautifulSoup(response.text, "html.parser")
 
-            # Remove script and style elements
+            # Extract meta images (Open Graph, Twitter Cards, etc.)
+            image_url = None
+            description = None
+
+            # Try Open Graph image first (most common)
+            og_image = soup.find("meta", property="og:image")
+            if og_image and og_image.get("content"):
+                image_url = og_image["content"]
+
+            # Try Twitter Card image
+            if not image_url:
+                twitter_image = soup.find("meta", attrs={"name": "twitter:image"})
+                if twitter_image and twitter_image.get("content"):
+                    image_url = twitter_image["content"]
+
+            # Try standard meta image
+            if not image_url:
+                meta_image = soup.find("meta", attrs={"name": "image"})
+                if meta_image and meta_image.get("content"):
+                    image_url = meta_image["content"]
+
+            # Try first article/content image as fallback
+            if not image_url:
+                for selector in [
+                    "article img",
+                    "main img",
+                    ".content img",
+                    "#content img",
+                    ".post img",
+                    ".news img",
+                    ".entry img",
+                    "img.img-thumbnail",
+                    "img.featured",
+                    "img.post-image",
+                    ".container img",
+                ]:
+                    img = soup.select_one(selector)
+                    if img and img.get("src"):
+                        # Skip logo, icon, and counter images
+                        src = img["src"].lower()
+                        if not any(skip in src for skip in ["logo", "icon", "avatar", "counter", "stats", "pixel"]):
+                            image_url = img["src"]
+                            break
+
+            # Last resort: find first large-ish image in body
+            if not image_url:
+                for img in soup.find_all("img", src=True):
+                    src = img["src"].lower()
+                    # Skip small images, logos, icons
+                    if any(skip in src for skip in ["logo", "icon", "avatar", "counter", "stats", "pixel", "btn", "button"]):
+                        continue
+                    # Prefer images that look like content images (usually in /news/, /uploads/, /images/, etc)
+                    if any(hint in src for hint in ["/news/", "/upload", "/photo", "/image", "/media", "/content"]):
+                        image_url = img["src"]
+                        break
+
+            # Make image URL absolute if relative
+            if image_url and not image_url.startswith(("http://", "https://")):
+                image_url = urljoin(url, image_url)
+
+            # Get Open Graph description
+            og_desc = soup.find("meta", property="og:description")
+            if og_desc and og_desc.get("content"):
+                description = og_desc["content"]
+
+            # Try meta description
+            if not description:
+                meta_desc = soup.find("meta", attrs={"name": "description"})
+                if meta_desc and meta_desc.get("content"):
+                    description = meta_desc["content"]
+
+            # Get Open Graph title (often better than page title)
+            og_title = soup.find("meta", property="og:title")
+            title = None
+            if og_title and og_title.get("content"):
+                title = og_title["content"]
+            elif soup.title:
+                title = soup.title.string
+            else:
+                title = url
+
+            # Remove script and style elements for content extraction
             for element in soup(["script", "style", "nav", "footer", "header", "aside"]):
                 element.decompose()
-
-            # Get title
-            title = soup.title.string if soup.title else url
 
             # Try to find main content
             main_content = None
@@ -718,6 +798,8 @@ async def _fetch_url_content(url: str) -> dict:
                 "url": url,
                 "title": title,
                 "content": main_content,
+                "image": image_url,
+                "description": description,
             }
 
     except Exception as e:
@@ -727,6 +809,8 @@ async def _fetch_url_content(url: str) -> dict:
             "url": url,
             "title": url,
             "content": "",
+            "image": None,
+            "description": None,
             "error": str(e),
         }
 
@@ -751,6 +835,7 @@ async def rag_chat(request: RAGChatRequest):
     try:
         context_parts = []
         sources = []
+        images = []  # Store extracted images
 
         # Check if message contains URLs - fetch external content
         urls = _extract_urls(request.message)
@@ -772,6 +857,15 @@ async def rag_chat(request: RAGChatRequest):
                         "source": result["url"],
                         "score": 1.0,
                     })
+
+                    # Add image if available
+                    if result.get("image"):
+                        images.append({
+                            "url": result["image"],
+                            "title": result["title"],
+                            "source_url": result["url"],
+                            "description": result.get("description"),
+                        })
                 else:
                     logger.warning(f"Failed to fetch URL: {url}")
         else:
@@ -858,6 +952,7 @@ async def rag_chat(request: RAGChatRequest):
             provider=response.get("provider"),
             sources=sources,
             context_used=len(sources) > 0,
+            images=images if images else None,
         )
 
     except Exception as e:
