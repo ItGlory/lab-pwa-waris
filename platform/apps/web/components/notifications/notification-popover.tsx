@@ -53,37 +53,52 @@ interface NotificationPopoverProps {
   onViewAll?: () => void;
 }
 
-// Configuration
+// Enhanced severity configuration with glassmorphism styles
 const severityConfig = {
   critical: {
     icon: AlertCircle,
-    color: 'text-red-500',
-    bg: 'bg-red-100 dark:bg-red-900/30',
+    color: 'text-white',
+    bg: 'bg-gradient-to-br from-red-500 to-rose-600',
     dot: 'bg-red-500',
+    glow: 'shadow-red-500/40',
+    ring: 'ring-red-500/30',
+    pulse: true,
   },
   high: {
     icon: AlertTriangle,
-    color: 'text-orange-500',
-    bg: 'bg-orange-100 dark:bg-orange-900/30',
+    color: 'text-white',
+    bg: 'bg-gradient-to-br from-orange-500 to-amber-600',
     dot: 'bg-orange-500',
+    glow: 'shadow-orange-500/30',
+    ring: 'ring-orange-500/30',
+    pulse: false,
   },
   medium: {
     icon: AlertTriangle,
-    color: 'text-amber-500',
-    bg: 'bg-amber-100 dark:bg-amber-900/30',
+    color: 'text-white',
+    bg: 'bg-gradient-to-br from-amber-500 to-yellow-600',
     dot: 'bg-amber-500',
+    glow: 'shadow-amber-500/30',
+    ring: 'ring-amber-500/30',
+    pulse: false,
   },
   low: {
     icon: Info,
-    color: 'text-blue-500',
-    bg: 'bg-blue-100 dark:bg-blue-900/30',
+    color: 'text-white',
+    bg: 'bg-gradient-to-br from-blue-500 to-cyan-600',
     dot: 'bg-blue-500',
+    glow: 'shadow-blue-500/30',
+    ring: 'ring-blue-500/30',
+    pulse: false,
   },
   info: {
     icon: Info,
-    color: 'text-slate-500',
-    bg: 'bg-slate-100 dark:bg-slate-800',
+    color: 'text-white',
+    bg: 'bg-gradient-to-br from-slate-500 to-slate-600',
     dot: 'bg-slate-500',
+    glow: 'shadow-slate-500/30',
+    ring: 'ring-slate-500/30',
+    pulse: false,
   },
 };
 
@@ -109,38 +124,41 @@ function formatRelativeTime(date: Date): string {
   return date.toLocaleDateString('th-TH');
 }
 
-// Loading Skeleton
+// Loading Skeleton with enhanced styling
 function NotificationItemSkeleton() {
   return (
     <div className="flex gap-3 p-3">
-      <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
+      <Skeleton className="h-10 w-10 shrink-0 rounded-xl skeleton-shimmer" />
       <div className="flex-1 space-y-2">
-        <Skeleton className="h-4 w-3/4" />
-        <Skeleton className="h-3 w-full" />
-        <Skeleton className="h-3 w-1/3" />
+        <Skeleton className="h-4 w-3/4 rounded-lg skeleton-shimmer" />
+        <Skeleton className="h-3 w-full rounded-lg skeleton-shimmer" />
+        <Skeleton className="h-3 w-1/3 rounded-lg skeleton-shimmer" />
       </div>
     </div>
   );
 }
 
-// Empty State
+// Empty State with modern design
 function EmptyNotifications() {
   return (
-    <div className="flex flex-col items-center justify-center py-8 text-center">
-      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-        <Bell className="h-6 w-6 text-slate-400" />
+    <div className="flex flex-col items-center justify-center py-10 text-center">
+      <div className="relative">
+        <div className="absolute inset-0 rounded-2xl bg-[var(--pwa-cyan)]/20 blur-xl animate-pulse" />
+        <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/20 ring-1 ring-[var(--pwa-cyan)]/20">
+          <Bell className="h-7 w-7 text-[var(--pwa-cyan)]" />
+        </div>
       </div>
-      <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+      <p className="mt-4 text-sm font-semibold text-foreground">
         ไม่มีการแจ้งเตือน
       </p>
-      <p className="mt-1 text-xs text-slate-500">
+      <p className="mt-1 text-xs text-muted-foreground">
         คุณจะได้รับการแจ้งเตือนที่นี่
       </p>
     </div>
   );
 }
 
-// Notification Item Component
+// Notification Item Component with modern styling
 function NotificationListItem({
   notification,
   onClick,
@@ -156,18 +174,26 @@ function NotificationListItem({
     <button
       onClick={onClick}
       className={cn(
-        'flex w-full items-start gap-3 p-3 text-left transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50',
-        isUnread && 'bg-blue-50/50 dark:bg-blue-900/10'
+        'group flex w-full items-start gap-3 p-3 text-left',
+        'transition-all duration-300',
+        'hover:bg-muted/50 hover:-translate-y-0.5',
+        isUnread && 'bg-[var(--pwa-cyan)]/5',
+        severity.pulse && isUnread && 'animate-breathing-glow'
       )}
     >
-      {/* Icon */}
+      {/* Icon with gradient and glow */}
       <div
         className={cn(
-          'flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
-          severity.bg
+          'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl',
+          'shadow-lg transition-all duration-300',
+          'group-hover:scale-110 group-hover:rotate-3',
+          severity.bg,
+          severity.glow
         )}
       >
-        <SeverityIcon className={cn('h-4 w-4', severity.color)} />
+        {/* Inner glow on hover */}
+        <div className="absolute inset-0 rounded-xl bg-white/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        <SeverityIcon className={cn('relative h-4.5 w-4.5', severity.color)} />
       </div>
 
       {/* Content */}
@@ -175,29 +201,37 @@ function NotificationListItem({
         <div className="flex items-start gap-2">
           <p
             className={cn(
-              'line-clamp-1 text-sm',
-              isUnread ? 'font-semibold' : 'font-medium'
+              'line-clamp-1 text-sm transition-colors',
+              isUnread ? 'font-semibold text-foreground' : 'font-medium text-foreground/80'
             )}
           >
             {notification.title_th}
           </p>
           {isUnread && (
-            <span className={cn('mt-1.5 h-2 w-2 shrink-0 rounded-full', severity.dot)} />
+            <span className={cn(
+              'mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full',
+              severity.dot,
+              'shadow-lg animate-pulse',
+              `shadow-${severity.dot.replace('bg-', '')}/50`
+            )} />
           )}
         </div>
-        <p className="mt-0.5 line-clamp-2 text-xs text-slate-500 dark:text-slate-400">
+        <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground/80">
           {notification.description_th}
         </p>
-        <div className="mt-1.5 flex items-center gap-2 text-xs text-slate-400">
+        <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground/60">
           <span>{formatRelativeTime(notification.createdAt)}</span>
           {notification.metadata?.dmaId && (
             <>
-              <span>•</span>
-              <span className="font-mono">{notification.metadata.dmaId}</span>
+              <span className="h-1 w-1 rounded-full bg-muted-foreground/30" />
+              <span className="font-mono text-[var(--pwa-cyan)] font-medium">{notification.metadata.dmaId}</span>
             </>
           )}
         </div>
       </div>
+
+      {/* Hover indicator */}
+      <ChevronRight className="h-4 w-4 text-muted-foreground/30 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0.5 self-center" />
     </button>
   );
 }
@@ -231,11 +265,20 @@ export function NotificationPopover({
       <Tooltip>
         <TooltipTrigger asChild>
           <PopoverTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative h-9 w-9">
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                'relative h-9 w-9 rounded-xl text-white/80 hover:bg-white/10 hover:text-white',
+                'transition-all duration-300 hover:scale-105'
+              )}
+            >
               <Bell className="h-5 w-5" />
               {unreadCount > 0 && (
-                <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white shadow-sm">
+                <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-gradient-to-r from-red-500 to-rose-500 px-1.5 text-[10px] font-bold leading-none text-white shadow-lg shadow-red-500/40 ring-1 ring-white/20">
                   {unreadCount > 99 ? '99+' : unreadCount}
+                  {/* Pulse effect */}
+                  <span className="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-30" />
                 </span>
               )}
             </Button>
@@ -246,15 +289,28 @@ export function NotificationPopover({
 
       <PopoverContent
         align="end"
-        className="w-80 p-0 sm:w-96"
+        className={cn(
+          'w-80 p-0 sm:w-[400px]',
+          'backdrop-blur-xl bg-background/95',
+          'border border-border/50',
+          'shadow-2xl shadow-slate-200/50 dark:shadow-slate-950/50',
+          'ring-1 ring-black/5 dark:ring-white/5',
+          'animate-elastic'
+        )}
         sideOffset={8}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between border-b px-4 py-3">
-          <div className="flex items-center gap-2">
+        {/* Header with gradient */}
+        <div className="relative flex items-center justify-between border-b border-border/50 px-4 py-3.5 bg-gradient-to-r from-[var(--pwa-cyan)]/5 to-transparent">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--pwa-cyan)]/10 ring-1 ring-[var(--pwa-cyan)]/20">
+              <Bell className="h-4 w-4 text-[var(--pwa-cyan)]" />
+            </div>
             <h3 className="font-semibold">การแจ้งเตือน</h3>
             {unreadCount > 0 && (
-              <Badge variant="default" className="h-5 px-1.5 text-xs">
+              <Badge
+                variant="default"
+                className="h-5 px-2 text-xs bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] shadow-sm"
+              >
                 {unreadCount} ใหม่
               </Badge>
             )}
@@ -263,19 +319,19 @@ export function NotificationPopover({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 text-xs"
+              className="h-8 text-xs text-[var(--pwa-cyan)] hover:text-[var(--pwa-cyan)] hover:bg-[var(--pwa-cyan)]/10 transition-all duration-300"
               onClick={onMarkAllAsRead}
             >
-              <CheckCheck className="mr-1 h-3.5 w-3.5" />
+              <CheckCheck className="mr-1.5 h-3.5 w-3.5" />
               อ่านทั้งหมด
             </Button>
           )}
         </div>
 
         {/* Content */}
-        <ScrollArea className="max-h-[400px]">
+        <ScrollArea className="max-h-[420px] modern-scrollbar">
           {isLoading ? (
-            <div className="divide-y">
+            <div className="divide-y divide-border/30">
               {[1, 2, 3].map((i) => (
                 <NotificationItemSkeleton key={i} />
               ))}
@@ -283,36 +339,44 @@ export function NotificationPopover({
           ) : latestNotifications.length === 0 ? (
             <EmptyNotifications />
           ) : (
-            <div className="divide-y">
-              {latestNotifications.map((notification) => (
-                <NotificationListItem
+            <div className="divide-y divide-border/30">
+              {latestNotifications.map((notification, index) => (
+                <div
                   key={notification.id}
-                  notification={notification}
-                  onClick={() => handleNotificationClick(notification)}
-                />
+                  className="animate-slide-up-fade"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <NotificationListItem
+                    notification={notification}
+                    onClick={() => handleNotificationClick(notification)}
+                  />
+                </div>
               ))}
             </div>
           )}
         </ScrollArea>
 
-        {/* Footer */}
+        {/* Footer with gradient */}
         {!isLoading && latestNotifications.length > 0 && (
-          <>
-            <Separator />
-            <div className="p-2">
-              <Button
-                variant="ghost"
-                className="w-full justify-between text-sm"
-                onClick={handleViewAll}
-                asChild
-              >
-                <Link href="/notifications">
-                  ดูการแจ้งเตือนทั้งหมด
-                  <ChevronRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </>
+          <div className="relative border-t border-border/50 p-2 bg-muted/30">
+            {/* Top glow line */}
+            <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-[var(--pwa-cyan)]/20 to-transparent" />
+            <Button
+              variant="ghost"
+              className={cn(
+                'w-full justify-between text-sm font-medium',
+                'text-[var(--pwa-cyan)] hover:text-[var(--pwa-cyan)] hover:bg-[var(--pwa-cyan)]/10',
+                'transition-all duration-300 rounded-xl'
+              )}
+              onClick={handleViewAll}
+              asChild
+            >
+              <Link href="/notifications" className="group">
+                ดูการแจ้งเตือนทั้งหมด
+                <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+              </Link>
+            </Button>
+          </div>
         )}
       </PopoverContent>
     </Popover>

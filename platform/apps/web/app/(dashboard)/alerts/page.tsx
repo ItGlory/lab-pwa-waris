@@ -229,27 +229,29 @@ export default function AlertsPage() {
       {/* Compact Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <h1 className="text-xl font-bold text-foreground">การแจ้งเตือน</h1>
+          <h1 className="text-xl font-bold bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] bg-clip-text text-transparent">
+            การแจ้งเตือน
+          </h1>
           {/* Compact Summary Badges */}
           <div className="hidden sm:flex items-center gap-1">
             {summaryCounts.critical > 0 && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500 text-white text-xs font-medium">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-medium shadow-lg shadow-red-500/30 animate-breathing-glow">
                 <AlertCircle className="h-3 w-3" />
                 {summaryCounts.critical}
               </span>
             )}
             {summaryCounts.high > 0 && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-500 text-white text-xs font-medium">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-medium shadow-lg shadow-orange-500/20">
                 {summaryCounts.high}
               </span>
             )}
             {summaryCounts.medium > 0 && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500 text-white text-xs font-medium">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-medium shadow-lg shadow-amber-500/20">
                 {summaryCounts.medium}
               </span>
             )}
             {summaryCounts.low > 0 && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500 text-white text-xs font-medium">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium shadow-lg shadow-blue-500/20">
                 {summaryCounts.low}
               </span>
             )}
@@ -257,11 +259,14 @@ export default function AlertsPage() {
         </div>
         <div className="flex items-center gap-2">
           {/* View Toggle */}
-          <div className="flex rounded-lg border border-slate-200 bg-background p-0.5">
+          <div className="flex rounded-xl border border-border/50 bg-background/80 backdrop-blur-sm p-0.5 shadow-sm">
             <Button
               variant={viewMode === 'list' ? 'default' : 'ghost'}
               size="sm"
-              className="h-7 px-2 gap-1"
+              className={cn(
+                "h-7 px-3 gap-1.5 rounded-lg transition-all",
+                viewMode === 'list' && 'bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] text-white shadow-md shadow-[var(--pwa-cyan)]/30'
+              )}
               onClick={() => setViewMode('list')}
             >
               <List className="h-3.5 w-3.5" />
@@ -270,7 +275,10 @@ export default function AlertsPage() {
             <Button
               variant={viewMode === 'map' ? 'default' : 'ghost'}
               size="sm"
-              className="h-7 px-2 gap-1"
+              className={cn(
+                "h-7 px-3 gap-1.5 rounded-lg transition-all",
+                viewMode === 'map' && 'bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] text-white shadow-md shadow-[var(--pwa-cyan)]/30'
+              )}
               onClick={() => setViewMode('map')}
             >
               <MapIcon className="h-3.5 w-3.5" />
@@ -280,32 +288,37 @@ export default function AlertsPage() {
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 px-2"
+            className="h-7 px-2 hover:bg-[var(--pwa-cyan)]/10 hover:text-[var(--pwa-cyan)] transition-colors"
             onClick={() => setShowFilters(!showFilters)}
           >
             <Filter className="h-3.5 w-3.5" />
-            <ChevronDown className={cn('h-3 w-3 ml-1 transition-transform', showFilters && 'rotate-180')} />
+            <ChevronDown className={cn('h-3 w-3 ml-1 transition-transform duration-300', showFilters && 'rotate-180')} />
           </Button>
-          <Button onClick={fetchAlerts} variant="ghost" size="sm" className="h-7 px-2">
-            <RefreshCw className="h-3.5 w-3.5" />
+          <Button
+            onClick={fetchAlerts}
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 hover:bg-[var(--pwa-cyan)]/10 hover:text-[var(--pwa-cyan)] transition-colors group"
+          >
+            <RefreshCw className="h-3.5 w-3.5 group-hover:rotate-180 transition-transform duration-500" />
           </Button>
         </div>
       </div>
 
       {/* Collapsible Filters */}
       {showFilters && (
-        <div className="flex flex-wrap items-center gap-2 p-3 bg-muted rounded-lg">
-          <div className="relative flex-1 min-w-[150px] max-w-xs">
-            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+        <div className="flex flex-wrap items-center gap-2 p-4 bg-gradient-to-r from-muted/80 to-muted/50 backdrop-blur-sm rounded-xl border border-border/50 shadow-sm animate-slide-up-fade">
+          <div className="relative flex-1 min-w-[150px] max-w-xs group">
+            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-[var(--pwa-cyan)]" />
             <Input
               placeholder="ค้นหา..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="h-8 pl-8 text-sm bg-background"
+              className="h-8 pl-8 text-sm bg-background/80 border-border/50 focus:border-[var(--pwa-cyan)]/50 focus:ring-[var(--pwa-cyan)]/20 transition-all"
             />
           </div>
           <Select value={severityFilter} onValueChange={setSeverityFilter}>
-            <SelectTrigger className="h-8 w-[130px] text-sm">
+            <SelectTrigger className="h-8 w-[130px] text-sm bg-background/80 border-border/50 hover:border-[var(--pwa-cyan)]/30 transition-colors">
               <SelectValue placeholder="ระดับ" />
             </SelectTrigger>
             <SelectContent>
@@ -317,7 +330,7 @@ export default function AlertsPage() {
             </SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="h-8 w-[130px] text-sm">
+            <SelectTrigger className="h-8 w-[130px] text-sm bg-background/80 border-border/50 hover:border-[var(--pwa-cyan)]/30 transition-colors">
               <SelectValue placeholder="สถานะ" />
             </SelectTrigger>
             <SelectContent>
@@ -331,7 +344,7 @@ export default function AlertsPage() {
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 px-2 text-xs"
+              className="h-8 px-3 text-xs hover:bg-red-500/10 hover:text-red-500 transition-colors"
               onClick={() => {
                 setSearch('');
                 setSeverityFilter('all');
@@ -451,69 +464,85 @@ export default function AlertsPage() {
         <>
           {/* Summary Cards - Only in List View */}
           <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
-            <Card className="bg-red-500 text-white border-0">
-              <CardContent className="p-3">
+            <Card className="relative overflow-hidden bg-gradient-to-br from-red-500 to-red-600 text-white border-0 shadow-lg shadow-red-500/25 hover:shadow-red-500/40 hover:scale-[1.02] transition-all duration-300 animate-slide-up-fade" style={{ animationDelay: '0ms' }}>
+              <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+              <div className="absolute inset-0 animate-breathing-glow opacity-50" />
+              <CardContent className="p-3 relative">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs text-red-100">วิกฤต</p>
                     <p className="text-2xl font-bold">{summaryCounts.critical}</p>
                   </div>
-                  <AlertCircle className="h-8 w-8 text-white/50" />
+                  <div className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/30">
+                    <AlertCircle className="h-5 w-5 text-white" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-orange-500 text-white border-0">
-              <CardContent className="p-3">
+            <Card className="relative overflow-hidden bg-gradient-to-br from-orange-500 to-orange-600 text-white border-0 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:scale-[1.02] transition-all duration-300 animate-slide-up-fade" style={{ animationDelay: '50ms' }}>
+              <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+              <CardContent className="p-3 relative">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs text-orange-100">สูง</p>
                     <p className="text-2xl font-bold">{summaryCounts.high}</p>
                   </div>
-                  <AlertTriangle className="h-8 w-8 text-white/50" />
+                  <div className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/30">
+                    <AlertTriangle className="h-5 w-5 text-white" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-amber-500 text-white border-0">
-              <CardContent className="p-3">
+            <Card className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-amber-600 text-white border-0 shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 hover:scale-[1.02] transition-all duration-300 animate-slide-up-fade" style={{ animationDelay: '100ms' }}>
+              <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+              <CardContent className="p-3 relative">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs text-amber-100">ปานกลาง</p>
                     <p className="text-2xl font-bold">{summaryCounts.medium}</p>
                   </div>
-                  <AlertTriangle className="h-8 w-8 text-white/50" />
+                  <div className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/30">
+                    <AlertTriangle className="h-5 w-5 text-white" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-blue-500 text-white border-0">
-              <CardContent className="p-3">
+            <Card className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-[1.02] transition-all duration-300 animate-slide-up-fade" style={{ animationDelay: '150ms' }}>
+              <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+              <CardContent className="p-3 relative">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs text-blue-100">ต่ำ</p>
                     <p className="text-2xl font-bold">{summaryCounts.low}</p>
                   </div>
-                  <Info className="h-8 w-8 text-white/50" />
+                  <div className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/30">
+                    <Info className="h-5 w-5 text-white" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </div>
 
           {/* Alerts List */}
-          <Card>
-            <CardHeader className="py-3">
+          <Card className="relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg">
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--pwa-cyan)]/30 to-transparent" />
+            <CardHeader className="py-3 relative">
               <CardTitle className="flex items-center gap-2 text-base">
-                <Bell className="h-4 w-4" />
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10 ring-1 ring-[var(--pwa-cyan)]/20">
+                  <Bell className="h-3.5 w-3.5 text-[var(--pwa-cyan)]" />
+                </div>
                 รายการแจ้งเตือน
-                <Badge variant="secondary" className="ml-1 text-xs">
+                <Badge variant="secondary" className="ml-1 text-xs bg-gradient-to-r from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10 text-[var(--pwa-cyan)] border-[var(--pwa-cyan)]/20">
                   {filteredAlerts.length}
                 </Badge>
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="pt-0 relative">
               {loading ? (
                 <div className="space-y-3">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex items-start gap-3 p-3 border rounded-lg">
-                      <Skeleton className="h-9 w-9 rounded-lg" />
+                    <div key={i} className="flex items-start gap-3 p-3 border border-border/50 rounded-xl animate-pulse">
+                      <Skeleton className="h-9 w-9 rounded-xl" />
                       <div className="flex-1 space-y-2">
                         <Skeleton className="h-4 w-1/3" />
                         <Skeleton className="h-3 w-2/3" />
@@ -523,13 +552,15 @@ export default function AlertsPage() {
                 </div>
               ) : filteredAlerts.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8">
-                  <CheckCircle className="h-10 w-10 text-emerald-500" />
+                  <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/10 flex items-center justify-center ring-1 ring-emerald-500/20">
+                    <CheckCircle className="h-8 w-8 text-emerald-500" />
+                  </div>
                   <p className="mt-3 font-medium">ไม่พบการแจ้งเตือน</p>
                   <p className="text-sm text-muted-foreground">ไม่มีการแจ้งเตือนที่ตรงกับเงื่อนไข</p>
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {filteredAlerts.map((alert) => {
+                  {filteredAlerts.map((alert, index) => {
                     const severity = severityConfig[alert.severity];
                     const status = statusConfig[alert.status];
                     const SeverityIcon = severity.icon;
@@ -538,15 +569,31 @@ export default function AlertsPage() {
                     return (
                       <div
                         key={alert.id}
-                        className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-background p-3 transition-shadow hover:shadow-sm sm:flex-row sm:items-start"
+                        className={cn(
+                          "group flex flex-col gap-3 rounded-xl border border-border/50 bg-background/50 p-3 transition-all duration-200 hover:shadow-md hover:border-[var(--pwa-cyan)]/30 sm:flex-row sm:items-start animate-slide-up-fade",
+                          alert.severity === 'critical' && 'bg-red-500/5 border-red-500/20'
+                        )}
+                        style={{ animationDelay: `${index * 30}ms` }}
                       >
-                        <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${severity.bg}`}>
+                        <div className={cn(
+                          "grid h-9 w-9 shrink-0 place-items-center rounded-xl shadow-lg transition-transform duration-200 group-hover:scale-110",
+                          alert.severity === 'critical' && 'bg-gradient-to-br from-red-500 to-red-600 shadow-red-500/30',
+                          alert.severity === 'high' && 'bg-gradient-to-br from-orange-500 to-orange-600 shadow-orange-500/30',
+                          alert.severity === 'medium' && 'bg-gradient-to-br from-amber-500 to-amber-600 shadow-amber-500/30',
+                          alert.severity === 'low' && 'bg-gradient-to-br from-blue-500 to-blue-600 shadow-blue-500/30'
+                        )}>
                           <SeverityIcon className="h-4 w-4 text-white" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="font-medium text-sm text-foreground">{alert.title_th}</h3>
-                            <Badge variant={severity.variant} className="text-[10px] h-5">
+                            <h3 className="font-medium text-sm text-foreground group-hover:text-[var(--pwa-cyan)] transition-colors">{alert.title_th}</h3>
+                            <Badge
+                              variant={severity.variant}
+                              className={cn(
+                                "text-[10px] h-5",
+                                alert.severity === 'critical' && 'bg-gradient-to-r from-red-500/20 to-red-500/10 text-red-700 dark:text-red-300 border-red-500/30 animate-pulse'
+                              )}
+                            >
                               {severity.label}
                             </Badge>
                             <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${status.bg} ${status.color}`}>
@@ -558,7 +605,7 @@ export default function AlertsPage() {
                           <div className="mt-1.5 flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground/70">
                             <Link
                               href={`/dma/${alert.dma_id}`}
-                              className="flex items-center gap-0.5 text-blue-600 hover:underline"
+                              className="flex items-center gap-0.5 text-[var(--pwa-cyan)] hover:underline transition-colors"
                             >
                               {alert.dma_name}
                               <ChevronRight className="h-3 w-3" />
@@ -569,12 +616,12 @@ export default function AlertsPage() {
                             </span>
                           </div>
                         </div>
-                        <div className="flex shrink-0 gap-2">
+                        <div className="flex shrink-0 gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           {alert.status === 'active' && (
                             <Button
                               size="sm"
                               variant="outline"
-                              className="h-7 text-xs gap-1"
+                              className="h-7 text-xs gap-1 hover:bg-[var(--pwa-cyan)]/10 hover:text-[var(--pwa-cyan)] hover:border-[var(--pwa-cyan)]/30 transition-colors"
                               onClick={() => handleAction(alert.id, 'acknowledge')}
                             >
                               <Check className="h-3 w-3" />
@@ -584,7 +631,7 @@ export default function AlertsPage() {
                           {alert.status !== 'resolved' && (
                             <Button
                               size="sm"
-                              className="h-7 text-xs gap-1 bg-emerald-500 hover:bg-emerald-600"
+                              className="h-7 text-xs gap-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 shadow-lg shadow-emerald-500/25"
                               onClick={() => handleAction(alert.id, 'resolve')}
                             >
                               <CheckCircle className="h-3 w-3" />

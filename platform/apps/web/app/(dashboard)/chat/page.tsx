@@ -261,13 +261,20 @@ export default function ChatPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">ถามตอบ AI</h1>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] bg-clip-text text-transparent">
+            ถามตอบ AI
+          </h1>
           <p className="text-muted-foreground">
             AI Chat Assistant - Thai 70B+ LLM
           </p>
         </div>
         {messages.length > 0 && (
-          <Button variant="outline" size="sm" onClick={handleClearChat} className="gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleClearChat}
+            className="gap-2 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/30 transition-colors"
+          >
             <Trash2 className="h-4 w-4" />
             ล้างประวัติ
           </Button>
@@ -275,34 +282,43 @@ export default function ChatPage() {
       </div>
 
       {/* Chat Container */}
-      <Card className="flex flex-1 flex-col overflow-hidden">
-        <CardHeader className="border-b py-3">
-          <CardTitle className="flex items-center gap-2 text-base font-medium">
-            <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-white">
+      <Card className="relative flex flex-1 flex-col overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--pwa-cyan)]/30 to-transparent" />
+        <CardHeader className="border-b border-border/50 py-3 relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-[var(--pwa-cyan)]/5 to-transparent" />
+          <CardTitle className="flex items-center gap-2 text-base font-medium relative">
+            <div className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] text-white shadow-lg shadow-[var(--pwa-cyan)]/30 animate-breathing-glow">
               <Sparkles className="h-4 w-4" />
             </div>
-            WARIS AI Assistant
+            <span className="bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] bg-clip-text text-transparent font-semibold">
+              WARIS AI Assistant
+            </span>
             {getProviderBadge()}
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="flex flex-1 flex-col overflow-hidden p-0">
+        <CardContent className="flex flex-1 flex-col overflow-hidden p-0 relative">
+          {/* Background pattern */}
+          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5 pointer-events-none" />
+
           {/* Messages Area */}
-          <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+          <ScrollArea className="flex-1 p-4 relative" ref={scrollRef}>
             {messages.length === 0 ? (
-              <div className="flex h-full flex-col items-center justify-center py-12">
-                <div className="grid h-16 w-16 place-items-center rounded-2xl bg-primary/10">
-                  <MessageSquare className="h-8 w-8 text-primary" />
+              <div className="flex h-full flex-col items-center justify-center py-12 animate-blur-in">
+                <div className="grid h-20 w-20 place-items-center rounded-2xl bg-gradient-to-br from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10 ring-1 ring-[var(--pwa-cyan)]/20 shadow-lg shadow-[var(--pwa-cyan)]/20">
+                  <MessageSquare className="h-10 w-10 text-[var(--pwa-cyan)]" />
                 </div>
-                <h2 className="mt-4 text-xl font-semibold">สวัสดีครับ! ผมพร้อมช่วยเหลือ</h2>
+                <h2 className="mt-4 text-xl font-semibold bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] bg-clip-text text-transparent">
+                  สวัสดีครับ! ผมพร้อมช่วยเหลือ
+                </h2>
                 <p className="mt-2 text-center text-muted-foreground">
                   ถามคำถามเกี่ยวกับน้ำสูญเสีย วิเคราะห์ข้อมูล DMA หรือขอคำแนะนำได้เลยครับ
                 </p>
 
                 {/* Provider Info */}
                 {status && (
-                  <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-                    <Settings2 className="h-4 w-4" />
+                  <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground px-3 py-1.5 rounded-full bg-muted/50 ring-1 ring-border/50">
+                    <Settings2 className="h-4 w-4 text-[var(--pwa-cyan)]" />
                     <span>
                       ใช้ {status.active_provider === 'openrouter' ? 'OpenRouter' : 'Ollama'} -{' '}
                       {status.active_provider === 'openrouter'
@@ -318,10 +334,11 @@ export default function ChatPage() {
                     <Button
                       key={index}
                       variant="outline"
-                      className="h-auto justify-start whitespace-normal p-3 text-left text-sm"
+                      className="group h-auto justify-start whitespace-normal p-3 text-left text-sm border-border/50 hover:border-[var(--pwa-cyan)]/30 hover:bg-[var(--pwa-cyan)]/5 transition-all animate-slide-up-fade"
+                      style={{ animationDelay: `${index * 50}ms` }}
                       onClick={() => handlePromptClick(prompt)}
                     >
-                      <Sparkles className="mr-2 h-4 w-4 shrink-0 text-primary" />
+                      <Sparkles className="mr-2 h-4 w-4 shrink-0 text-[var(--pwa-cyan)] group-hover:scale-110 transition-transform" />
                       {prompt}
                     </Button>
                   ))}
@@ -329,22 +346,25 @@ export default function ChatPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {messages.map((message) => (
+                {messages.map((message, index) => (
                   <div
                     key={message.id}
                     className={cn(
-                      'flex gap-3',
+                      'flex gap-3 animate-slide-up-fade',
                       message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
                     )}
+                    style={{ animationDelay: `${index * 30}ms` }}
                   >
                     <Avatar
                       className={cn(
-                        'h-8 w-8 shrink-0',
-                        message.role === 'assistant' && 'bg-primary text-white'
+                        'h-8 w-8 shrink-0 ring-2 ring-offset-2 ring-offset-background',
+                        message.role === 'assistant'
+                          ? 'bg-gradient-to-br from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] ring-[var(--pwa-cyan)]/30'
+                          : 'ring-border/50'
                       )}
                     >
                       <AvatarFallback
-                        className={message.role === 'assistant' ? 'bg-primary text-white' : ''}
+                        className={message.role === 'assistant' ? 'bg-transparent text-white' : ''}
                       >
                         {message.role === 'assistant' ? (
                           <Bot className="h-4 w-4" />
@@ -356,10 +376,10 @@ export default function ChatPage() {
 
                     <div
                       className={cn(
-                        'group relative max-w-[80%] rounded-2xl px-4 py-3',
+                        'group relative max-w-[80%] rounded-2xl px-4 py-3 shadow-sm',
                         message.role === 'user'
-                          ? 'bg-primary text-white'
-                          : 'bg-muted text-foreground'
+                          ? 'bg-gradient-to-br from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] text-white shadow-[var(--pwa-cyan)]/20'
+                          : 'bg-muted/80 text-foreground backdrop-blur-sm border border-border/50'
                       )}
                     >
                       <div className="whitespace-pre-wrap text-sm">{message.content}</div>
@@ -367,7 +387,7 @@ export default function ChatPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="absolute -right-10 top-0 h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100"
+                          className="absolute -right-10 top-0 h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-[var(--pwa-cyan)]/10 hover:text-[var(--pwa-cyan)]"
                           onClick={() => handleCopy(message.content, message.id)}
                         >
                           {copiedId === message.id ? (
@@ -381,9 +401,9 @@ export default function ChatPage() {
                         message.role === 'assistant' &&
                         message.id === messages[messages.length - 1]?.id &&
                         !message.content && (
-                          <div className="flex items-center gap-1">
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            <span className="text-sm">กำลังคิด...</span>
+                          <div className="flex items-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin text-[var(--pwa-cyan)]" />
+                            <span className="text-sm text-muted-foreground">กำลังคิด...</span>
                           </div>
                         )}
                     </div>
@@ -394,7 +414,8 @@ export default function ChatPage() {
           </ScrollArea>
 
           {/* Input Area */}
-          <div className="border-t bg-background p-4">
+          <div className="border-t border-border/50 bg-gradient-to-r from-background via-background to-background p-4 relative">
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--pwa-cyan)]/20 to-transparent" />
             <form onSubmit={handleSubmit} className="flex gap-2">
               <Input
                 ref={inputRef}
@@ -402,9 +423,13 @@ export default function ChatPage() {
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="พิมพ์คำถามของคุณที่นี่..."
                 disabled={isLoading}
-                className="flex-1 bg-background"
+                className="flex-1 bg-background/50 border-border/50 focus:border-[var(--pwa-cyan)]/50 focus:ring-[var(--pwa-cyan)]/20 transition-all"
               />
-              <Button type="submit" disabled={isLoading || !input.trim()} className="gap-2">
+              <Button
+                type="submit"
+                disabled={isLoading || !input.trim()}
+                className="gap-2 bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] hover:from-[var(--pwa-cyan)]/90 hover:to-[var(--pwa-blue-deep)]/90 shadow-lg shadow-[var(--pwa-cyan)]/25 transition-all disabled:opacity-50"
+              >
                 {isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
@@ -414,7 +439,7 @@ export default function ChatPage() {
               </Button>
             </form>
             <p className="mt-2 text-center text-xs text-muted-foreground">
-              WARIS AI - ข้อมูลที่ได้รับอาจไม่ถูกต้อง กรุณาตรวจสอบก่อนนำไปใช้
+              <span className="text-[var(--pwa-cyan)]">WARIS AI</span> - ข้อมูลที่ได้รับอาจไม่ถูกต้อง กรุณาตรวจสอบก่อนนำไปใช้
             </p>
           </div>
         </CardContent>

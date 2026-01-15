@@ -126,7 +126,9 @@ export default function DMAListPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">พื้นที่จ่ายน้ำย่อย (DMA)</h1>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] bg-clip-text text-transparent">
+            พื้นที่จ่ายน้ำย่อย (DMA)
+          </h1>
           <p className="text-muted-foreground">
             จัดการและตรวจสอบข้อมูล DMA ทั้งหมด
           </p>
@@ -135,11 +137,12 @@ export default function DMAListPage() {
 
       {/* Summary Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <Card>
-          <CardContent className="p-4">
+        <Card className="relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl transition-all duration-300 group animate-slide-up-fade" style={{ animationDelay: '0ms' }}>
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--pwa-cyan)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <CardContent className="p-4 relative">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                <MapPin className="h-5 w-5 text-primary" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10 ring-1 ring-[var(--pwa-cyan)]/20 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                <MapPin className="h-5 w-5 text-[var(--pwa-cyan)]" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">DMA ทั้งหมด</p>
@@ -148,10 +151,12 @@ export default function DMAListPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-emerald-500 text-white border-0">
-          <CardContent className="p-4">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-600 text-white border-0 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-[1.02] transition-all duration-300 animate-slide-up-fade" style={{ animationDelay: '50ms' }}>
+          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+          <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+          <CardContent className="p-4 relative">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/20">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-1 ring-white/30">
                 <Droplets className="h-5 w-5 text-white" />
               </div>
               <div>
@@ -163,10 +168,12 @@ export default function DMAListPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-amber-500 text-white border-0">
-          <CardContent className="p-4">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-amber-600 text-white border-0 shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 hover:scale-[1.02] transition-all duration-300 animate-slide-up-fade" style={{ animationDelay: '100ms' }}>
+          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+          <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+          <CardContent className="p-4 relative">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/20">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-1 ring-white/30">
                 <Droplets className="h-5 w-5 text-white" />
               </div>
               <div>
@@ -178,10 +185,13 @@ export default function DMAListPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-red-500 text-white border-0">
-          <CardContent className="p-4">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-red-500 to-red-600 text-white border-0 shadow-lg shadow-red-500/25 hover:shadow-red-500/40 hover:scale-[1.02] transition-all duration-300 animate-slide-up-fade" style={{ animationDelay: '150ms' }}>
+          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+          <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute inset-0 animate-breathing-glow opacity-50" />
+          <CardContent className="p-4 relative">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/20">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-1 ring-white/30">
                 <Droplets className="h-5 w-5 text-white" />
               </div>
               <div>
@@ -193,14 +203,16 @@ export default function DMAListPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-blue-500 text-white border-0">
-          <CardContent className="p-4">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] text-white border-0 shadow-lg shadow-[var(--pwa-cyan)]/25 hover:shadow-[var(--pwa-cyan)]/40 hover:scale-[1.02] transition-all duration-300 animate-slide-up-fade" style={{ animationDelay: '200ms' }}>
+          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+          <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+          <CardContent className="p-4 relative">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/20">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm ring-1 ring-white/30">
                 <Droplets className="h-5 w-5 text-white" />
               </div>
               <div>
-                <p className="text-sm text-blue-100">เฉลี่ยสูญเสีย</p>
+                <p className="text-sm text-cyan-100">เฉลี่ยสูญเสีย</p>
                 <p className="text-2xl font-bold text-white">
                   {isLoading ? '-' : formatPercent(summary.avgLoss)}
                 </p>
@@ -211,26 +223,29 @@ export default function DMAListPage() {
       </div>
 
       {/* Filters */}
-      <Card>
-        <CardHeader className="pb-3">
+      <Card className="relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-md">
+        <div className="absolute inset-0 bg-gradient-to-r from-[var(--pwa-cyan)]/5 via-transparent to-[var(--pwa-blue-deep)]/5" />
+        <CardHeader className="pb-3 relative">
           <CardTitle className="flex items-center gap-2 text-base font-medium">
-            <Filter className="h-4 w-4" />
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10 ring-1 ring-[var(--pwa-cyan)]/20">
+              <Filter className="h-3.5 w-3.5 text-[var(--pwa-cyan)]" />
+            </div>
             ตัวกรอง
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="relative">
           <div className="flex flex-wrap gap-4">
-            <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <div className="relative flex-1 min-w-[200px] group">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-[var(--pwa-cyan)]" />
               <Input
                 placeholder="ค้นหา DMA..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-9"
+                className="pl-9 bg-background/50 border-border/50 focus:border-[var(--pwa-cyan)]/50 focus:ring-[var(--pwa-cyan)]/20 transition-all"
               />
             </div>
             <Select value={region} onValueChange={setRegion}>
-              <SelectTrigger className="w-[200px]">
+              <SelectTrigger className="w-[200px] bg-background/50 border-border/50 hover:border-[var(--pwa-cyan)]/30 transition-colors">
                 <SelectValue placeholder="เลือกเขต" />
               </SelectTrigger>
               <SelectContent>
@@ -242,7 +257,7 @@ export default function DMAListPage() {
               </SelectContent>
             </Select>
             <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger className="w-[150px]">
+              <SelectTrigger className="w-[150px] bg-background/50 border-border/50 hover:border-[var(--pwa-cyan)]/30 transition-colors">
                 <SelectValue placeholder="สถานะ" />
               </SelectTrigger>
               <SelectContent>
@@ -258,32 +273,33 @@ export default function DMAListPage() {
       </Card>
 
       {/* DMA Table */}
-      <Card>
+      <Card className="relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--pwa-cyan)]/30 to-transparent" />
         <CardContent className="p-0">
           {isLoading ? (
             <div className="p-6 space-y-4">
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-4">
-                  <Skeleton className="h-10 w-10 rounded-lg" />
+                <div key={i} className="flex items-center gap-4 animate-pulse">
+                  <Skeleton className="h-10 w-10 rounded-xl" />
                   <div className="flex-1 space-y-2">
                     <Skeleton className="h-4 w-1/3" />
                     <Skeleton className="h-3 w-1/4" />
                   </div>
-                  <Skeleton className="h-6 w-16" />
+                  <Skeleton className="h-6 w-16 rounded-full" />
                 </div>
               ))}
             </div>
           ) : (
             <Table>
               <TableHeader>
-                <TableRow>
+                <TableRow className="bg-gradient-to-r from-muted/50 to-transparent border-b border-border/50 hover:bg-muted/50">
                   <TableHead className="w-[250px]">DMA</TableHead>
                   <TableHead>สาขา / เขต</TableHead>
                   <TableHead>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="-ml-3 h-8 data-[state=open]:bg-accent"
+                      className="-ml-3 h-8 data-[state=open]:bg-accent hover:bg-[var(--pwa-cyan)]/10 hover:text-[var(--pwa-cyan)] transition-colors"
                       onClick={() => handleSort('loss_percentage')}
                     >
                       น้ำสูญเสีย
@@ -294,7 +310,7 @@ export default function DMAListPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="-ml-3 h-8 data-[state=open]:bg-accent"
+                      className="-ml-3 h-8 data-[state=open]:bg-accent hover:bg-[var(--pwa-cyan)]/10 hover:text-[var(--pwa-cyan)] transition-colors"
                       onClick={() => handleSort('current_loss')}
                     >
                       ปริมาณสูญเสีย
@@ -313,12 +329,28 @@ export default function DMAListPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  sortedDMAs.map((dma) => (
-                    <TableRow key={dma.id} className="hover:bg-muted/50">
+                  sortedDMAs.map((dma, index) => (
+                    <TableRow
+                      key={dma.id}
+                      className={cn(
+                        "group transition-all duration-200 hover:bg-gradient-to-r hover:from-[var(--pwa-cyan)]/5 hover:to-transparent",
+                        dma.status === 'critical' && 'bg-red-500/5',
+                        "animate-slide-up-fade"
+                      )}
+                      style={{ animationDelay: `${index * 30}ms` }}
+                    >
                       <TableCell>
-                        <div>
-                          <p className="font-medium">{dma.name_th}</p>
-                          <p className="text-xs text-muted-foreground">{dma.code}</p>
+                        <div className="flex items-center gap-3">
+                          <div className={cn(
+                            "h-2 w-2 rounded-full",
+                            dma.status === 'normal' && 'bg-emerald-500',
+                            dma.status === 'warning' && 'bg-amber-500',
+                            dma.status === 'critical' && 'bg-red-500 animate-pulse'
+                          )} />
+                          <div>
+                            <p className="font-medium group-hover:text-[var(--pwa-cyan)] transition-colors">{dma.name_th}</p>
+                            <p className="text-xs text-muted-foreground">{dma.code}</p>
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -332,10 +364,10 @@ export default function DMAListPage() {
                           className={cn(
                             'text-lg font-bold',
                             dma.status === 'normal'
-                              ? 'text-green-700 dark:text-green-400'
+                              ? 'text-emerald-600 dark:text-emerald-400'
                               : dma.status === 'warning'
-                              ? 'text-amber-700 dark:text-amber-400'
-                              : 'text-red-700 dark:text-red-400'
+                              ? 'text-amber-600 dark:text-amber-400'
+                              : 'text-red-600 dark:text-red-400'
                           )}
                         >
                           {formatPercent(dma.loss_percentage)}
@@ -352,12 +384,25 @@ export default function DMAListPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={getStatusVariant(dma.status)}>
+                        <Badge
+                          variant={getStatusVariant(dma.status)}
+                          className={cn(
+                            "transition-all",
+                            dma.status === 'normal' && 'bg-gradient-to-r from-emerald-500/20 to-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30',
+                            dma.status === 'warning' && 'bg-gradient-to-r from-amber-500/20 to-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30',
+                            dma.status === 'critical' && 'bg-gradient-to-r from-red-500/20 to-red-500/10 text-red-700 dark:text-red-300 border-red-500/30 animate-pulse'
+                          )}
+                        >
                           {getStatusText(dma.status)}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="icon" asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          asChild
+                          className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[var(--pwa-cyan)]/10 hover:text-[var(--pwa-cyan)]"
+                        >
                           <Link href={`/dma/${dma.id}`}>
                             <ChevronRight className="h-4 w-4" />
                           </Link>

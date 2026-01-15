@@ -277,10 +277,12 @@ export default function ReportsPage() {
       {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">รายงาน</h1>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] bg-clip-text text-transparent">
+            รายงาน
+          </h1>
           <p className="text-muted-foreground">Reports</p>
         </div>
-        <Button className="gap-2">
+        <Button className="gap-2 bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] hover:from-[var(--pwa-cyan)]/90 hover:to-[var(--pwa-blue-deep)]/90 shadow-lg shadow-[var(--pwa-cyan)]/25 transition-all hover:shadow-[var(--pwa-cyan)]/40">
           <FileText className="h-4 w-4" />
           สร้างรายงานใหม่
         </Button>
@@ -288,19 +290,32 @@ export default function ReportsPage() {
 
       {/* Summary Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {Object.entries(categoryConfig).map(([key, config]) => {
+        {Object.entries(categoryConfig).map(([key, config], index) => {
           const Icon = config.icon;
           const count = reports.filter((r) => r.category === key).length;
+          const colorMap: Record<string, { gradient: string; shadow: string; iconBg: string }> = {
+            water_loss: { gradient: 'from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)]', shadow: 'shadow-[var(--pwa-cyan)]/20', iconBg: 'from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10' },
+            dma_performance: { gradient: 'from-purple-500 to-purple-600', shadow: 'shadow-purple-500/20', iconBg: 'from-purple-500/20 to-purple-600/10' },
+            alerts: { gradient: 'from-amber-500 to-amber-600', shadow: 'shadow-amber-500/20', iconBg: 'from-amber-500/20 to-amber-600/10' },
+            financial: { gradient: 'from-emerald-500 to-emerald-600', shadow: 'shadow-emerald-500/20', iconBg: 'from-emerald-500/20 to-emerald-600/10' },
+          };
+          const colors = colorMap[key] || colorMap.water_loss;
+
           return (
-            <Card key={key} className="cursor-pointer transition-shadow hover:shadow-md">
-              <CardContent className="p-4">
+            <Card
+              key={key}
+              className={`relative overflow-hidden cursor-pointer backdrop-blur-sm bg-background/80 border-border/50 shadow-lg ${colors.shadow} hover:scale-[1.02] transition-all duration-300 group animate-slide-up-fade`}
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-[var(--pwa-cyan)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <CardContent className="p-4 relative">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">{config.label}</p>
                     <p className="text-2xl font-bold">{count}</p>
                   </div>
-                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10">
-                    <Icon className="h-5 w-5 text-primary" />
+                  <div className={`grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br ${colors.iconBg} ring-1 ring-border/50 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300`}>
+                    <Icon className="h-5 w-5 text-[var(--pwa-cyan)]" />
                   </div>
                 </div>
               </CardContent>
@@ -310,29 +325,32 @@ export default function ReportsPage() {
       </div>
 
       {/* Filters */}
-      <Card>
-        <CardHeader className="pb-3">
+      <Card className="relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-md">
+        <div className="absolute inset-0 bg-gradient-to-r from-[var(--pwa-cyan)]/5 via-transparent to-[var(--pwa-blue-deep)]/5" />
+        <CardHeader className="pb-3 relative">
           <CardTitle className="flex items-center gap-2 text-base font-medium">
-            <Filter className="h-4 w-4" />
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10 ring-1 ring-[var(--pwa-cyan)]/20">
+              <Filter className="h-3.5 w-3.5 text-[var(--pwa-cyan)]" />
+            </div>
             ตัวกรอง
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="relative">
           <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">
             {/* Search */}
-            <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <div className="relative flex-1 min-w-[200px] group">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-[var(--pwa-cyan)]" />
               <Input
                 placeholder="ค้นหารายงาน..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 bg-background"
+                className="pl-9 bg-background/50 border-border/50 focus:border-[var(--pwa-cyan)]/50 focus:ring-[var(--pwa-cyan)]/20 transition-all"
               />
             </div>
 
             {/* Type Filter */}
             <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] bg-background/50 border-border/50 hover:border-[var(--pwa-cyan)]/30 transition-colors">
                 <SelectValue placeholder="ประเภทรายงาน" />
               </SelectTrigger>
               <SelectContent>
@@ -347,7 +365,7 @@ export default function ReportsPage() {
 
             {/* Category Filter */}
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] bg-background/50 border-border/50 hover:border-[var(--pwa-cyan)]/30 transition-colors">
                 <SelectValue placeholder="หมวดหมู่" />
               </SelectTrigger>
               <SelectContent>
@@ -363,22 +381,25 @@ export default function ReportsPage() {
       </Card>
 
       {/* Reports List */}
-      <Card>
-        <CardHeader>
+      <Card className="relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--pwa-cyan)]/30 to-transparent" />
+        <CardHeader className="relative">
           <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10 ring-1 ring-[var(--pwa-cyan)]/20">
+              <FileText className="h-4 w-4 text-[var(--pwa-cyan)]" />
+            </div>
             รายการรายงาน
-            <Badge variant="secondary" className="ml-2">
+            <Badge variant="secondary" className="ml-2 bg-gradient-to-r from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10 text-[var(--pwa-cyan)] border-[var(--pwa-cyan)]/20">
               {filteredReports.length} รายการ
             </Badge>
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="relative">
           {loading ? (
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center gap-4 p-4 border rounded-lg">
-                  <Skeleton className="h-10 w-10 rounded-lg" />
+                <div key={i} className="flex items-center gap-4 p-4 border border-border/50 rounded-xl animate-pulse">
+                  <Skeleton className="h-12 w-12 rounded-xl" />
                   <div className="flex-1 space-y-2">
                     <Skeleton className="h-5 w-1/2" />
                     <Skeleton className="h-4 w-1/4" />
@@ -388,13 +409,15 @@ export default function ReportsPage() {
             </div>
           ) : filteredReports.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12">
-              <FileText className="h-12 w-12 text-muted-foreground" />
+              <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 flex items-center justify-center ring-1 ring-border/50">
+                <FileText className="h-8 w-8 text-muted-foreground" />
+              </div>
               <h2 className="mt-4 text-xl font-semibold">ไม่พบรายงาน</h2>
               <p className="mt-2 text-muted-foreground">ไม่มีรายงานที่ตรงกับเงื่อนไข</p>
             </div>
           ) : (
             <div className="space-y-3">
-              {filteredReports.map((report) => {
+              {filteredReports.map((report, index) => {
                 const typeInfo = typeConfig[report.type];
                 const categoryInfo = categoryConfig[report.category];
                 const CategoryIcon = categoryInfo.icon;
@@ -402,18 +425,19 @@ export default function ReportsPage() {
                 return (
                   <div
                     key={report.id}
-                    className="flex flex-col gap-4 rounded-lg border border-slate-200 bg-background p-4 transition-shadow hover:shadow-md sm:flex-row sm:items-center"
+                    className="group flex flex-col gap-4 rounded-xl border border-border/50 bg-background/50 p-4 transition-all duration-200 hover:shadow-md hover:border-[var(--pwa-cyan)]/30 sm:flex-row sm:items-center animate-slide-up-fade"
+                    style={{ animationDelay: `${index * 30}ms` }}
                   >
                     {/* Icon */}
-                    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-primary/10">
-                      <CategoryIcon className="h-6 w-6 text-primary" />
+                    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10 ring-1 ring-[var(--pwa-cyan)]/20 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                      <CategoryIcon className="h-6 w-6 text-[var(--pwa-cyan)]" />
                     </div>
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-foreground">{report.title_th}</h3>
+                      <h3 className="font-semibold text-foreground group-hover:text-[var(--pwa-cyan)] transition-colors">{report.title_th}</h3>
                       <div className="mt-1 flex flex-wrap items-center gap-2 text-sm">
-                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${typeInfo.color}`}>
+                        <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${typeInfo.color} ring-1 ring-border/30`}>
                           {typeInfo.label}
                         </span>
                         <span className="text-muted-foreground">•</span>
@@ -433,13 +457,13 @@ export default function ReportsPage() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex shrink-0 gap-2">
+                    <div className="flex shrink-0 gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       {report.status === 'ready' ? (
                         <>
                           <Button
                             size="sm"
                             variant="outline"
-                            className="gap-1"
+                            className="gap-1 hover:bg-[var(--pwa-cyan)]/10 hover:text-[var(--pwa-cyan)] hover:border-[var(--pwa-cyan)]/30 transition-colors"
                             onClick={() => handlePreview(report)}
                           >
                             <Eye className="h-4 w-4" />
@@ -447,8 +471,7 @@ export default function ReportsPage() {
                           </Button>
                           <Button
                             size="sm"
-                            variant="default"
-                            className="gap-1"
+                            className="gap-1 bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] hover:from-[var(--pwa-cyan)]/90 hover:to-[var(--pwa-blue-deep)]/90 shadow-lg shadow-[var(--pwa-cyan)]/25"
                             onClick={() => handleDownload(report)}
                           >
                             <Download className="h-4 w-4" />
@@ -456,7 +479,7 @@ export default function ReportsPage() {
                           </Button>
                         </>
                       ) : report.status === 'generating' ? (
-                        <Badge variant="secondary" className="animate-pulse">
+                        <Badge variant="secondary" className="animate-pulse bg-gradient-to-r from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10 text-[var(--pwa-cyan)]">
                           กำลังสร้าง...
                         </Badge>
                       ) : (
