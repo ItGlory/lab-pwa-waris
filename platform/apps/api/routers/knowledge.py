@@ -608,8 +608,9 @@ def _keyword_search(query: str, documents: List[dict], top_k: int = 5) -> List[d
         key_phrases.extend(["step test", "alc", "active leak", "ท่อแตก", "ท่อรั่ว"])
     if "จุดควบคุม" in query_lower or "control" in query_lower:
         key_phrases.extend(["จุดควบคุม", "cp1", "cp2", "cp3", "control point"])
-    if "ตาราง" in query_lower:
-        key_phrases.extend(["ตาราง", "4.3"])
+    # Only match "ตาราง" if it's related to water loss documents (e.g., "ตาราง 4.3")
+    if "ตาราง 4.3" in query_lower or "ตารางที่ 4.3" in query_lower:
+        key_phrases.extend(["ตาราง 4.3", "ตารางที่ 4.3"])
 
     results = []
     for doc in documents:
@@ -888,9 +889,17 @@ async def rag_chat(request: RAGChatRequest):
             # Search for relevant documents
             search_results = _keyword_search(request.message, documents, top_k=5)
 
-            # Build context from search results
+            # Log search results for debugging
+            logger.info(f"KB Search for: '{request.message[:50]}...' found {len(search_results)} results")
+            for i, r in enumerate(search_results[:3]):
+                logger.info(f"  Result {i+1}: score={r['score']:.2f}, title={r['title'][:40]}")
+
+            # Build context from search results - use high threshold for relevance
+            # Score >= 0.7 means query is genuinely about KB topics
+            # Lower scores indicate partial keyword matches that may not be relevant
+            MIN_RELEVANCE_SCORE = 0.7
             for result in search_results:
-                if result["score"] > 0.1:
+                if result["score"] >= MIN_RELEVANCE_SCORE:
                     context_parts.append(f"--- {result['title']} ---")
                     context_parts.append(result["content"])
                     context_parts.append("")
@@ -906,11 +915,7 @@ async def rag_chat(request: RAGChatRequest):
         # Generate answer using LLM
         messages = []
 
-        # Add conversation history
-        if request.conversation_history:
-            messages.extend(request.conversation_history)
-
-        # System prompt - different for URL vs KB queries
+        # System prompt - different for URL vs KB queries (MUST be first)
         if urls:
             system_prompt = """คุณคือผู้ช่วย AI ของระบบ WARIS (Water Loss Intelligent Analysis and Reporting System) ของการประปาส่วนภูมิภาค (กปภ.)
 
@@ -923,21 +928,55 @@ async def rag_chat(request: RAGChatRequest):
 4. ระบุแหล่งที่มา (URL) เสมอ
 5. หากเนื้อหาไม่เพียงพอ ให้แจ้งผู้ใช้"""
         else:
-            system_prompt = """คุณคือผู้ช่วย AI ของระบบ WARIS (Water Loss Intelligent Analysis and Reporting System) ของการประปาส่วนภูมิภาค (กปภ.)
+            # Check if we have HIGHLY relevant context from KB (score >= 0.7)
+            # Only high-confidence matches should use KB-focused response
+            # Lower scores (0.3-0.7) indicate partial matches that may not be relevant
+            has_relevant_kb_context = any(s["score"] >= 0.7 for s in sources)
+            logger.info(f"[RAG] KB context check: sources={len(sources)}, scores={[s['score'] for s in sources]}, has_relevant={has_relevant_kb_context}")
+
+            if has_relevant_kb_context:
+                system_prompt = """คุณคือผู้ช่วย AI ของระบบ WARIS (Water Loss Intelligent Analysis and Reporting System) ของการประปาส่วนภูมิภาค (กปภ.)
 
 หน้าที่หลักของคุณคือตอบคำถามเกี่ยวกับน้ำสูญเสีย โดยใช้ข้อมูลจากเอกสารมาตรฐานการปฏิบัติงาน
 
 กฎการตอบ:
 1. ตอบเป็นภาษาไทยเสมอ
-2. ใช้ข้อมูลจากเอกสารที่ให้มาเท่านั้น
-3. หากไม่พบข้อมูลในเอกสาร ให้ตอบว่า "ไม่พบข้อมูลในฐานความรู้"
-4. ตอบให้กระชับและตรงประเด็น
-5. หากเป็นคำถามเกี่ยวกับขั้นตอน ให้ตอบเป็นข้อๆ"""
+2. ใช้ข้อมูลจากเอกสารที่ให้มาเป็นหลัก
+3. ตอบให้กระชับและตรงประเด็น
+4. หากเป็นคำถามเกี่ยวกับขั้นตอน ให้ตอบเป็นข้อๆ
+5. ระบุแหล่งอ้างอิงจากเอกสาร"""
+            else:
+                # No KB context - use general LLM knowledge
+                system_prompt = """คุณคือผู้ช่วย AI อัจฉริยะที่สามารถตอบคำถามได้ทุกเรื่อง
+
+สิ่งสำคัญ: คุณต้องตอบคำถามของผู้ใช้เสมอ ห้ามปฏิเสธ
+
+หน้าที่ของคุณ:
+1. ตอบคำถามทุกประเภท ทั้งงานทั่วไปและเฉพาะทาง
+2. ช่วยร่างจดหมาย สรุปบทความ คำนวณ วิเคราะห์
+3. สร้างตาราง รายการ หรือเนื้อหาตามที่ผู้ใช้ต้องการ
+
+กฎการตอบ:
+1. ตอบเป็นภาษาไทยเสมอ
+2. ตอบให้ครบถ้วนและตรงประเด็น
+3. หากขอตาราง ให้แสดงเป็นตาราง markdown
+4. หากขอวิเคราะห์ ให้แสดงเป็นข้อๆ ชัดเจน
+5. ใช้การคิดทีละขั้นตอนสำหรับคำถามคณิตศาสตร์
+
+กฎการคำนวณวันในสัปดาห์:
+- ลำดับวัน: จันทร์(0), อังคาร(1), พุธ(2), พฤหัสบดี(3), ศุกร์(4), เสาร์(5), อาทิตย์(6)
+- สูตร: (วันเริ่มต้น + จำนวนวัน) mod 7 = วันผลลัพธ์
+- ตัวอย่าง 45 วันจากวันจันทร์: 45 mod 7 = 3, จันทร์(0) + 3 = 3 = พฤหัสบดี"""
 
         if context:
             system_prompt += f"\n\nข้อมูลอ้างอิง:\n{context}"
 
         messages.append({"role": "system", "content": system_prompt})
+
+        # Add conversation history (after system, before current user message)
+        if request.conversation_history:
+            messages.extend(request.conversation_history)
+
         messages.append({"role": "user", "content": request.message})
 
         # Call LLM

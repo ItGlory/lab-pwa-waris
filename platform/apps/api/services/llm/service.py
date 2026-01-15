@@ -92,8 +92,15 @@ class LLMService:
                 }
             messages = validated_messages
 
-        # Ensure system message
-        if not any(m.get("role") == "system" for m in messages):
+        # Ensure system message (only add WARIS_SYSTEM_PROMPT if no system message provided)
+        has_system = any(m.get("role") == "system" for m in messages)
+        logger.info(f"[LLM.chat] Input messages count: {len(messages)}, has_system: {has_system}")
+        if messages:
+            first_msg = messages[0]
+            logger.info(f"[LLM.chat] First message role: {first_msg.get('role')}, content preview: {first_msg.get('content', '')[:150]}...")
+
+        if not has_system:
+            logger.info("[LLM.chat] No system message found, adding WARIS_SYSTEM_PROMPT")
             messages = [{"role": "system", "content": WARIS_SYSTEM_PROMPT}] + messages
 
         # Determine provider

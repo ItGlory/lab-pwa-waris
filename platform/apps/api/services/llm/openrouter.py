@@ -108,6 +108,11 @@ class OpenRouterClient:
                     response.raise_for_status()
                     data = response.json()
 
+                    # Debug log raw response
+                    if "choices" not in data:
+                        logger.error(f"OpenRouter response missing 'choices': {json.dumps(data, ensure_ascii=False)[:500]}")
+                        raise KeyError("'choices' not in response")
+
                     return {
                         "content": data["choices"][0]["message"]["content"],
                         "model": data.get("model", model),
