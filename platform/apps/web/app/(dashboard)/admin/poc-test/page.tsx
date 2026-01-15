@@ -1013,13 +1013,13 @@ function POCTestPageContent() {
                       <div
                         key={message.id}
                         className={cn(
-                          'flex gap-2 sm:gap-3',
+                          'flex gap-2 sm:gap-3 w-full',
                           message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
                         )}
                       >
                         <Avatar
                           className={cn(
-                            'h-6 w-6 sm:h-8 sm:w-8 shrink-0',
+                            'h-6 w-6 sm:h-8 sm:w-8 shrink-0 hidden sm:flex',
                             message.role === 'assistant'
                               ? 'bg-gradient-to-br from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)]'
                               : ''
@@ -1029,20 +1029,21 @@ function POCTestPageContent() {
                             className={message.role === 'assistant' ? 'bg-transparent text-white' : ''}
                           >
                             {message.role === 'assistant' ? (
-                              <Bot className="h-3 w-3 sm:h-4 sm:w-4" />
+                              <Bot className="h-4 w-4" />
                             ) : (
-                              <User className="h-3 w-3 sm:h-4 sm:w-4" />
+                              <User className="h-4 w-4" />
                             )}
                           </AvatarFallback>
                         </Avatar>
 
                         <div
                           className={cn(
-                            'group relative rounded-xl sm:rounded-2xl px-3 py-2 sm:px-4 sm:py-3',
-                            'max-w-[85%] sm:max-w-[80%]',
-                            'break-words overflow-hidden',
+                            'group relative rounded-2xl px-3 py-2 sm:px-4 sm:py-3',
+                            'max-w-[90%] sm:max-w-[80%]',
+                            'break-words overflow-hidden overflow-wrap-anywhere',
+                            '[word-break:break-word]',
                             message.role === 'user'
-                              ? 'bg-gradient-to-br from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] text-white'
+                              ? 'bg-gradient-to-br from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] text-white ml-auto'
                               : 'bg-muted/80'
                           )}
                         >
