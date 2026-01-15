@@ -24,6 +24,7 @@ import {
   Users,
   BookOpen,
   GraduationCap,
+  FlaskConical,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -184,6 +185,12 @@ const navGroups: NavGroup[] = [
         href: '/admin/training',
         icon: GraduationCap,
       },
+      {
+        label: 'ทดสอบ POC',
+        labelEn: 'POC Test',
+        href: '/admin/poc-test',
+        icon: FlaskConical,
+      },
     ],
   },
 ];
@@ -321,14 +328,16 @@ function NavGroupSection({
     return sum + (item.badge ?? 0);
   }, 0);
 
-  const [isOpen, setIsOpen] = React.useState(group.defaultOpen || hasActiveItem);
+  // Use defaultOpen only for initial state to prevent hydration mismatch
+  // hasActiveItem will be handled by useEffect after hydration
+  const [isOpen, setIsOpen] = React.useState(group.defaultOpen ?? false);
 
-  // Auto-expand when an item becomes active
+  // Auto-expand when an item becomes active (runs after hydration)
   React.useEffect(() => {
-    if (hasActiveItem && !isOpen) {
+    if (hasActiveItem) {
       setIsOpen(true);
     }
-  }, [hasActiveItem, isOpen]);
+  }, [hasActiveItem]);
 
   // Items with badges applied
   const itemsWithBadge = group.items.map((item) =>
@@ -396,10 +405,16 @@ function NavGroupSection({
   }
 
   // Expanded view - collapsible group with items
+  // Use stable ID to prevent hydration mismatch
+  const contentId = `nav-group-${group.id}-content`;
+  const triggerId = `nav-group-${group.id}-trigger`;
+
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <CollapsibleTrigger asChild>
         <button
+          id={triggerId}
+          aria-controls={contentId}
           className={cn(
             'group flex w-full items-center gap-3 rounded-xl px-3 py-2.5',
             'text-white/60 transition-all duration-300',
@@ -424,7 +439,7 @@ function NavGroupSection({
           />
         </button>
       </CollapsibleTrigger>
-      <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+      <CollapsibleContent id={contentId} className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
         <div className="flex flex-col gap-0.5 pb-2">
           {itemsWithBadge.map((item) => {
             const isActive =

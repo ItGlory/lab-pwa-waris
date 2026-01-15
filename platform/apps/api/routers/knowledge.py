@@ -25,7 +25,7 @@ class SearchRequest(BaseModel):
     query: str = Field(..., description="Search query")
     top_k: int = Field(default=5, ge=1, le=20, description="Number of results")
     category: Optional[str] = Field(default=None, description="Filter by category")
-    min_score: float = Field(default=0.7, ge=0.0, le=1.0, description="Minimum score")
+    min_score: float = Field(default=0.1, ge=0.0, le=1.0, description="Minimum score")
 
 
 class SearchResult(BaseModel):
@@ -209,30 +209,26 @@ async def index_knowledge_base(background_tasks: BackgroundTasks):
     }
 
 
-@router.post("/chat/rag", response_model=RAGChatResponse)
-async def rag_chat(request: RAGChatRequest):
-    """
-    RAG-enhanced chat
-
-    Retrieves relevant context from knowledge base before generating response.
-    """
-    try:
-        result = await rag_retriever.query_with_context(
-            query=request.message,
-            conversation_history=request.conversation_history,
-            category=request.category,
-        )
-
-        return RAGChatResponse(
-            answer=result.get("answer", ""),
-            model=result.get("model"),
-            provider=result.get("provider"),
-            sources=result.get("sources", []),
-            context_used=result.get("context_used", False),
-        )
-    except Exception as e:
-        logger.error(f"RAG chat failed: {e}")
-        raise HTTPException(status_code=500, detail=f"RAG chat failed: {str(e)}")
+# Original Milvus-based RAG endpoint - disabled for POC testing
+# @router.post("/chat/rag", response_model=RAGChatResponse)
+# async def rag_chat_milvus(request: RAGChatRequest):
+#     """RAG-enhanced chat using Milvus vector search (requires Milvus connection)"""
+#     try:
+#         result = await rag_retriever.query_with_context(
+#             query=request.message,
+#             conversation_history=request.conversation_history,
+#             category=request.category,
+#         )
+#         return RAGChatResponse(
+#             answer=result.get("answer", ""),
+#             model=result.get("model"),
+#             provider=result.get("provider"),
+#             sources=result.get("sources", []),
+#             context_used=result.get("context_used", False),
+#         )
+#     except Exception as e:
+#         logger.error(f"RAG chat failed: {e}")
+#         raise HTTPException(status_code=500, detail=f"RAG chat failed: {str(e)}")
 
 
 @router.post("/chat/rag/stream")
@@ -561,3 +557,261 @@ async def search_km(
     except Exception as e:
         logger.error(f"KM search failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# =============================================================================
+# POC RAG Endpoint - Uses local index for testing
+# =============================================================================
+
+from pathlib import Path
+
+# KM documents path - supports both local dev and Docker container
+# Docker: /app/docs/km (mounted volume)
+# Local: ../../docs/km relative to api directory
+_km_docker_path = Path("/app/docs/km")
+_km_local_path = Path(__file__).parent.parent.parent.parent.parent / "docs" / "km"
+KM_ROOT = _km_docker_path if _km_docker_path.exists() else _km_local_path
+INDEX_DATA_PATH = KM_ROOT / ".index_data.json"
+
+
+def _load_local_index() -> List[dict]:
+    """Load local index data from km_indexer"""
+    if INDEX_DATA_PATH.exists():
+        try:
+            import json as json_module
+            return json_module.loads(INDEX_DATA_PATH.read_text(encoding="utf-8"))
+        except Exception as e:
+            logger.error(f"Failed to load local index: {e}")
+    return []
+
+
+def _keyword_search(query: str, documents: List[dict], top_k: int = 5) -> List[dict]:
+    """Enhanced keyword-based search for POC testing"""
+    query_lower = query.lower()
+
+    # Extract key terms (filter out common Thai words)
+    stop_words = {"คือ", "อะไร", "คืออะไร", "เป็น", "และ", "หรือ", "จะ", "ได้", "ไม่", "มี", "ใน", "ให้", "ที่", "จาก", "กับ", "เมื่อ", "ถ้า", "หาก", "พบ", "การ", "ของ", "ต้อง"}
+    query_words = set(w for w in query_lower.split() if len(w) > 2 and w not in stop_words)
+
+    # Key phrase patterns for better matching
+    key_phrases = []
+    if "มาตรวัดน้ำ" in query_lower or "มาตร" in query_lower:
+        key_phrases.extend(["มาตรวัดน้ำ", "คลาดเคลื่อน", "±4%", "4%", "เที่ยง", "ตรวจสอบ"])
+    if "ขั้นตอน" in query_lower:
+        key_phrases.extend(["ขั้นตอน", "กระบวนการ", "วิธี"])
+    if "dma" in query_lower or "พื้นที่" in query_lower:
+        key_phrases.extend(["dma", "district", "พื้นที่ย่อย", "เฝ้าระวัง"])
+    if "mnf" in query_lower or "กลางคืน" in query_lower:
+        key_phrases.extend(["mnf", "minimum night flow", "กลางคืน"])
+    if "step test" in query_lower or "สูญเสียสูง" in query_lower:
+        key_phrases.extend(["step test", "alc", "active leak", "ท่อแตก", "ท่อรั่ว"])
+    if "จุดควบคุม" in query_lower or "control" in query_lower:
+        key_phrases.extend(["จุดควบคุม", "cp1", "cp2", "cp3", "control point"])
+    if "ตาราง" in query_lower:
+        key_phrases.extend(["ตาราง", "4.3"])
+
+    results = []
+    for doc in documents:
+        content = doc.get("content", "").lower()
+        title = doc.get("title", "").lower()
+        question = doc.get("question", "").lower() if doc.get("question") else ""
+        combined_text = f"{content} {title} {question}"
+
+        # Calculate relevance score
+        score = 0.0
+
+        # Exact phrase match (highest priority)
+        if query_lower in content or query_lower in question:
+            score += 0.6
+
+        # Key phrase match (high priority for domain-specific terms)
+        for phrase in key_phrases:
+            if phrase in combined_text:
+                score += 0.25
+
+        # FAQ question semantic match
+        if doc.get("is_faq"):
+            # Check if question contains key terms from user query
+            matching_terms = sum(1 for w in query_words if w in question)
+            if matching_terms >= 2:
+                score += 0.4
+            elif matching_terms >= 1:
+                score += 0.2
+
+        # Word match with weighted scoring
+        for word in query_words:
+            if word in content:
+                score += 0.08
+            if word in title:
+                score += 0.1
+            if word in question:
+                score += 0.12
+
+        if score > 0:
+            results.append({
+                "id": doc.get("id", ""),
+                "title": doc.get("title", ""),
+                "content": doc.get("content", ""),
+                "source": doc.get("file_path", ""),
+                "category": doc.get("category", ""),
+                "score": min(score, 1.0),
+                "is_faq": doc.get("is_faq", False),
+                "question": doc.get("question"),
+            })
+
+    # Sort by score and return top_k
+    results.sort(key=lambda x: x["score"], reverse=True)
+    return results[:top_k]
+
+
+@router.post("/chat/rag", response_model=RAGChatResponse)
+async def rag_chat(request: RAGChatRequest):
+    """
+    RAG-enhanced chat using local index
+
+    For POC testing - uses keyword search on local index data.
+    """
+    from services.llm import default_llm_service
+
+    try:
+        # Load local index
+        documents = _load_local_index()
+
+        if not documents:
+            # Fallback: Try to read markdown files directly
+            documents = _load_km_documents_directly()
+
+        if not documents:
+            return RAGChatResponse(
+                answer="ขออภัย ยังไม่มีข้อมูลใน Knowledge Base กรุณารัน km_indexer.py ก่อน",
+                model=None,
+                provider=None,
+                sources=[],
+                context_used=False,
+            )
+
+        # Search for relevant documents
+        search_results = _keyword_search(request.message, documents, top_k=5)
+
+        # Build context from search results
+        context_parts = []
+        sources = []
+
+        for result in search_results:
+            if result["score"] > 0.1:
+                context_parts.append(f"--- {result['title']} ---")
+                context_parts.append(result["content"])
+                context_parts.append("")
+
+                sources.append({
+                    "title": result["title"],
+                    "source": result["source"],
+                    "score": result["score"],
+                })
+
+        context = "\n".join(context_parts)
+
+        # Generate answer using LLM
+        messages = []
+
+        # Add conversation history
+        if request.conversation_history:
+            messages.extend(request.conversation_history)
+
+        # System prompt with context
+        system_prompt = """คุณคือผู้ช่วย AI ของระบบ WARIS (Water Loss Intelligent Analysis and Reporting System) ของการประปาส่วนภูมิภาค (กปภ.)
+
+หน้าที่หลักของคุณคือตอบคำถามเกี่ยวกับน้ำสูญเสีย โดยใช้ข้อมูลจากเอกสารมาตรฐานการปฏิบัติงาน
+
+กฎการตอบ:
+1. ตอบเป็นภาษาไทยเสมอ
+2. ใช้ข้อมูลจากเอกสารที่ให้มาเท่านั้น
+3. หากไม่พบข้อมูลในเอกสาร ให้ตอบว่า "ไม่พบข้อมูลในฐานความรู้"
+4. ตอบให้กระชับและตรงประเด็น
+5. หากเป็นคำถามเกี่ยวกับขั้นตอน ให้ตอบเป็นข้อๆ"""
+
+        if context:
+            system_prompt += f"\n\nข้อมูลอ้างอิงจากฐานความรู้:\n{context}"
+
+        messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": request.message})
+
+        # Call LLM
+        response = await default_llm_service.chat(
+            messages=messages,
+            skip_guardrails=False,
+        )
+
+        return RAGChatResponse(
+            answer=response.get("content", "ขออภัย ไม่สามารถสร้างคำตอบได้"),
+            model=response.get("model"),
+            provider=response.get("provider"),
+            sources=sources,
+            context_used=len(sources) > 0,
+        )
+
+    except Exception as e:
+        logger.error(f"RAG chat failed: {e}")
+        raise HTTPException(status_code=500, detail=f"RAG chat failed: {str(e)}")
+
+
+def _load_km_documents_directly() -> List[dict]:
+    """Load KM documents directly from markdown files"""
+    import re
+    import yaml
+
+    documents = []
+
+    if not KM_ROOT.exists():
+        return documents
+
+    for md_file in KM_ROOT.rglob("*.md"):
+        if md_file.name.startswith("."):
+            continue
+
+        try:
+            content = md_file.read_text(encoding="utf-8")
+            rel_path = str(md_file.relative_to(KM_ROOT))
+
+            # Parse frontmatter
+            fm_match = re.match(r"^---\n(.*?)\n---\n", content, re.DOTALL)
+            if fm_match:
+                frontmatter = yaml.safe_load(fm_match.group(1))
+                title = frontmatter.get("title", md_file.stem)
+                category = frontmatter.get("category", "unknown")
+                body = content[fm_match.end():]
+            else:
+                title = md_file.stem
+                category = "unknown"
+                body = content
+
+            # Extract FAQ sections
+            faq_pattern = r"### Q:\s*(.*?)\n\n\*\*A:\*\*\s*(.*?)(?=\n### Q:|\n---|\Z)"
+            faq_matches = re.findall(faq_pattern, body, re.DOTALL)
+
+            for question, answer in faq_matches:
+                documents.append({
+                    "id": f"{rel_path}:faq:{len(documents)}",
+                    "file_path": rel_path,
+                    "title": title,
+                    "category": category,
+                    "content": f"Q: {question.strip()}\n\nA: {answer.strip()}",
+                    "is_faq": True,
+                    "question": question.strip(),
+                })
+
+            # Add full document content
+            documents.append({
+                "id": f"{rel_path}:full",
+                "file_path": rel_path,
+                "title": title,
+                "category": category,
+                "content": body[:8000],  # Limit content size
+                "is_faq": False,
+                "question": None,
+            })
+
+        except Exception as e:
+            logger.error(f"Error loading {md_file}: {e}")
+
+    return documents

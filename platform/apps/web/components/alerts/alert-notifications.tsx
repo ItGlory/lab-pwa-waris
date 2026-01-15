@@ -3,7 +3,7 @@
 import { useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { useAlertWebSocket } from '@/hooks/use-websocket';
-import { useConnectionStatus } from '@/hooks/use-connection-status';
+import { useConnectionStore } from '@/hooks/use-connection-status';
 import { AlertTriangle, Bell, Droplets, Gauge, Wrench } from 'lucide-react';
 
 interface AlertData {
@@ -86,7 +86,7 @@ export function AlertNotifications() {
   }, []);
 
   const { isConnected } = useAlertWebSocket(handleNewAlert);
-  const setConnected = useConnectionStatus((state) => state.setConnected);
+  const setConnected = useConnectionStore((state) => state.setConnected);
 
   // Sync connection status to global store
   useEffect(() => {

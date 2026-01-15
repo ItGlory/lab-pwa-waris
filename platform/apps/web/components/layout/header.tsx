@@ -1,8 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
-import { Search, Sun, Moon, Menu, Wifi, WifiOff } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
+import { Search, Sun, Moon, Menu, Wifi, WifiOff, ChevronRight, Home } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,6 +19,28 @@ import {
   sampleNotifications,
 } from '@/components/notifications/notification-popover';
 
+// Breadcrumb mapping for Thai labels
+const breadcrumbLabels: Record<string, string> = {
+  '': 'หน้าหลัก',
+  'dashboard': 'แดชบอร์ด',
+  'alerts': 'การแจ้งเตือน',
+  'dma': 'พื้นที่ DMA',
+  'reports': 'รายงาน',
+  'documents': 'เอกสาร',
+  'chat': 'ถามตอบ AI',
+  'ai-insights': 'AI Insights',
+  'model-evaluation': 'ประเมินโมเดล',
+  'data-import': 'นำเข้าข้อมูล',
+  'settings': 'ตั้งค่า',
+  'notifications': 'การแจ้งเตือน',
+  'admin': 'ผู้ดูแลระบบ',
+  'users': 'จัดการผู้ใช้',
+  'knowledge-base': 'ฐานความรู้',
+  'training': 'ฝึกสอนโมเดล',
+  'poc-test': 'ทดสอบ POC',
+  'audit': 'System Audit',
+};
+
 interface HeaderProps {
   alertCount?: number;
   onMenuClick?: () => void;
@@ -26,14 +49,34 @@ interface HeaderProps {
 
 export function Header({ alertCount = 0, onMenuClick, onSearchClick }: HeaderProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
   const [notifications, setNotifications] = React.useState(sampleNotifications);
-  const isConnected = useConnectionStatus((state) => state.isConnected);
+  const { isConnected } = useConnectionStatus();
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Generate breadcrumb items from pathname
+  const breadcrumbs = React.useMemo(() => {
+    const segments = pathname.split('/').filter(Boolean);
+    const items: Array<{ label: string; href: string; isLast: boolean }> = [];
+
+    let currentPath = '';
+    segments.forEach((segment, index) => {
+      currentPath += `/${segment}`;
+      const label = breadcrumbLabels[segment] || segment;
+      items.push({
+        label,
+        href: currentPath,
+        isLast: index === segments.length - 1,
+      });
+    });
+
+    return items;
+  }, [pathname]);
 
   // Calculate unread count
   const unreadCount = notifications.filter((n) => n.status === 'unread').length;
@@ -76,7 +119,7 @@ export function Header({ alertCount = 0, onMenuClick, onSearchClick }: HeaderPro
   };
 
   return (
-    <header className="relative flex h-14 items-center justify-between px-3 text-white sm:h-16 sm:px-4 lg:px-6 overflow-hidden">
+    <header className="shrink-0 relative flex h-14 items-center justify-between px-3 text-white sm:h-16 sm:px-4 lg:px-6 overflow-hidden z-40">
       {/* Gradient background with glassmorphism */}
       <div className="absolute inset-0 bg-gradient-to-r from-[var(--pwa-blue-deep)] via-[var(--pwa-navy)] to-[var(--pwa-blue-deep)]" />
 
@@ -92,7 +135,7 @@ export function Header({ alertCount = 0, onMenuClick, onSearchClick }: HeaderPro
       {/* Bottom border with gradient */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--pwa-cyan)]/50 to-transparent" />
 
-      {/* Left: Mobile menu + Search */}
+      {/* Left: Mobile menu + Breadcrumb Navigation */}
       <div className="relative flex items-center gap-2 sm:gap-4">
         <Button
           variant="ghost"
@@ -103,6 +146,43 @@ export function Header({ alertCount = 0, onMenuClick, onSearchClick }: HeaderPro
           <Menu className="h-5 w-5" />
         </Button>
 
+        {/* Breadcrumb Navigation */}
+        <nav className="hidden items-center gap-1 sm:flex" aria-label="Breadcrumb">
+          <Link
+            href="/"
+            className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm text-white/70 transition-all duration-200 hover:bg-white/10 hover:text-white"
+          >
+            <Home className="h-4 w-4" />
+            <span className="hidden md:inline">หน้าหลัก</span>
+          </Link>
+
+          {breadcrumbs.map((item, index) => (
+            <React.Fragment key={item.href}>
+              <ChevronRight className="h-4 w-4 text-white/40" />
+              {item.isLast ? (
+                <span className="rounded-lg bg-white/10 px-2.5 py-1 text-sm font-medium text-white">
+                  {item.label}
+                </span>
+              ) : (
+                <Link
+                  href={item.href}
+                  className="rounded-lg px-2 py-1 text-sm text-white/70 transition-all duration-200 hover:bg-white/10 hover:text-white"
+                >
+                  {item.label}
+                </Link>
+              )}
+            </React.Fragment>
+          ))}
+        </nav>
+
+        {/* Mobile: Current page title only */}
+        <span className="text-sm font-medium text-white sm:hidden">
+          {breadcrumbs.length > 0 ? breadcrumbs[breadcrumbs.length - 1].label : 'หน้าหลัก'}
+        </span>
+      </div>
+
+      {/* Center: Search */}
+      <div className="relative flex-1 flex justify-center max-w-md mx-4">
         {/* Mobile Search Button */}
         <Button
           variant="ghost"
@@ -117,7 +197,7 @@ export function Header({ alertCount = 0, onMenuClick, onSearchClick }: HeaderPro
         <button
           type="button"
           onClick={handleSearchClick}
-          className="group relative hidden h-10 w-52 items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 text-sm text-white/70 backdrop-blur-sm transition-all duration-300 hover:border-[var(--pwa-cyan)]/30 hover:bg-white/10 hover:text-white hover:shadow-lg hover:shadow-[var(--pwa-cyan)]/10 sm:flex md:w-72"
+          className="group relative hidden h-10 w-full max-w-xs items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 text-sm text-white/70 backdrop-blur-sm transition-all duration-300 hover:border-[var(--pwa-cyan)]/30 hover:bg-white/10 hover:text-white hover:shadow-lg hover:shadow-[var(--pwa-cyan)]/10 sm:flex"
         >
           <Search className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" />
           <span className="flex-1 text-left font-medium">ค้นหา...</span>

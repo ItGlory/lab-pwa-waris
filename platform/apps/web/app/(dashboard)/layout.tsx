@@ -54,7 +54,7 @@ export default function DashboardLayout({
 
       {/* Main Content - Add margin to account for fixed sidebar on desktop */}
       <div
-        className={`flex flex-1 flex-col min-w-0 transition-all duration-300 ${
+        className={`flex flex-1 flex-col min-w-0 transition-all duration-300 h-screen ${
           sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
         }`}
       >

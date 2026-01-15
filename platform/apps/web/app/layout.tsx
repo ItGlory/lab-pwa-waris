@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: 'Provincial Waterworks Authority' }],
   icons: {
-    icon: '/favicon.ico',
+    icon: '/icon.svg',
   },
 };
 

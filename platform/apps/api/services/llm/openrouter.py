@@ -6,11 +6,17 @@ Provides access to Thai LLM models (70B+) via OpenRouter API
 from typing import AsyncGenerator, Dict, List, Optional, Any
 import logging
 import json
+import asyncio
 import httpx
 
 from core.llm_config import llm_settings, WARIS_SYSTEM_PROMPT
 
 logger = logging.getLogger(__name__)
+
+# Retry configuration
+MAX_RETRIES = 3
+RETRY_DELAY = 2  # seconds
+RETRY_BACKOFF = 1.5  # exponential backoff multiplier
 
 
 class OpenRouterClient:
@@ -85,11 +91,15 @@ class OpenRouterClient:
             **kwargs
         }
 
-        try:
+        if stream:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
-                if stream:
-                    return self._stream_response(client, payload)
-                else:
+                return self._stream_response(client, payload)
+
+        # Retry logic for non-streaming requests
+        last_error = None
+        for attempt in range(MAX_RETRIES):
+            try:
+                async with httpx.AsyncClient(timeout=self.timeout) as client:
                     response = await client.post(
                         f"{self.base_url}/chat/completions",
                         headers=self._get_headers(),
@@ -105,15 +115,34 @@ class OpenRouterClient:
                         "finish_reason": data["choices"][0].get("finish_reason"),
                     }
 
-        except httpx.HTTPStatusError as e:
-            logger.error(f"OpenRouter HTTP error: {e.response.status_code} - {e.response.text}")
-            raise
-        except httpx.TimeoutException:
-            logger.error("OpenRouter request timeout")
-            raise
-        except Exception as e:
-            logger.error(f"OpenRouter error: {e}")
-            raise
+            except httpx.HTTPStatusError as e:
+                last_error = e
+                logger.warning(f"OpenRouter HTTP error (attempt {attempt + 1}/{MAX_RETRIES}): {e.response.status_code}")
+                if e.response.status_code >= 500:
+                    # Retry on server errors
+                    delay = RETRY_DELAY * (RETRY_BACKOFF ** attempt)
+                    await asyncio.sleep(delay)
+                    continue
+                raise
+            except httpx.TimeoutException as e:
+                last_error = e
+                logger.warning(f"OpenRouter timeout (attempt {attempt + 1}/{MAX_RETRIES})")
+                delay = RETRY_DELAY * (RETRY_BACKOFF ** attempt)
+                await asyncio.sleep(delay)
+                continue
+            except (httpx.RemoteProtocolError, httpx.ReadError, ConnectionError) as e:
+                last_error = e
+                logger.warning(f"OpenRouter connection error (attempt {attempt + 1}/{MAX_RETRIES}): {e}")
+                delay = RETRY_DELAY * (RETRY_BACKOFF ** attempt)
+                await asyncio.sleep(delay)
+                continue
+            except Exception as e:
+                logger.error(f"OpenRouter error: {e}")
+                raise
+
+        # All retries failed
+        logger.error(f"OpenRouter failed after {MAX_RETRIES} retries")
+        raise last_error or Exception("OpenRouter request failed")
 
     async def _stream_response(
         self,

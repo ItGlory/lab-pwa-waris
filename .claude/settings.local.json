@@ -109,7 +109,21 @@
       "Bash(PATH=\"/Users/fero/.nvm/versions/node/v24.12.0/bin:/usr/bin:/bin:$PATH\" node /Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/apps/web/node_modules/typescript/bin/tsc:*)",
       "Bash(PATH=\"/Users/fero/.nvm/versions/node/v24.12.0/bin:/usr/bin:/bin:$PATH\" npm install:*)",
       "Bash(PATH=\"/Users/fero/.nvm/versions/node/v24.12.0/bin:/usr/bin:/bin:$PATH\" curl -k https://waris.local:8443/)",
-      "Bash(PATH=\"/Users/fero/.nvm/versions/node/v24.12.0/bin:/usr/bin:/bin:$PATH\" docker logs:*)"
+      "Bash(PATH=\"/Users/fero/.nvm/versions/node/v24.12.0/bin:/usr/bin:/bin:$PATH\" docker logs:*)",
+      "Bash(ollama list:*)",
+      "Bash(sh)",
+      "Bash(brew list:*)",
+      "Bash(brew install:*)",
+      "Bash(brew services start:*)",
+      "Bash(ollama pull:*)",
+      "Bash(npm run typecheck:*)",
+      "Bash(export PATH=\"/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH\")",
+      "Bash(ollama run:*)",
+      "Bash(OLLAMA_FLASH_ATTENTION=0 ollama run:*)",
+      "Bash(ollama search:*)",
+      "Bash(SHELL=/bin/bash /bin/bash:*)",
+      "Bash(python scripts/km_indexer.py:*)",
+      "Bash(python:*)"
     ]
   }
 }

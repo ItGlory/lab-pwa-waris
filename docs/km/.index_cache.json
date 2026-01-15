@@ -1,0 +1,110 @@
+{
+  "indexed_files": {
+    "README.md": {
+      "hash": "5328eb450a184816bafb5e93cb84cfa3",
+      "chunks": 18,
+      "indexed_at": "2026-01-15T16:24:10.231423"
+    },
+    "common-questions.md": {
+      "hash": "50d2bb9a67d0deb7db226855cef5817d",
+      "chunks": 12,
+      "indexed_at": "2026-01-15T16:24:10.232456"
+    },
+    "pwa-operations/01-organization.md": {
+      "hash": "8e00c59f7b70c363077868474356fe57",
+      "chunks": 13,
+      "indexed_at": "2026-01-15T16:24:10.233185"
+    },
+    "pwa-operations/02-service-areas.md": {
+      "hash": "3df51836f71396476e21da0971989d46",
+      "chunks": 22,
+      "indexed_at": "2026-01-15T16:24:10.234064"
+    },
+    "pwa-operations/03-processes.md": {
+      "hash": "ae9899fb4a561555063ffff4ee76ab16",
+      "chunks": 16,
+      "indexed_at": "2026-01-15T16:24:10.234705"
+    },
+    "dma-management/02-monitoring.md": {
+      "hash": "6e7d5f4b0a6b62ca0dc0907017b1eeaf",
+      "chunks": 14,
+      "indexed_at": "2026-01-15T16:24:10.235995"
+    },
+    "dma-management/03-analysis.md": {
+      "hash": "d472918751797a05f0b64bdc9b9610f5",
+      "chunks": 17,
+      "indexed_at": "2026-01-15T16:24:10.237942"
+    },
+    "dma-management/01-dma-basics.md": {
+      "hash": "9244e6f8b6198d1c8949bd4b919fba65",
+      "chunks": 13,
+      "indexed_at": "2026-01-15T16:24:10.238552"
+    },
+    "scenarios/02-recommendations.md": {
+      "hash": "9b3c837f38e6fe62d3a91f3ff0e9f181",
+      "chunks": 16,
+      "indexed_at": "2026-01-15T16:24:10.239240"
+    },
+    "scenarios/01-troubleshooting.md": {
+      "hash": "62b18bcf4f69b4ca778f08da425fe08e",
+      "chunks": 19,
+      "indexed_at": "2026-01-15T16:24:10.239777"
+    },
+    "glossary/02-technical-terms.md": {
+      "hash": "132aae05f8e7bb7e5a826dd250a6bf11",
+      "chunks": 20,
+      "indexed_at": "2026-01-15T16:24:10.240465"
+    },
+    "glossary/01-thai-english.md": {
+      "hash": "67bef09fa4d4ef81a6fda0389d0426cc",
+      "chunks": 14,
+      "indexed_at": "2026-01-15T16:24:10.240922"
+    },
+    "glossary/03-colloquial-terms.md": {
+      "hash": "5b00f17bce1f4be599853fcc5125ec11",
+      "chunks": 17,
+      "indexed_at": "2026-01-15T16:24:10.241571"
+    },
+    "water-loss/02-physical-loss.md": {
+      "hash": "cb66c66aaac2fdc7b6f684ea76e3db40",
+      "chunks": 14,
+      "indexed_at": "2026-01-15T16:24:10.242355"
+    },
+    "water-loss/03-commercial-loss.md": {
+      "hash": "d2a702990a9f52fcd52d96b0cdba2c74",
+      "chunks": 16,
+      "indexed_at": "2026-01-15T16:24:10.242917"
+    },
+    "water-loss/04-loss-reduction.md": {
+      "hash": "abfdb68a7e0c41eb182df6a13a905d7c",
+      "chunks": 11,
+      "indexed_at": "2026-01-15T16:24:10.243436"
+    },
+    "water-loss/01-nrw-basics.md": {
+      "hash": "8dde6bab4f65645bb0378adecd6019fd",
+      "chunks": 13,
+      "indexed_at": "2026-01-15T16:24:10.243895"
+    },
+    "standards/01-iwa-standards.md": {
+      "hash": "b495cde39ac97c1b5dda825c56b11f54",
+      "chunks": 13,
+      "indexed_at": "2026-01-15T16:24:10.245142"
+    },
+    "standards/04-pwa-commercial-loss-sop.md": {
+      "hash": "0d77cb8dce2ed3586c4165c3a7e2037e",
+      "chunks": 23,
+      "indexed_at": "2026-01-15T16:24:10.246108"
+    },
+    "standards/03-pwa-physical-loss-sop.md": {
+      "hash": "0c06884d1a2d4902ca216882e41da8e1",
+      "chunks": 31,
+      "indexed_at": "2026-01-15T16:24:10.247056"
+    },
+    "standards/02-pwa-guidelines.md": {
+      "hash": "e321128f971e1a81f68d84b54c5e6c68",
+      "chunks": 21,
+      "indexed_at": "2026-01-15T16:24:10.248090"
+    }
+  },
+  "last_index": "2026-01-15T16:24:20.401532"
+}

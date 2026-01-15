@@ -125,6 +125,26 @@ interface KBStats {
   pending: number;
 }
 
+// Training Document Interface
+interface TrainingDocument {
+  id: string;
+  title: string;
+  title_th: string;
+  filename: string;
+  file_type: 'pdf' | 'docx' | 'xlsx' | 'txt' | 'md';
+  file_size: number;
+  category: string;
+  tags: string[];
+  training_status: 'queued' | 'extracting' | 'chunking' | 'embedding' | 'completed' | 'failed';
+  training_progress: number;
+  source: string;
+  pages?: number;
+  extracted_text_preview?: string;
+  queued_at: string;
+  completed_at?: string;
+  error_message?: string;
+}
+
 // Mock data
 const mockDocuments: Document[] = [
   {
@@ -241,6 +261,140 @@ const mockDocuments: Document[] = [
     uploaded_by: 'สมชาย มั่งมี',
     uploaded_at: '2026-01-15T09:00:00Z',
     last_indexed: '',
+  },
+  // PWA SOP Documents
+  {
+    id: 'doc-008',
+    title: 'Physical Water Loss Management SOP',
+    title_th: 'มาตรฐานการปฏิบัติงาน น้ำสูญเสียเชิงกายภาพ',
+    filename: 'PWA67_10-4.pdf',
+    file_type: 'pdf',
+    file_size: 188000,
+    category: 'procedures',
+    tags: ['SOP', 'น้ำสูญเสียเชิงกายภาพ', 'DMA', 'DMAMA', 'WTMS', 'MNF', 'Step Test', 'ALC'],
+    status: 'indexed',
+    chunks: 45,
+    vectors: 45,
+    uploaded_by: 'Admin',
+    uploaded_at: '2026-01-15T10:00:00Z',
+    last_indexed: '2026-01-15T10:30:00Z',
+    description: 'มาตรฐานการปฏิบัติงานกระบวนการบริหารจัดการน้ำสูญเสียเชิงกายภาพ - ครอบคลุม DMA, DMAMA, WTMS, MNF Analysis, Step Test, ALC',
+  },
+  {
+    id: 'doc-009',
+    title: 'Commercial Water Loss Management SOP',
+    title_th: 'มาตรฐานการปฏิบัติงาน น้ำสูญเสียเชิงพาณิชย์',
+    filename: 'PWA67_10-3.pdf',
+    file_type: 'pdf',
+    file_size: 245000,
+    category: 'procedures',
+    tags: ['SOP', 'น้ำสูญเสียเชิงพาณิชย์', 'MMS', 'มาตรวัดน้ำ', 'มาตรหลัก', 'มาตรลูกค้า'],
+    status: 'indexed',
+    chunks: 52,
+    vectors: 52,
+    uploaded_by: 'Admin',
+    uploaded_at: '2026-01-15T10:00:00Z',
+    last_indexed: '2026-01-15T10:30:00Z',
+    description: 'มาตรฐานการปฏิบัติงานกระบวนการบริหารจัดการน้ำสูญเสียเชิงพาณิชย์ - ครอบคลุม MMS, การตรวจสอบมาตรหลัก, มาตรลูกค้า',
+  },
+];
+
+// Mock Training Queue Data
+const mockTrainingQueue: TrainingDocument[] = [
+  {
+    id: 'train-001',
+    title: 'Physical Water Loss Management SOP',
+    title_th: 'มาตรฐานการปฏิบัติงาน น้ำสูญเสียเชิงกายภาพ',
+    filename: 'PWA67_10-4.pdf',
+    file_type: 'pdf',
+    file_size: 188000,
+    category: 'procedures',
+    tags: ['SOP', 'DMA', 'DMAMA', 'WTMS', 'MNF'],
+    training_status: 'completed',
+    training_progress: 100,
+    source: 'docs/poc-challenge/',
+    pages: 5,
+    extracted_text_preview: 'มาตรฐานการปฏิบัติงานกระบวนการบริหารจัดการน้ำสูญเสีย (เชิงกายภาพ) การบริหารกิจการประปาให้ได้ผลประกอบการเป็นไปตามเป้าหมาย...',
+    queued_at: '2026-01-15T09:00:00Z',
+    completed_at: '2026-01-15T09:15:00Z',
+  },
+  {
+    id: 'train-002',
+    title: 'Commercial Water Loss Management SOP',
+    title_th: 'มาตรฐานการปฏิบัติงาน น้ำสูญเสียเชิงพาณิชย์',
+    filename: 'PWA67_10-3.pdf',
+    file_type: 'pdf',
+    file_size: 245000,
+    category: 'procedures',
+    tags: ['SOP', 'MMS', 'มาตรวัดน้ำ'],
+    training_status: 'embedding',
+    training_progress: 75,
+    source: 'docs/poc-challenge/',
+    pages: 8,
+    extracted_text_preview: 'มาตรฐานการปฏิบัติงานกระบวนการบริหารจัดการน้ำสูญเสีย (เชิงพาณิชย์) น้ำสูญเสียคือน้ำที่จ่ายเข้าระบบแล้ว ไม่ก่อให้เกิดรายได้...',
+    queued_at: '2026-01-15T09:30:00Z',
+  },
+  {
+    id: 'train-003',
+    title: 'DMA Setup Guidelines',
+    title_th: 'คู่มือการตั้งค่า DMA',
+    filename: 'dma-setup-guide.pdf',
+    file_type: 'pdf',
+    file_size: 1200000,
+    category: 'manuals',
+    tags: ['DMA', 'Setup', 'คู่มือ'],
+    training_status: 'chunking',
+    training_progress: 45,
+    source: 'upload',
+    pages: 24,
+    extracted_text_preview: 'การตั้งค่า District Metering Area (DMA) สำหรับการบริหารจัดการน้ำสูญเสีย...',
+    queued_at: '2026-01-15T10:00:00Z',
+  },
+  {
+    id: 'train-004',
+    title: 'Water Meter Calibration Manual',
+    title_th: 'คู่มือการสอบเทียบมาตรวัดน้ำ',
+    filename: 'meter-calibration.pdf',
+    file_type: 'pdf',
+    file_size: 890000,
+    category: 'technical',
+    tags: ['มาตรวัดน้ำ', 'สอบเทียบ', 'Calibration'],
+    training_status: 'extracting',
+    training_progress: 20,
+    source: 'upload',
+    pages: 15,
+    queued_at: '2026-01-15T10:30:00Z',
+  },
+  {
+    id: 'train-005',
+    title: 'Leak Detection Equipment Guide',
+    title_th: 'คู่มืออุปกรณ์ตรวจหารอยรั่ว',
+    filename: 'leak-equipment-guide.pdf',
+    file_type: 'pdf',
+    file_size: 2100000,
+    category: 'technical',
+    tags: ['รอยรั่ว', 'อุปกรณ์', 'ALC'],
+    training_status: 'queued',
+    training_progress: 0,
+    source: 'upload',
+    pages: 32,
+    queued_at: '2026-01-15T11:00:00Z',
+  },
+  {
+    id: 'train-006',
+    title: 'SCADA Integration Manual',
+    title_th: 'คู่มือการเชื่อมต่อ SCADA',
+    filename: 'scada-integration.pdf',
+    file_type: 'pdf',
+    file_size: 1500000,
+    category: 'technical',
+    tags: ['SCADA', 'Integration', 'ระบบ'],
+    training_status: 'failed',
+    training_progress: 35,
+    source: 'upload',
+    pages: 18,
+    queued_at: '2026-01-15T08:00:00Z',
+    error_message: 'PDF extraction failed: Unable to parse page 12-15 (corrupted content)',
   },
 ];
 
@@ -466,6 +620,11 @@ export default function KnowledgeBasePage() {
   const [isIndexing, setIsIndexing] = React.useState(false);
   const [kmCategoryFilter, setKMCategoryFilter] = React.useState<string>('all');
 
+  // Training Queue state
+  const [trainingQueue, setTrainingQueue] = React.useState<TrainingDocument[]>([]);
+  const [selectedTrainingDoc, setSelectedTrainingDoc] = React.useState<TrainingDocument | null>(null);
+  const [isTrainingDetailOpen, setIsTrainingDetailOpen] = React.useState(false);
+
   React.useEffect(() => {
     const timer = setTimeout(() => {
       setDocuments(mockDocuments);
@@ -473,6 +632,7 @@ export default function KnowledgeBasePage() {
       setStats(mockStats);
       setKMDocuments(mockKMDocuments);
       setKMValidation(mockKMValidation);
+      setTrainingQueue(mockTrainingQueue);
       setLoading(false);
     }, 800);
 
@@ -531,6 +691,64 @@ export default function KnowledgeBasePage() {
         );
     }
   };
+
+  const getTrainingStatusBadge = (status: TrainingDocument['training_status']) => {
+    switch (status) {
+      case 'queued':
+        return (
+          <Badge className="bg-gradient-to-r from-slate-500 to-slate-600 text-white border-0">
+            <Clock className="h-3 w-3 mr-1" />
+            รอคิว
+          </Badge>
+        );
+      case 'extracting':
+        return (
+          <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 animate-pulse">
+            <FileText className="h-3 w-3 mr-1" />
+            กำลังอ่าน PDF
+          </Badge>
+        );
+      case 'chunking':
+        return (
+          <Badge className="bg-gradient-to-r from-purple-500 to-purple-600 text-white border-0 animate-pulse">
+            <Layers className="h-3 w-3 mr-1" />
+            กำลังแบ่ง Chunks
+          </Badge>
+        );
+      case 'embedding':
+        return (
+          <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 animate-pulse">
+            <Zap className="h-3 w-3 mr-1" />
+            กำลังสร้าง Vectors
+          </Badge>
+        );
+      case 'completed':
+        return (
+          <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0">
+            <CheckCircle className="h-3 w-3 mr-1" />
+            เสร็จสิ้น
+          </Badge>
+        );
+      case 'failed':
+        return (
+          <Badge className="bg-gradient-to-r from-red-500 to-red-600 text-white border-0">
+            <XCircle className="h-3 w-3 mr-1" />
+            ล้มเหลว
+          </Badge>
+        );
+    }
+  };
+
+  // Training queue stats
+  const trainingStats = React.useMemo(() => {
+    return {
+      total: trainingQueue.length,
+      completed: trainingQueue.filter(d => d.training_status === 'completed').length,
+      processing: trainingQueue.filter(d => ['extracting', 'chunking', 'embedding'].includes(d.training_status)).length,
+      queued: trainingQueue.filter(d => d.training_status === 'queued').length,
+      failed: trainingQueue.filter(d => d.training_status === 'failed').length,
+    };
+  }, [trainingQueue]);
 
   const filteredDocuments = documents.filter((doc) => {
     const matchesSearch =
@@ -811,6 +1029,15 @@ export default function KnowledgeBasePage() {
             <TabsTrigger value="km-test" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all">
               <MessageSquare className="h-4 w-4" />
               ทดสอบ RAG
+            </TabsTrigger>
+            <TabsTrigger value="training" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all">
+              <Bot className="h-4 w-4" />
+              Training Queue
+              {trainingStats.processing > 0 && (
+                <span className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-white/20 text-[10px] font-bold animate-pulse">
+                  {trainingStats.processing}
+                </span>
+              )}
             </TabsTrigger>
           </TabsList>
 
@@ -1584,7 +1811,470 @@ export default function KnowledgeBasePage() {
               </Card>
             )}
           </TabsContent>
+
+          {/* Training Queue Tab */}
+          <TabsContent value="training" className="space-y-4 animate-blur-in">
+            {/* Training Stats */}
+            <div className="grid gap-4 md:grid-cols-5">
+              <Card className="group relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl transition-all">
+                <CardContent className="relative p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground">ทั้งหมด</p>
+                      <p className="text-2xl font-bold">{trainingStats.total}</p>
+                    </div>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/10">
+                      <FileText className="h-5 w-5 text-purple-500" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="group relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl transition-all">
+                <CardContent className="relative p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground">เสร็จสิ้น</p>
+                      <p className="text-2xl font-bold text-emerald-600">{trainingStats.completed}</p>
+                    </div>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/10">
+                      <CheckCircle className="h-5 w-5 text-emerald-500" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="group relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl transition-all">
+                <CardContent className="relative p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground">กำลังประมวลผล</p>
+                      <p className="text-2xl font-bold text-amber-600">{trainingStats.processing}</p>
+                    </div>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/10">
+                      <RefreshCw className={`h-5 w-5 text-amber-500 ${trainingStats.processing > 0 ? 'animate-spin' : ''}`} />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="group relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl transition-all">
+                <CardContent className="relative p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground">รอคิว</p>
+                      <p className="text-2xl font-bold text-slate-600">{trainingStats.queued}</p>
+                    </div>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-slate-500/20 to-slate-600/10">
+                      <Clock className="h-5 w-5 text-slate-500" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="group relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl transition-all">
+                <CardContent className="relative p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground">ล้มเหลว</p>
+                      <p className="text-2xl font-bold text-red-600">{trainingStats.failed}</p>
+                    </div>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/20 to-red-600/10">
+                      <XCircle className="h-5 w-5 text-red-500" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Training Actions */}
+            <Card className="backdrop-blur-sm bg-background/80 border-border/50">
+              <CardContent className="p-4">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm text-muted-foreground">
+                      อัปโหลด PDF เพื่อ Train สำหรับ RAG Chat
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      className="gap-2"
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                      Retry Failed
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setIsUploadDialogOpen(true);
+                        simulateUpload();
+                      }}
+                      className="gap-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                    >
+                      <Upload className="h-4 w-4" />
+                      อัปโหลด PDF ใหม่
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Training Pipeline Info */}
+            <Card className="backdrop-blur-sm bg-gradient-to-br from-purple-500/5 to-pink-500/5 border-purple-500/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/10">
+                    <Bot className="h-6 w-6 text-purple-500" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-purple-600 dark:text-purple-400">RAG Training Pipeline</p>
+                    <p className="text-sm text-muted-foreground">
+                      PDF → Text Extraction → Chunking (1000 chars) → BGE-M3 Embedding → Milvus Vector Store
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <div className="h-2 w-2 rounded-full bg-blue-500" />
+                      <span>Extract</span>
+                    </div>
+                    <ChevronRight className="h-3 w-3" />
+                    <div className="flex items-center gap-1">
+                      <div className="h-2 w-2 rounded-full bg-purple-500" />
+                      <span>Chunk</span>
+                    </div>
+                    <ChevronRight className="h-3 w-3" />
+                    <div className="flex items-center gap-1">
+                      <div className="h-2 w-2 rounded-full bg-amber-500" />
+                      <span>Embed</span>
+                    </div>
+                    <ChevronRight className="h-3 w-3" />
+                    <div className="flex items-center gap-1">
+                      <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                      <span>Store</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Training Queue Table */}
+            <Card className="relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg">
+              <CardHeader className="border-b border-border/30 pb-4">
+                <CardTitle className="flex items-center gap-2">
+                  <Database className="h-5 w-5 text-purple-500" />
+                  Training Queue
+                </CardTitle>
+                <CardDescription>
+                  เอกสารที่กำลังประมวลผลสำหรับ RAG System
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="relative p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-border/50 bg-muted/30">
+                        <th className="text-left p-4 font-medium text-sm">เอกสาร</th>
+                        <th className="text-left p-4 font-medium text-sm">แหล่งที่มา</th>
+                        <th className="text-left p-4 font-medium text-sm">หน้า</th>
+                        <th className="text-left p-4 font-medium text-sm">สถานะ</th>
+                        <th className="text-left p-4 font-medium text-sm">Progress</th>
+                        <th className="text-left p-4 font-medium text-sm">เวลา</th>
+                        <th className="text-left p-4 font-medium text-sm"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {trainingQueue.map((doc, index) => (
+                        <tr
+                          key={doc.id}
+                          className={`border-b border-border/30 hover:bg-muted/30 transition-colors animate-slide-up-fade cursor-pointer ${
+                            doc.training_status === 'failed' ? 'bg-red-500/5' : ''
+                          }`}
+                          style={{ animationDelay: `${index * 30}ms` }}
+                          onClick={() => {
+                            setSelectedTrainingDoc(doc);
+                            setIsTrainingDetailOpen(true);
+                          }}
+                        >
+                          <td className="p-4">
+                            <div className="flex items-center gap-3">
+                              <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+                                doc.training_status === 'completed' ? 'bg-emerald-500/10' :
+                                doc.training_status === 'failed' ? 'bg-red-500/10' :
+                                'bg-purple-500/10'
+                              }`}>
+                                <FileText className={`h-5 w-5 ${
+                                  doc.training_status === 'completed' ? 'text-emerald-500' :
+                                  doc.training_status === 'failed' ? 'text-red-500' :
+                                  'text-purple-500'
+                                }`} />
+                              </div>
+                              <div>
+                                <p className="font-medium">{doc.title_th}</p>
+                                <p className="text-xs text-muted-foreground">{doc.filename}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="p-4">
+                            <Badge variant="outline" className="gap-1 text-xs">
+                              <Folder className="h-3 w-3" />
+                              {doc.source}
+                            </Badge>
+                          </td>
+                          <td className="p-4">
+                            <span className="text-sm">{doc.pages || '-'}</span>
+                          </td>
+                          <td className="p-4">
+                            {getTrainingStatusBadge(doc.training_status)}
+                          </td>
+                          <td className="p-4">
+                            <div className="w-24">
+                              <div className="flex items-center gap-2">
+                                <Progress value={doc.training_progress} className="h-2" />
+                                <span className="text-xs text-muted-foreground w-8">
+                                  {doc.training_progress}%
+                                </span>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="p-4">
+                            <span className="text-sm text-muted-foreground">
+                              {formatDateTime(doc.queued_at)}
+                            </span>
+                          </td>
+                          <td className="p-4" onClick={(e) => e.stopPropagation()}>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => {
+                                  setSelectedTrainingDoc(doc);
+                                  setIsTrainingDetailOpen(true);
+                                }}>
+                                  <Eye className="h-4 w-4 mr-2" />
+                                  ดูรายละเอียด
+                                </DropdownMenuItem>
+                                {doc.training_status === 'failed' && (
+                                  <DropdownMenuItem>
+                                    <RefreshCw className="h-4 w-4 mr-2" />
+                                    ลองใหม่
+                                  </DropdownMenuItem>
+                                )}
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-red-500">
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  ลบออกจากคิว
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
+
+        {/* Training Detail Dialog */}
+        <Dialog open={isTrainingDetailOpen} onOpenChange={setIsTrainingDetailOpen}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            {selectedTrainingDoc && (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-3">
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+                      selectedTrainingDoc.training_status === 'completed' ? 'bg-emerald-500/10' :
+                      selectedTrainingDoc.training_status === 'failed' ? 'bg-red-500/10' :
+                      'bg-purple-500/10'
+                    }`}>
+                      <FileText className={`h-5 w-5 ${
+                        selectedTrainingDoc.training_status === 'completed' ? 'text-emerald-500' :
+                        selectedTrainingDoc.training_status === 'failed' ? 'text-red-500' :
+                        'text-purple-500'
+                      }`} />
+                    </div>
+                    <div>
+                      <span>{selectedTrainingDoc.title_th}</span>
+                      <p className="text-sm font-normal text-muted-foreground mt-0.5">
+                        {selectedTrainingDoc.title}
+                      </p>
+                    </div>
+                  </DialogTitle>
+                </DialogHeader>
+
+                <div className="space-y-6 py-4">
+                  {/* Status & Progress */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      {getTrainingStatusBadge(selectedTrainingDoc.training_status)}
+                      <span className="text-sm font-medium">{selectedTrainingDoc.training_progress}%</span>
+                    </div>
+                    <Progress value={selectedTrainingDoc.training_progress} className="h-3" />
+                  </div>
+
+                  {/* Error Message */}
+                  {selectedTrainingDoc.training_status === 'failed' && selectedTrainingDoc.error_message && (
+                    <Card className="bg-red-500/10 border-red-500/30">
+                      <CardContent className="p-4">
+                        <div className="flex items-start gap-3">
+                          <XCircle className="h-5 w-5 text-red-500 mt-0.5" />
+                          <div>
+                            <p className="font-medium text-red-600">เกิดข้อผิดพลาด</p>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {selectedTrainingDoc.error_message}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* File Info */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <Card className="bg-muted/20 border-border/50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10">
+                            <FileText className="h-5 w-5 text-blue-500" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground">ไฟล์</p>
+                            <p className="text-sm font-medium truncate max-w-[150px]" title={selectedTrainingDoc.filename}>
+                              {selectedTrainingDoc.filename}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-muted/20 border-border/50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10">
+                            <Layers className="h-5 w-5 text-purple-500" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground">จำนวนหน้า</p>
+                            <p className="text-sm font-medium">{selectedTrainingDoc.pages || '-'} หน้า</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-muted/20 border-border/50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10">
+                            <Database className="h-5 w-5 text-amber-500" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground">ขนาด</p>
+                            <p className="text-sm font-medium">{formatFileSize(selectedTrainingDoc.file_size)}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-muted/20 border-border/50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
+                            <Folder className="h-5 w-5 text-emerald-500" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground">แหล่งที่มา</p>
+                            <p className="text-sm font-medium">{selectedTrainingDoc.source}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Tags */}
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground">Tags</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedTrainingDoc.tags.map((tag, i) => (
+                        <Badge key={i} variant="outline" className="gap-1">
+                          <Tag className="h-3 w-3" />
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Text Preview */}
+                  {selectedTrainingDoc.extracted_text_preview && (
+                    <div className="space-y-2">
+                      <Label className="text-muted-foreground">ตัวอย่างเนื้อหา</Label>
+                      <div className="bg-muted/30 rounded-lg p-4 text-sm text-muted-foreground max-h-32 overflow-y-auto">
+                        {selectedTrainingDoc.extracted_text_preview}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Timeline */}
+                  <div className="space-y-3">
+                    <Label className="text-muted-foreground">ประวัติ</Label>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3 text-sm">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-500/10">
+                          <Clock className="h-4 w-4 text-purple-500" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium">เข้าคิว</p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatDateTime(selectedTrainingDoc.queued_at)}
+                          </p>
+                        </div>
+                      </div>
+                      {selectedTrainingDoc.completed_at && (
+                        <div className="flex items-center gap-3 text-sm">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10">
+                            <CheckCircle className="h-4 w-4 text-emerald-500" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-medium">เสร็จสิ้น</p>
+                            <p className="text-xs text-muted-foreground">
+                              {formatDateTime(selectedTrainingDoc.completed_at)}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <DialogFooter className="gap-2 sm:gap-0">
+                  {selectedTrainingDoc.training_status === 'failed' && (
+                    <Button variant="outline" className="gap-2">
+                      <RefreshCw className="h-4 w-4" />
+                      ลองใหม่
+                    </Button>
+                  )}
+                  {selectedTrainingDoc.training_status === 'completed' && (
+                    <Button variant="outline" className="gap-2">
+                      <Eye className="h-4 w-4" />
+                      ดูใน Knowledge Base
+                    </Button>
+                  )}
+                  <Button
+                    variant="destructive"
+                    className="gap-2"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    ลบ
+                  </Button>
+                </DialogFooter>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* Document Detail Dialog */}
         <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
@@ -1769,7 +2459,7 @@ export default function KnowledgeBasePage() {
                 อัปโหลดเอกสาร
               </DialogTitle>
               <DialogDescription>
-                เพิ่มเอกสารใหม่เข้าสู่คลังความรู้
+                เพิ่มเอกสารใหม่เข้าสู่คลังความรู้และ Train สำหรับ RAG
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
@@ -1796,7 +2486,7 @@ export default function KnowledgeBasePage() {
 
               <div className="space-y-2">
                 <Label>หมวดหมู่</Label>
-                <Select defaultValue="manuals">
+                <Select defaultValue="procedures">
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -1810,21 +2500,54 @@ export default function KnowledgeBasePage() {
 
               <div className="space-y-2">
                 <Label>Tags (คั่นด้วยคอมม่า)</Label>
-                <Input placeholder="น้ำสูญเสีย, DMA, คู่มือ" />
+                <Input placeholder="SOP, น้ำสูญเสีย, DMA, MMS" />
               </div>
 
               <div className="space-y-2">
                 <Label>คำอธิบาย</Label>
                 <Textarea placeholder="รายละเอียดเกี่ยวกับเอกสาร..." rows={2} />
               </div>
+
+              {/* RAG Training Options */}
+              <Card className="bg-gradient-to-br from-purple-500/5 to-pink-500/5 border-purple-500/20">
+                <CardContent className="p-4 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/10">
+                      <Bot className="h-5 w-5 text-purple-500" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-purple-600 dark:text-purple-400">RAG Training</p>
+                      <p className="text-xs text-muted-foreground">Train เอกสารสำหรับ AI Chat</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label className="text-sm">เพิ่มเข้า Training Queue</Label>
+                      <p className="text-xs text-muted-foreground">ประมวลผลเอกสารสำหรับ RAG ทันที</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      defaultChecked
+                      className="h-4 w-4 rounded border-purple-500 text-purple-500 focus:ring-purple-500"
+                    />
+                  </div>
+
+                  <div className="pt-2 border-t border-purple-500/20">
+                    <p className="text-xs text-muted-foreground">
+                      Pipeline: PDF → Extract Text → Chunk (1000 chars) → BGE-M3 Embedding → Milvus
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-            <DialogFooter>
+            <DialogFooter className="gap-2 sm:gap-0">
               <Button variant="outline" onClick={() => setIsUploadDialogOpen(false)}>
                 ยกเลิก
               </Button>
-              <Button className="gap-2 bg-gradient-to-r from-amber-500 to-orange-500">
+              <Button className="gap-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
                 <Upload className="h-4 w-4" />
-                อัปโหลด
+                อัปโหลดและ Train
               </Button>
             </DialogFooter>
           </DialogContent>

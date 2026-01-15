@@ -24,6 +24,21 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
   },
+
+  // Proxy API requests to FastAPI backend
+  async rewrites() {
+    const apiUrl = process.env.API_URL || 'http://localhost:8000';
+    return [
+      {
+        source: '/api/health',
+        destination: `${apiUrl}/health`,
+      },
+      {
+        source: '/api/:path*',
+        destination: `${apiUrl}/api/:path*`,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
