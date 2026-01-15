@@ -80,7 +80,15 @@
       "Bash(/opt/homebrew/bin/npm --version)",
       "Bash(source:*)",
       "Bash(docker cp:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(npx tsc:*)",
+      "Bash(/opt/homebrew/bin/npx tsc --noEmit)",
+      "Bash(export PATH=\"/opt/homebrew/bin:$PATH\")",
+      "Bash(/usr/bin/env node:*)",
+      "Bash(./node_modules/.bin/tsc:*)",
+      "Bash(/Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/apps/web/node_modules/.bin/tsc:*)",
+      "Bash(export PATH=\"/usr/local/bin:/usr/bin:/bin:$PATH\")",
+      "Bash(/usr/bin/env npm install @radix-ui/react-collapsible)"
     ]
   }
 }

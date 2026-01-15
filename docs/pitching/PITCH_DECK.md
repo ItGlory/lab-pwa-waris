@@ -1,4 +1,5 @@
 # WARIS - Pitching Document
+
 # เอกสารนำเสนอโครงการ
 
 ---
@@ -6,16 +7,20 @@
 ## 1. ภาพรวมโครงการ (Executive Summary)
 
 ### ชื่อโครงการ
+
 **WARIS** - Water Loss Intelligent Analysis and Reporting System
 ระบบวิเคราะห์และรายงานข้อมูลน้ำสูญเสียอัจฉริยะด้วยปัญญาประดิษฐ์ร่วมกับโมเดลภาษาขนาดใหญ่
 
 ### ลูกค้า
+
 การประปาส่วนภูมิภาค (กปภ.) - Provincial Waterworks Authority (PWA)
 
 ### งบประมาณ
+
 **9,577,554.96 บาท** (รวมภาษีมูลค่าเพิ่ม)
 
 ### ระยะเวลา
+
 **270 วัน** (9 เดือน)
 
 ---
@@ -42,6 +47,7 @@
 ```
 
 ### ผลกระทบ
+
 - สูญเสียรายได้ประมาณ **หลายพันล้านบาท/ปี**
 - การซ่อมบำรุงล่าช้า
 - ประสิทธิภาพการดำเนินงานต่ำ
@@ -80,12 +86,12 @@
 
 ### 4.1 AI Shadowing - 4 โมเดลอัจฉริยะ
 
-| โมเดล | หน้าที่ | เทคโนโลยี | เป้าหมาย |
-|-------|--------|-----------|----------|
-| **Anomaly Detection** | ตรวจจับสัญญาณผิดปกติ | Isolation Forest, LSTM | F1 ≥ 0.85 |
-| **Pattern Recognition** | รูปแบบการใช้น้ำผิดปกติ | K-Means, CNN | Acc ≥ 0.80 |
-| **Classification** | แยกแยะน้ำสูญเสียกายภาพ/พาณิชย์ | XGBoost, RF | AUC ≥ 0.85 |
-| **Time-series** | ทำนายแนวโน้มน้ำสูญเสีย | Prophet, LSTM | MAPE ≤ 15% |
+| โมเดล                   | หน้าที่                        | เทคโนโลยี              | เป้าหมาย   |
+| ----------------------- | ------------------------------ | ---------------------- | ---------- |
+| **Anomaly Detection**   | ตรวจจับสัญญาณผิดปกติ           | Isolation Forest, LSTM | F1 ≥ 0.85  |
+| **Pattern Recognition** | รูปแบบการใช้น้ำผิดปกติ         | K-Means, CNN           | Acc ≥ 0.80 |
+| **Classification**      | แยกแยะน้ำสูญเสียกายภาพ/พาณิชย์ | XGBoost, RF            | AUC ≥ 0.85 |
+| **Time-series**         | ทำนายแนวโน้มน้ำสูญเสีย         | Prophet, LSTM          | MAPE ≤ 15% |
 
 ### 4.2 LLM System - ถาม-ตอบภาษาไทย
 
@@ -112,6 +118,7 @@
 ```
 
 **คุณสมบัติ:**
+
 - ✅ LLM ขนาด 70B+ parameters
 - ✅ รองรับภาษาไทยเป็นหลัก
 - ✅ Air-gapped deployment (ไม่เชื่อมต่ออินเทอร์เน็ต)
@@ -145,10 +152,10 @@
 
 ### 4.4 Alert System
 
-| ระดับ | Response Time | Resolution Time |
-|-------|--------------|-----------------|
-| 🔴 Critical (ระบบล่ม) | 6 ชั่วโมง | 1 วัน |
-| 🟡 Normal | 1 วัน | 5 วัน |
+| ระดับ                 | Response Time | Resolution Time |
+| --------------------- | ------------- | --------------- |
+| 🔴 Critical (ระบบล่ม) | 6 ชั่วโมง     | 1 วัน           |
+| 🟡 Normal             | 1 วัน         | 5 วัน           |
 
 - เก็บประวัติ 60 วัน พร้อม timestamp
 - แจ้งเตือนผ่าน Web Application
@@ -204,24 +211,24 @@
 
 ### Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| **Frontend** | Next.js 16, React 19, TypeScript, TailwindCSS 4, shadcn/ui |
-| **Backend** | FastAPI, Python 3.12+, Node.js 22 |
-| **AI/ML** | PyTorch 2.10+, LangChain 1.2, Ollama, MLflow 3.8 |
-| **Database** | PostgreSQL 18+, MongoDB 8.2, Milvus 2.6, Redis 8.4 |
-| **Infrastructure** | Docker, Kubernetes 1.35, Terraform 1.14 |
+| Layer              | Technology                                                 |
+| ------------------ | ---------------------------------------------------------- |
+| **Frontend**       | Next.js 16, React 19, TypeScript, TailwindCSS 4, shadcn/ui |
+| **Backend**        | FastAPI, Python 3.12+, Node.js 22                          |
+| **AI/ML**          | PyTorch 2.10+, LangChain 1.2, Ollama, MLflow 3.8           |
+| **Database**       | PostgreSQL 18+, MongoDB 8.2, Milvus 2.6, Redis 8.4         |
+| **Infrastructure** | Docker, Kubernetes 1.35, Terraform 1.14                    |
 
 ### Server Specifications (On-Premise)
 
-| Component | Specification |
-|-----------|---------------|
-| CPU | 2x 25+ cores, 2.2GHz+ |
-| RAM | 512GB DDR5 |
-| Storage | 5x 3.5TB SSD (Hot-swap) |
-| GPU | 2x 48GB GDDR6, 51.6+ TFLOPS FP32 |
-| Network | 5x 10/25Gb ports |
-| Warranty | 3 ปี On-site |
+| Component | Specification                    |
+| --------- | -------------------------------- |
+| CPU       | 2x 25+ cores, 2.2GHz+            |
+| RAM       | 512GB DDR5                       |
+| Storage   | 5x 3.5TB SSD (Hot-swap)          |
+| GPU       | 2x 48GB GDDR6, 51.6+ TFLOPS FP32 |
+| Network   | 5x 10/25Gb ports                 |
+| Warranty  | 3 ปี On-site                     |
 
 ---
 
@@ -264,12 +271,12 @@
 
 ### Security Features
 
-| Feature | Implementation |
-|---------|----------------|
-| 🔐 Authentication | JWT + OAuth2 |
-| 🔒 Encryption | TLS 1.3, AES-256 at rest |
-| 🛡️ Access Control | Role-based (RBAC) |
-| 🔍 Audit Trail | Full logging |
+| Feature           | Implementation                |
+| ----------------- | ----------------------------- |
+| 🔐 Authentication | JWT + OAuth2                  |
+| 🔒 Encryption     | TLS 1.3, AES-256 at rest      |
+| 🛡️ Access Control | Role-based (RBAC)             |
+| 🔍 Audit Trail    | Full logging                  |
 | 🚫 Air-gapped LLM | No external data transmission |
 
 ### Compliance
@@ -301,12 +308,12 @@ Phase 4 ░░░░░░░░░░░░░░░░░░░░░░░░
 
 ### Deliverables by Phase
 
-| Phase | Day | Payment | Deliverables |
-|-------|-----|---------|--------------|
-| **งวดที่ 1** | 30 | 15% | NDA, Project Plan, Team Structure, Inception Report |
-| **งวดที่ 2** | 120 | 30% | User Requirements, System Design, UX/UI Design |
-| **งวดที่ 3** | 140 | 40% | Server Installation, DMAMA Integration, AI System, Test Report |
-| **งวดที่ 4** | 270 | 15% | Training (80 คน), Final Documentation |
+| Phase        | Day | Payment | Deliverables                                                   |
+| ------------ | --- | ------- | -------------------------------------------------------------- |
+| **งวดที่ 1** | 30  | 15%     | NDA, Project Plan, Team Structure, Inception Report            |
+| **งวดที่ 2** | 120 | 30%     | User Requirements, System Design, UX/UI Design                 |
+| **งวดที่ 3** | 140 | 40%     | Server Installation, DMAMA Integration, AI System, Test Report |
+| **งวดที่ 4** | 270 | 15%     | Training (80 คน), Final Documentation                          |
 
 ---
 
@@ -314,22 +321,22 @@ Phase 4 ░░░░░░░░░░░░░░░░░░░░░░░░
 
 ### AI Model Performance
 
-| Model | Metric | Target |
-|-------|--------|--------|
-| Anomaly Detection | F1-Score | ≥ 0.85 |
+| Model               | Metric   | Target |
+| ------------------- | -------- | ------ |
+| Anomaly Detection   | F1-Score | ≥ 0.85 |
 | Pattern Recognition | Accuracy | ≥ 0.80 |
-| Classification | AUC-ROC | ≥ 0.85 |
-| Time-series | MAPE | ≤ 15% |
-| LLM (Thai) | Accuracy | ≥ 0.90 |
+| Classification      | AUC-ROC  | ≥ 0.85 |
+| Time-series         | MAPE     | ≤ 15%  |
+| LLM (Thai)          | Accuracy | ≥ 0.90 |
 
 ### System Performance
 
-| Metric | Target |
-|--------|--------|
-| API Response Time | < 2 seconds |
-| Dashboard Load Time | < 3 seconds |
-| LLM Response Time | < 10 seconds |
-| System Uptime | ≥ 99.5% |
+| Metric              | Target       |
+| ------------------- | ------------ |
+| API Response Time   | < 2 seconds  |
+| Dashboard Load Time | < 3 seconds  |
+| LLM Response Time   | < 10 seconds |
+| System Uptime       | ≥ 99.5%      |
 
 ### User Acceptance
 
@@ -371,16 +378,16 @@ Phase 4 ░░░░░░░░░░░░░░░░░░░░░░░░
 
 ### Key Roles
 
-| Role | Responsibility |
-|------|----------------|
+| Role            | Responsibility                   |
+| --------------- | -------------------------------- |
 | Project Manager | การบริหารโครงการ, ประสานงาน กปภ. |
-| Data Engineer | DMAMA integration, ETL pipeline |
-| ML Engineer | AI Shadowing models (4 models) |
-| LLM Specialist | LLM deployment, RAG pipeline |
-| Frontend Dev | Dashboard, Q&A interface |
-| Backend Dev | API, services |
-| DevOps | Infrastructure, CI/CD |
-| QA Engineer | Testing, quality assurance |
+| Data Engineer   | DMAMA integration, ETL pipeline  |
+| ML Engineer     | AI Shadowing models (4 models)   |
+| LLM Specialist  | LLM deployment, RAG pipeline     |
+| Frontend Dev    | Dashboard, Q&A interface         |
+| Backend Dev     | API, services                    |
+| DevOps          | Infrastructure, CI/CD            |
+| QA Engineer     | Testing, quality assurance       |
 
 ---
 
@@ -414,20 +421,20 @@ Phase 4 ░░░░░░░░░░░░░░░░░░░░░░░░
 
 ### การรับประกัน (1 ปี)
 
-| รายการ | รายละเอียด |
-|--------|------------|
-| ระยะเวลา | 1 ปี หลังส่งมอบ |
-| Bug Fixes | ไม่มีค่าใช้จ่าย |
-| Model Retraining | ปรับแต่งตามต้องการ |
-| Documentation | อัปเดตตามการเปลี่ยนแปลง |
-| Source Code | ส่งมอบเมื่อสิ้นสุด warranty |
+| รายการ           | รายละเอียด                  |
+| ---------------- | --------------------------- |
+| ระยะเวลา         | 1 ปี หลังส่งมอบ             |
+| Bug Fixes        | ไม่มีค่าใช้จ่าย             |
+| Model Retraining | ปรับแต่งตามต้องการ          |
+| Documentation    | อัปเดตตามการเปลี่ยนแปลง     |
+| Source Code      | ส่งมอบเมื่อสิ้นสุด warranty |
 
 ### Support SLA
 
-| Severity | Response | Resolution |
-|----------|----------|------------|
-| 🔴 Critical | 6 ชั่วโมง | 1 วัน |
-| 🟡 Normal | 1 วัน | 5 วัน |
+| Severity    | Response  | Resolution |
+| ----------- | --------- | ---------- |
+| 🔴 Critical | 6 ชั่วโมง | 1 วัน      |
+| 🟡 Normal   | 1 วัน     | 5 วัน      |
 
 ---
 
@@ -461,5 +468,5 @@ Phase 4 ░░░░░░░░░░░░░░░░░░░░░░░░
 
 ---
 
-*เอกสารนี้จัดทำขึ้นเพื่อประกอบการนำเสนอโครงการ WARIS*
-*อ้างอิงตาม TOR ที่ได้รับจากการประปาส่วนภูมิภาค*
+_เอกสารนี้จัดทำขึ้นเพื่อประกอบการนำเสนอโครงการ WARIS_
+_อ้างอิงตาม TOR ที่ได้รับจากการประปาส่วนภูมิภาค_

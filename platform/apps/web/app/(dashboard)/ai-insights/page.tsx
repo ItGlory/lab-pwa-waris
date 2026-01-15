@@ -170,8 +170,12 @@ export default function AIInsightsPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Brain className="h-7 w-7 text-purple-600" />
-            AI Insights
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-600/10 ring-1 ring-purple-500/20 shadow-lg shadow-purple-500/10">
+              <Brain className="h-5 w-5 text-purple-600" />
+            </div>
+            <span className="bg-gradient-to-r from-purple-600 to-[var(--pwa-blue-deep)] bg-clip-text text-transparent">
+              AI Insights
+            </span>
           </h1>
           <p className="text-muted-foreground">
             การวิเคราะห์อัจฉริยะและการคาดการณ์
@@ -179,7 +183,7 @@ export default function AIInsightsPage() {
         </div>
         <div className="flex items-center gap-2">
           <Select value={selectedDma} onValueChange={setSelectedDma}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[140px] bg-background/50 border-border/50 hover:border-purple-500/30 transition-colors">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -188,7 +192,11 @@ export default function AIInsightsPage() {
               <SelectItem value="DMA-003">DMA-003</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={runAnalysis} disabled={analyzing} className="gap-2">
+          <Button
+            onClick={runAnalysis}
+            disabled={analyzing}
+            className="gap-2 bg-gradient-to-r from-purple-600 to-[var(--pwa-blue-deep)] hover:from-purple-600/90 hover:to-[var(--pwa-blue-deep)]/90 shadow-lg shadow-purple-500/25 transition-all hover:shadow-purple-500/40"
+          >
             {analyzing ? (
               <>
                 <RefreshCw className="h-4 w-4 animate-spin" />
@@ -206,15 +214,27 @@ export default function AIInsightsPage() {
 
       {/* Model Status Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        {models.map((model) => (
-          <Card key={model.id}>
-            <CardHeader className="pb-2">
+        {models.map((model, index) => (
+          <Card
+            key={model.id}
+            className="group relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl hover:shadow-purple-500/10 hover:border-purple-500/30 transition-all duration-300 animate-slide-up-fade"
+            style={{ animationDelay: `${index * 50}ms` }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-[var(--pwa-blue-deep)]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <CardHeader className="relative pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium">{model.name_th}</CardTitle>
-                {getStatusBadge(model.status)}
+                {model.status === 'active' ? (
+                  <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0 shadow-md shadow-emerald-500/25 animate-breathing-glow">
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    Active
+                  </Badge>
+                ) : (
+                  <Badge variant="secondary">{model.status}</Badge>
+                )}
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative">
               <div className="space-y-2">
                 {Object.entries(model.metrics).slice(0, 2).map(([key, value]) => (
                   <div key={key} className="flex items-center justify-between text-sm">
@@ -224,7 +244,7 @@ export default function AIInsightsPage() {
                     </span>
                   </div>
                 ))}
-                <div className="text-xs text-muted-foreground">
+                <div className="text-xs text-muted-foreground pt-1 border-t border-border/30">
                   v{model.version}
                 </div>
               </div>
@@ -235,44 +255,51 @@ export default function AIInsightsPage() {
 
       {/* Main Content */}
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview" className="gap-2">
+        <TabsList className="backdrop-blur-sm bg-background/80 border border-border/50 p-1 shadow-lg">
+          <TabsTrigger value="overview" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-[var(--pwa-blue-deep)] data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:shadow-purple-500/25 transition-all">
             <Activity className="h-4 w-4" />
             ภาพรวม
           </TabsTrigger>
-          <TabsTrigger value="forecast" className="gap-2">
+          <TabsTrigger value="forecast" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-[var(--pwa-blue-deep)] data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:shadow-purple-500/25 transition-all">
             <TrendingUp className="h-4 w-4" />
             พยากรณ์
           </TabsTrigger>
-          <TabsTrigger value="patterns" className="gap-2">
+          <TabsTrigger value="patterns" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-[var(--pwa-blue-deep)] data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:shadow-purple-500/25 transition-all">
             <PieChart className="h-4 w-4" />
             รูปแบบ
           </TabsTrigger>
-          <TabsTrigger value="models" className="gap-2">
+          <TabsTrigger value="models" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-[var(--pwa-blue-deep)] data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:shadow-purple-500/25 transition-all">
             <BarChart3 className="h-4 w-4" />
             โมเดล
           </TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-4">
+        <TabsContent value="overview" className="space-y-4 animate-blur-in">
           {analysisResult ? (
             <div className="grid gap-4 md:grid-cols-2">
               {/* Anomaly Detection */}
-              <Card>
-                <CardHeader>
+              <Card className="group relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-300">
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <CardHeader className="relative">
                   <CardTitle className="flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5 text-amber-500" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/10 ring-1 ring-amber-500/20">
+                      <AlertTriangle className="h-4 w-4 text-amber-500" />
+                    </div>
                     การตรวจจับความผิดปกติ
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="relative">
                   {analysisResult.anomalies?.map((a: any, i: number) => (
-                    <div key={i} className="flex items-center gap-4">
+                    <div key={i} className="flex items-center gap-4 p-3 rounded-lg bg-muted/30">
                       {a.is_anomaly ? (
-                        <XCircle className="h-8 w-8 text-red-500" />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-red-600 text-white shadow-lg shadow-red-500/30 animate-breathing-glow">
+                          <XCircle className="h-5 w-5" />
+                        </div>
                       ) : (
-                        <CheckCircle className="h-8 w-8 text-emerald-500" />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/30">
+                          <CheckCircle className="h-5 w-5" />
+                        </div>
                       )}
                       <div>
                         <p className="font-medium">
@@ -288,24 +315,27 @@ export default function AIInsightsPage() {
               </Card>
 
               {/* Classification */}
-              <Card>
-                <CardHeader>
+              <Card className="group relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-[var(--pwa-blue-deep)]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <CardHeader className="relative">
                   <CardTitle className="flex items-center gap-2">
-                    <Target className="h-5 w-5 text-blue-500" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500/20 to-[var(--pwa-blue-deep)]/10 ring-1 ring-blue-500/20">
+                      <Target className="h-4 w-4 text-blue-500" />
+                    </div>
                     การจำแนกประเภท
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="relative">
                   <div className="space-y-3">
-                    <div>
-                      <p className="text-2xl font-bold">
+                    <div className="p-3 rounded-lg bg-gradient-to-r from-blue-500/10 to-[var(--pwa-blue-deep)]/5 border border-blue-500/20">
+                      <p className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-[var(--pwa-blue-deep)] bg-clip-text text-transparent">
                         {analysisResult.classification?.loss_type_th}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         ความน่าจะเป็น: {((analysisResult.classification?.probability || 0) * 100).toFixed(0)}%
                       </p>
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-2">
                       <p className="text-sm font-medium">ปัจจัยสำคัญ:</p>
                       {Object.entries(analysisResult.classification?.feature_importance || {})
                         .slice(0, 3)
@@ -316,7 +346,12 @@ export default function AIInsightsPage() {
                                 <span>{key}</span>
                                 <span>{((value as number) * 100).toFixed(0)}%</span>
                               </div>
-                              <Progress value={(value as number) * 100} className="h-1" />
+                              <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-gradient-to-r from-blue-500 to-[var(--pwa-blue-deep)] rounded-full transition-all"
+                                  style={{ width: `${(value as number) * 100}%` }}
+                                />
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -326,19 +361,32 @@ export default function AIInsightsPage() {
               </Card>
 
               {/* Recommendations */}
-              <Card className="md:col-span-2">
-                <CardHeader>
+              <Card className="md:col-span-2 group relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl hover:shadow-yellow-500/10 transition-all duration-300">
+                <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-amber-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <CardHeader className="relative">
                   <CardTitle className="flex items-center gap-2">
-                    <Lightbulb className="h-5 w-5 text-yellow-500" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-yellow-500/20 to-amber-500/10 ring-1 ring-yellow-500/20">
+                      <Lightbulb className="h-4 w-4 text-yellow-500" />
+                    </div>
                     คำแนะนำ
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="relative">
                   <div className="space-y-3">
                     {analysisResult.recommendations?.map((rec: any, i: number) => (
-                      <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                      <div
+                        key={i}
+                        className="flex items-start gap-3 p-4 rounded-xl backdrop-blur-sm bg-muted/30 border border-border/30 hover:border-border/50 transition-all animate-slide-up-fade"
+                        style={{ animationDelay: `${i * 100}ms` }}
+                      >
                         <Badge
-                          variant={rec.priority === 'high' ? 'destructive' : rec.priority === 'medium' ? 'default' : 'secondary'}
+                          className={
+                            rec.priority === 'high'
+                              ? 'bg-gradient-to-r from-red-500 to-red-600 text-white border-0 shadow-md shadow-red-500/25'
+                              : rec.priority === 'medium'
+                                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 shadow-md shadow-amber-500/25'
+                                : 'bg-gradient-to-r from-gray-400 to-gray-500 text-white border-0'
+                          }
                         >
                           {rec.priority === 'high' ? 'สูง' : rec.priority === 'medium' ? 'กลาง' : 'ต่ำ'}
                         </Badge>
@@ -346,6 +394,7 @@ export default function AIInsightsPage() {
                           <p className="font-medium">{rec.message}</p>
                           <p className="text-sm text-muted-foreground">{rec.action}</p>
                         </div>
+                        <ChevronRight className="ml-auto h-5 w-5 text-muted-foreground/50" />
                       </div>
                     ))}
                   </div>
@@ -353,15 +402,26 @@ export default function AIInsightsPage() {
               </Card>
             </div>
           ) : (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <Brain className="h-16 w-16 text-muted-foreground/50 mb-4" />
-                <h3 className="text-lg font-medium mb-2">เริ่มการวิเคราะห์</h3>
-                <p className="text-sm text-muted-foreground mb-4">
+            <Card className="relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg">
+              <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-gradient-to-b from-purple-500/10 to-transparent rounded-full blur-3xl" />
+              <CardContent className="relative flex flex-col items-center justify-center py-16">
+                <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500/20 to-[var(--pwa-blue-deep)]/10 ring-1 ring-purple-500/20 shadow-xl shadow-purple-500/20 mb-6">
+                  <Brain className="h-10 w-10 text-purple-500" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2 bg-gradient-to-r from-purple-600 to-[var(--pwa-blue-deep)] bg-clip-text text-transparent">
+                  เริ่มการวิเคราะห์
+                </h3>
+                <p className="text-sm text-muted-foreground mb-6 text-center max-w-md">
                   คลิกปุ่ม "วิเคราะห์" เพื่อรัน AI analysis สำหรับ {selectedDma}
                 </p>
-                <Button onClick={runAnalysis} disabled={analyzing}>
-                  <Zap className="h-4 w-4 mr-2" />
+                <Button
+                  onClick={runAnalysis}
+                  disabled={analyzing}
+                  size="lg"
+                  className="gap-2 bg-gradient-to-r from-purple-600 to-[var(--pwa-blue-deep)] hover:from-purple-600/90 hover:to-[var(--pwa-blue-deep)]/90 shadow-lg shadow-purple-500/25 transition-all hover:shadow-purple-500/40 hover:scale-105"
+                >
+                  <Zap className="h-5 w-5" />
                   วิเคราะห์ตอนนี้
                 </Button>
               </CardContent>
@@ -370,49 +430,60 @@ export default function AIInsightsPage() {
         </TabsContent>
 
         {/* Forecast Tab */}
-        <TabsContent value="forecast">
-          <Card>
-            <CardHeader>
-              <CardTitle>พยากรณ์น้ำสูญเสีย 7 วัน</CardTitle>
+        <TabsContent value="forecast" className="animate-blur-in">
+          <Card className="relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg">
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[var(--pwa-cyan)]/10 to-transparent rounded-full blur-3xl" />
+            <CardHeader className="relative">
+              <CardTitle className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10 ring-1 ring-[var(--pwa-cyan)]/20">
+                  <TrendingUp className="h-4 w-4 text-[var(--pwa-cyan)]" />
+                </div>
+                พยากรณ์น้ำสูญเสีย 7 วัน
+              </CardTitle>
               <CardDescription>
                 การคาดการณ์ปริมาณน้ำสูญเสียด้วย Time Series Model
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
+            <CardContent className="relative">
+              <div className="space-y-6">
                 {/* Simple bar chart visualization */}
-                <div className="flex items-end gap-2 h-48">
+                <div className="flex items-end gap-3 h-56 px-2">
                   {forecast.map((item, i) => {
                     const maxValue = Math.max(...forecast.map(f => f.upper));
                     const height = (item.value / maxValue) * 100;
                     return (
-                      <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                      <div
+                        key={i}
+                        className="flex-1 flex flex-col items-center gap-2 animate-slide-up-fade"
+                        style={{ animationDelay: `${i * 75}ms` }}
+                      >
                         <div className="w-full flex flex-col items-center">
                           <div
-                            className="w-full bg-blue-200 rounded-t relative"
-                            style={{ height: `${(item.upper / maxValue) * 160}px` }}
+                            className="w-full bg-gradient-to-t from-[var(--pwa-cyan)]/20 to-[var(--pwa-cyan)]/5 rounded-t-lg relative backdrop-blur-sm border border-[var(--pwa-cyan)]/10"
+                            style={{ height: `${(item.upper / maxValue) * 180}px` }}
                           >
                             <div
-                              className="absolute bottom-0 w-full bg-blue-500 rounded-t"
-                              style={{ height: `${height * 1.6}px` }}
+                              className="absolute bottom-0 w-full bg-gradient-to-t from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] rounded-t-lg shadow-lg shadow-[var(--pwa-cyan)]/30 transition-all hover:shadow-[var(--pwa-cyan)]/50"
+                              style={{ height: `${height * 1.8}px` }}
                             />
                           </div>
                         </div>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs text-muted-foreground font-medium">
                           {new Date(item.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })}
                         </span>
                       </div>
                     );
                   })}
                 </div>
-                <div className="flex items-center justify-center gap-6 text-sm">
+                <div className="flex items-center justify-center gap-8 text-sm p-4 rounded-xl backdrop-blur-sm bg-muted/30 border border-border/30">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-blue-500 rounded" />
-                    <span>คาดการณ์</span>
+                    <div className="w-4 h-4 rounded bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] shadow-md shadow-[var(--pwa-cyan)]/30" />
+                    <span className="font-medium">คาดการณ์</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-blue-200 rounded" />
-                    <span>ช่วงความเชื่อมั่น 95%</span>
+                    <div className="w-4 h-4 rounded bg-gradient-to-t from-[var(--pwa-cyan)]/20 to-[var(--pwa-cyan)]/5 border border-[var(--pwa-cyan)]/20" />
+                    <span className="font-medium">ช่วงความเชื่อมั่น 95%</span>
                   </div>
                 </div>
               </div>
@@ -421,26 +492,50 @@ export default function AIInsightsPage() {
         </TabsContent>
 
         {/* Patterns Tab */}
-        <TabsContent value="patterns">
-          <Card>
-            <CardHeader>
-              <CardTitle>รูปแบบการใช้น้ำที่ตรวจพบ</CardTitle>
+        <TabsContent value="patterns" className="animate-blur-in">
+          <Card className="relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg">
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-emerald-500/10 to-transparent rounded-full blur-3xl" />
+            <CardHeader className="relative">
+              <CardTitle className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/10 ring-1 ring-emerald-500/20">
+                  <PieChart className="h-4 w-4 text-emerald-500" />
+                </div>
+                รูปแบบการใช้น้ำที่ตรวจพบ
+              </CardTitle>
               <CardDescription>
                 การจดจำรูปแบบด้วย Clustering Algorithm
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative">
               <div className="space-y-4">
-                {patterns.map((pattern) => (
-                  <div key={pattern.id} className="flex items-center gap-4">
-                    <div className="flex-1">
-                      <div className="flex justify-between mb-1">
-                        <span className="font-medium">{pattern.label_th}</span>
-                        <span className="text-sm text-muted-foreground">
-                          {pattern.count} readings ({pattern.percentage.toFixed(1)}%)
-                        </span>
+                {patterns.map((pattern, index) => (
+                  <div
+                    key={pattern.id}
+                    className="group p-4 rounded-xl backdrop-blur-sm bg-muted/30 border border-border/30 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5 transition-all animate-slide-up-fade"
+                    style={{ animationDelay: `${index * 75}ms` }}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 ring-1 ring-emerald-500/20 group-hover:scale-110 transition-transform">
+                        <span className="text-lg font-bold text-emerald-600">{index + 1}</span>
                       </div>
-                      <Progress value={pattern.percentage} className="h-2" />
+                      <div className="flex-1">
+                        <div className="flex justify-between mb-2">
+                          <span className="font-medium">{pattern.label_th}</span>
+                          <span className="text-sm text-muted-foreground">
+                            {pattern.count} readings
+                            <Badge className="ml-2 bg-gradient-to-r from-emerald-500/20 to-teal-500/10 text-emerald-600 border-emerald-500/20">
+                              {pattern.percentage.toFixed(1)}%
+                            </Badge>
+                          </span>
+                        </div>
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full shadow-lg shadow-emerald-500/30 transition-all"
+                            style={{ width: `${pattern.percentage}%` }}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -450,51 +545,97 @@ export default function AIInsightsPage() {
         </TabsContent>
 
         {/* Models Tab */}
-        <TabsContent value="models">
+        <TabsContent value="models" className="animate-blur-in">
           <div className="grid gap-4 md:grid-cols-2">
-            {models.map((model) => (
-              <Card key={model.id}>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>{model.name_th}</CardTitle>
-                    {getStatusBadge(model.status)}
-                  </div>
-                  <CardDescription>{model.name}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <p className="text-muted-foreground">Version</p>
-                        <p className="font-medium">v{model.version}</p>
+            {models.map((model, index) => {
+              const modelColors = [
+                { gradient: 'from-purple-500 to-purple-600', shadow: 'purple', iconBg: 'from-purple-500/20 to-purple-600/10', ring: 'purple-500/20' },
+                { gradient: 'from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)]', shadow: 'cyan', iconBg: 'from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10', ring: '[var(--pwa-cyan)]/20' },
+                { gradient: 'from-amber-500 to-orange-500', shadow: 'amber', iconBg: 'from-amber-500/20 to-orange-500/10', ring: 'amber-500/20' },
+                { gradient: 'from-emerald-500 to-teal-500', shadow: 'emerald', iconBg: 'from-emerald-500/20 to-teal-500/10', ring: 'emerald-500/20' },
+              ];
+              const color = modelColors[index % modelColors.length];
+
+              return (
+                <Card
+                  key={model.id}
+                  className="group relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl transition-all duration-300 animate-slide-up-fade"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <div className={`absolute inset-0 bg-gradient-to-br ${color.iconBg} opacity-0 group-hover:opacity-100 transition-opacity`} />
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-current/5 to-transparent rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <CardHeader className="relative">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${color.iconBg} ring-1 ring-${color.ring} group-hover:scale-110 transition-transform`}>
+                          <Brain className={`h-5 w-5 bg-gradient-to-br ${color.gradient} bg-clip-text text-transparent`} style={{ color: index === 0 ? '#a855f7' : index === 1 ? '#00C2F3' : index === 2 ? '#f59e0b' : '#10b981' }} />
+                        </div>
+                        <CardTitle>{model.name_th}</CardTitle>
+                      </div>
+                      {model.status === 'active' ? (
+                        <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0 shadow-md shadow-emerald-500/25">
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          Active
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary">{model.status}</Badge>
+                      )}
+                    </div>
+                    <CardDescription className="ml-13">{model.name}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="relative">
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4 p-3 rounded-lg bg-muted/30 border border-border/30">
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Version</p>
+                          <p className="font-semibold">v{model.version}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Last Trained</p>
+                          <p className="font-semibold">
+                            {new Date(model.last_trained).toLocaleDateString('th-TH')}
+                          </p>
+                        </div>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Last Trained</p>
-                        <p className="font-medium">
-                          {new Date(model.last_trained).toLocaleDateString('th-TH')}
+                        <p className="text-sm font-medium mb-3 flex items-center gap-2">
+                          <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                          Performance Metrics
                         </p>
+                        <div className="space-y-3">
+                          {Object.entries(model.metrics).map(([key, value]) => {
+                            const isGood = key === 'mape' ? value < 15 : value > 0.8;
+                            const isMedium = key === 'mape' ? value >= 15 && value < 25 : value >= 0.6 && value <= 0.8;
+                            const barColor = isGood ? 'from-emerald-500 to-emerald-600' : isMedium ? 'from-amber-500 to-orange-500' : 'from-red-500 to-red-600';
+                            const barWidth = key === 'mape' ? Math.max(0, 100 - value * 2) : value * 100;
+
+                            return (
+                              <div key={key}>
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-sm text-muted-foreground capitalize">
+                                    {key.replace('_', ' ')}
+                                  </span>
+                                  <span className={`text-sm font-medium ${getMetricColor(key, value)}`}>
+                                    {key === 'mape' || key === 'rmse' ? value.toFixed(1) : value.toFixed(2)}
+                                    {key === 'mape' && '%'}
+                                  </span>
+                                </div>
+                                <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                                  <div
+                                    className={`h-full bg-gradient-to-r ${barColor} rounded-full transition-all`}
+                                    style={{ width: `${barWidth}%` }}
+                                  />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium mb-2">Performance Metrics</p>
-                      <div className="space-y-2">
-                        {Object.entries(model.metrics).map(([key, value]) => (
-                          <div key={key} className="flex items-center justify-between">
-                            <span className="text-sm text-muted-foreground capitalize">
-                              {key.replace('_', ' ')}
-                            </span>
-                            <span className={`text-sm font-medium ${getMetricColor(key, value)}`}>
-                              {key === 'mape' || key === 'rmse' ? value.toFixed(1) : value.toFixed(2)}
-                              {key === 'mape' && '%'}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </TabsContent>
       </Tabs>

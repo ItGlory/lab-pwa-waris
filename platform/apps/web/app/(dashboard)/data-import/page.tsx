@@ -55,6 +55,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatThaiDate, formatFileSize } from '@/lib/formatting';
+import { cn } from '@/lib/utils';
 
 interface ETLStatus {
   status: string;
@@ -299,19 +300,25 @@ export default function DataImportPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold">นำเข้าข้อมูล</h1>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] bg-clip-text text-transparent">
+            นำเข้าข้อมูล
+          </h1>
           <p className="text-muted-foreground">
             นำเข้าและซิงค์ข้อมูลจากระบบ DMAMA
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={fetchStatus} className="gap-2">
-            <RefreshCw className="h-4 w-4" />
+          <Button
+            variant="outline"
+            onClick={fetchStatus}
+            className="gap-2 hover:bg-[var(--pwa-cyan)]/10 hover:text-[var(--pwa-cyan)] hover:border-[var(--pwa-cyan)]/30 transition-colors group"
+          >
+            <RefreshCw className="h-4 w-4 group-hover:rotate-180 transition-transform duration-500" />
             รีเฟรช
           </Button>
           <Dialog open={syncDialogOpen} onOpenChange={setSyncDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2">
+              <Button className="gap-2 bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] hover:from-[var(--pwa-cyan)]/90 hover:to-[var(--pwa-blue-deep)]/90 shadow-lg shadow-[var(--pwa-cyan)]/25 transition-all hover:shadow-[var(--pwa-cyan)]/40">
                 <Play className="h-4 w-4" />
                 ซิงค์ข้อมูล
               </Button>
@@ -371,18 +378,21 @@ export default function DataImportPage() {
 
       {/* Status Cards */}
       <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <Card className="relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl transition-all duration-300 group animate-slide-up-fade" style={{ animationDelay: '0ms' }}>
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--pwa-cyan)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <CardHeader className="flex flex-row items-center justify-between pb-2 relative">
             <CardTitle className="text-sm font-medium">สถานะ ETL</CardTitle>
             {etlStatus && getStatusBadge(etlStatus.status)}
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              {etlStatus?.status === 'idle' && <CheckCircle className="h-8 w-8 text-emerald-500" />}
-              {etlStatus?.status === 'syncing' && <RefreshCw className="h-8 w-8 text-blue-500 animate-spin" />}
-              {etlStatus?.status === 'processing' && <RefreshCw className="h-8 w-8 text-blue-500 animate-spin" />}
-              {etlStatus?.status === 'error' && <XCircle className="h-8 w-8 text-red-500" />}
-              {etlStatus?.status === 'completed' && <CheckCircle className="h-8 w-8 text-emerald-500" />}
+          <CardContent className="relative">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/10 ring-1 ring-emerald-500/20 group-hover:scale-110 transition-transform duration-300">
+                {etlStatus?.status === 'idle' && <CheckCircle className="h-6 w-6 text-emerald-500" />}
+                {etlStatus?.status === 'syncing' && <RefreshCw className="h-6 w-6 text-[var(--pwa-cyan)] animate-spin" />}
+                {etlStatus?.status === 'processing' && <RefreshCw className="h-6 w-6 text-[var(--pwa-cyan)] animate-spin" />}
+                {etlStatus?.status === 'error' && <XCircle className="h-6 w-6 text-red-500" />}
+                {etlStatus?.status === 'completed' && <CheckCircle className="h-6 w-6 text-emerald-500" />}
+              </div>
               <div>
                 <p className="text-2xl font-bold">
                   {etlStatus?.records_processed.toLocaleString() || 0}
@@ -393,27 +403,34 @@ export default function DataImportPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <Card className="relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl transition-all duration-300 group animate-slide-up-fade" style={{ animationDelay: '50ms' }}>
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--pwa-cyan)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <CardHeader className="flex flex-row items-center justify-between pb-2 relative">
             <CardTitle className="text-sm font-medium">ซิงค์ล่าสุด</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10 ring-1 ring-[var(--pwa-cyan)]/20">
+              <Clock className="h-3.5 w-3.5 text-[var(--pwa-cyan)]" />
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative">
             <div className="text-2xl font-bold">
               {etlStatus?.last_sync_th || '-'}
             </div>
             <p className="text-xs text-muted-foreground">
-              ซิงค์ถัดไป: {etlStatus?.next_scheduled_sync || '02:00'}
+              ซิงค์ถัดไป: <span className="text-[var(--pwa-cyan)]">{etlStatus?.next_scheduled_sync || '02:00'}</span>
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <Card className="relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl transition-all duration-300 group animate-slide-up-fade" style={{ animationDelay: '100ms' }}>
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--pwa-cyan)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          {(etlStatus?.errors || 0) > 0 && <div className="absolute inset-0 animate-breathing-glow opacity-30" />}
+          <CardHeader className="flex flex-row items-center justify-between pb-2 relative">
             <CardTitle className="text-sm font-medium">ข้อผิดพลาด</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+            <div className={`flex h-7 w-7 items-center justify-center rounded-lg ring-1 ${(etlStatus?.errors || 0) > 0 ? 'bg-gradient-to-br from-red-500/20 to-red-500/10 ring-red-500/20' : 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/10 ring-emerald-500/20'}`}>
+              <AlertTriangle className={`h-3.5 w-3.5 ${(etlStatus?.errors || 0) > 0 ? 'text-red-500' : 'text-emerald-500'}`} />
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative">
             <div className={`text-2xl font-bold ${(etlStatus?.errors || 0) > 0 ? 'text-red-600' : 'text-emerald-600'}`}>
               {etlStatus?.errors || 0}
             </div>
@@ -426,16 +443,16 @@ export default function DataImportPage() {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="upload" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="upload" className="gap-2">
+        <TabsList className="backdrop-blur-sm bg-background/80 border border-border/50 p-1 shadow-lg">
+          <TabsTrigger value="upload" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[var(--pwa-cyan)] data-[state=active]:to-[var(--pwa-blue-deep)] data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:shadow-[var(--pwa-cyan)]/25 transition-all">
             <Upload className="h-4 w-4" />
             อัปโหลดไฟล์
           </TabsTrigger>
-          <TabsTrigger value="history" className="gap-2">
+          <TabsTrigger value="history" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[var(--pwa-cyan)] data-[state=active]:to-[var(--pwa-blue-deep)] data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:shadow-[var(--pwa-cyan)]/25 transition-all">
             <Clock className="h-4 w-4" />
             ประวัติการซิงค์
           </TabsTrigger>
-          <TabsTrigger value="settings" className="gap-2">
+          <TabsTrigger value="settings" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[var(--pwa-cyan)] data-[state=active]:to-[var(--pwa-blue-deep)] data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:shadow-[var(--pwa-cyan)]/25 transition-all">
             <Settings className="h-4 w-4" />
             ตั้งค่า
           </TabsTrigger>
@@ -445,18 +462,24 @@ export default function DataImportPage() {
         <TabsContent value="upload" className="space-y-4">
           {/* Drag & Drop Zone */}
           <Card
-            className={`border-2 border-dashed transition-colors ${
-              isDragging ? 'border-primary bg-primary/5' : 'border-muted-foreground/25'
-            }`}
+            className={cn(
+              "relative overflow-hidden border-2 border-dashed transition-all duration-300 backdrop-blur-sm",
+              isDragging
+                ? 'border-[var(--pwa-cyan)] bg-[var(--pwa-cyan)]/5 shadow-lg shadow-[var(--pwa-cyan)]/20'
+                : 'border-border/50 bg-background/80 hover:border-[var(--pwa-cyan)]/30 hover:bg-[var(--pwa-cyan)]/5'
+            )}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <div className="rounded-full bg-primary/10 p-4 mb-4">
-                <Upload className="h-8 w-8 text-primary" />
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5 pointer-events-none" />
+            <CardContent className="flex flex-col items-center justify-center py-12 relative">
+              <div className="rounded-2xl bg-gradient-to-br from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10 p-5 mb-4 ring-1 ring-[var(--pwa-cyan)]/20 shadow-lg shadow-[var(--pwa-cyan)]/10 group-hover:scale-110 transition-transform">
+                <Upload className="h-10 w-10 text-[var(--pwa-cyan)]" />
               </div>
-              <h3 className="text-lg font-medium mb-2">ลากไฟล์มาวางที่นี่</h3>
+              <h3 className="text-lg font-medium mb-2 bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] bg-clip-text text-transparent">
+                ลากไฟล์มาวางที่นี่
+              </h3>
               <p className="text-sm text-muted-foreground mb-4">
                 รองรับไฟล์ CSV และ Excel (.xlsx, .xls)
               </p>
@@ -471,7 +494,7 @@ export default function DataImportPage() {
               <Button
                 variant="outline"
                 onClick={() => fileInputRef.current?.click()}
-                className="gap-2"
+                className="gap-2 hover:bg-[var(--pwa-cyan)]/10 hover:text-[var(--pwa-cyan)] hover:border-[var(--pwa-cyan)]/30 transition-colors"
               >
                 <FileSpreadsheet className="h-4 w-4" />
                 เลือกไฟล์
@@ -480,9 +503,15 @@ export default function DataImportPage() {
           </Card>
 
           {/* File Template Download */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">เทมเพลตไฟล์นำเข้า</CardTitle>
+          <Card className="relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-md hover:shadow-lg transition-all duration-300">
+            <div className="absolute inset-0 bg-gradient-to-r from-[var(--pwa-cyan)]/5 via-transparent to-[var(--pwa-blue-deep)]/5" />
+            <CardHeader className="relative">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10 ring-1 ring-[var(--pwa-cyan)]/20">
+                  <FileSpreadsheet className="h-3.5 w-3.5 text-[var(--pwa-cyan)]" />
+                </div>
+                เทมเพลตไฟล์นำเข้า
+              </CardTitle>
               <CardDescription>
                 ดาวน์โหลดเทมเพลตเพื่อดูรูปแบบข้อมูลที่ถูกต้อง
               </CardDescription>
@@ -526,9 +555,18 @@ export default function DataImportPage() {
 
           {/* Uploaded Files List */}
           {uploadedFiles.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">ไฟล์ที่อัปโหลด</CardTitle>
+            <Card className="relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg">
+              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--pwa-cyan)]/30 to-transparent" />
+              <CardHeader className="relative">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500/20 to-emerald-500/10 ring-1 ring-emerald-500/20">
+                    <Upload className="h-3.5 w-3.5 text-emerald-500" />
+                  </div>
+                  ไฟล์ที่อัปโหลด
+                  <Badge variant="secondary" className="ml-1 text-xs bg-gradient-to-r from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10 text-[var(--pwa-cyan)] border-[var(--pwa-cyan)]/20">
+                    {uploadedFiles.length}
+                  </Badge>
+                </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <Table>
@@ -597,9 +635,15 @@ export default function DataImportPage() {
 
         {/* History Tab */}
         <TabsContent value="history">
-          <Card>
-            <CardHeader>
-              <CardTitle>ประวัติการซิงค์</CardTitle>
+          <Card className="relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg">
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--pwa-cyan)]/30 to-transparent" />
+            <CardHeader className="relative">
+              <CardTitle className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10 ring-1 ring-[var(--pwa-cyan)]/20">
+                  <Clock className="h-4 w-4 text-[var(--pwa-cyan)]" />
+                </div>
+                ประวัติการซิงค์
+              </CardTitle>
               <CardDescription>
                 รายการซิงค์ข้อมูลทั้งหมด
               </CardDescription>
@@ -650,9 +694,15 @@ export default function DataImportPage() {
         {/* Settings Tab */}
         <TabsContent value="settings">
           <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>แหล่งข้อมูล DMAMA</CardTitle>
+            <Card className="relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl transition-all duration-300 group animate-slide-up-fade">
+              <div className="absolute inset-0 bg-gradient-to-br from-[var(--pwa-cyan)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <CardHeader className="relative">
+                <CardTitle className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10 ring-1 ring-[var(--pwa-cyan)]/20 group-hover:scale-110 transition-transform duration-300">
+                    <Cloud className="h-4 w-4 text-[var(--pwa-cyan)]" />
+                  </div>
+                  แหล่งข้อมูล DMAMA
+                </CardTitle>
                 <CardDescription>
                   ตั้งค่าการเชื่อมต่อ DMAMA
                 </CardDescription>
@@ -676,9 +726,15 @@ export default function DataImportPage() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>กำหนดการซิงค์</CardTitle>
+            <Card className="relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl transition-all duration-300 group animate-slide-up-fade" style={{ animationDelay: '50ms' }}>
+              <div className="absolute inset-0 bg-gradient-to-br from-[var(--pwa-cyan)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <CardHeader className="relative">
+                <CardTitle className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--pwa-cyan)]/20 to-[var(--pwa-blue-deep)]/10 ring-1 ring-[var(--pwa-cyan)]/20 group-hover:scale-110 transition-transform duration-300">
+                    <Clock className="h-4 w-4 text-[var(--pwa-cyan)]" />
+                  </div>
+                  กำหนดการซิงค์
+                </CardTitle>
                 <CardDescription>
                   ตั้งเวลาซิงค์อัตโนมัติ
                 </CardDescription>

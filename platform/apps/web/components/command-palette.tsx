@@ -4,13 +4,6 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import {
-  LayoutDashboard,
-  MapPin,
-  Bell,
-  MessageSquare,
-  FileText,
-  FolderOpen,
-  Settings,
   Sun,
   Moon,
   Search,
@@ -30,64 +23,27 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from '@/components/ui/command';
+import { navGroups } from '@/components/layout/sidebar';
 
 interface CommandPaletteProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
 
-// Navigation items
-const navigationItems = [
-  {
-    label: 'แดชบอร์ด',
-    labelEn: 'Dashboard',
-    href: '/',
-    icon: LayoutDashboard,
-    keywords: ['home', 'หน้าหลัก', 'dashboard'],
-  },
-  {
-    label: 'พื้นที่ DMA',
-    labelEn: 'DMA Areas',
-    href: '/dma',
-    icon: MapPin,
-    keywords: ['dma', 'area', 'พื้นที่', 'แผนที่'],
-  },
-  {
-    label: 'การแจ้งเตือน',
-    labelEn: 'Alerts',
-    href: '/alerts',
-    icon: Bell,
-    keywords: ['alert', 'notification', 'แจ้งเตือน', 'เตือน'],
-  },
-  {
-    label: 'ถามตอบ AI',
-    labelEn: 'AI Chat',
-    href: '/chat',
-    icon: MessageSquare,
-    keywords: ['ai', 'chat', 'ถาม', 'แชท', 'waris'],
-  },
-  {
-    label: 'รายงาน',
-    labelEn: 'Reports',
-    href: '/reports',
-    icon: FileText,
-    keywords: ['report', 'รายงาน', 'สรุป'],
-  },
-  {
-    label: 'เอกสาร',
-    labelEn: 'Documents',
-    href: '/documents',
-    icon: FolderOpen,
-    keywords: ['document', 'file', 'เอกสาร', 'ไฟล์'],
-  },
-  {
-    label: 'ตั้งค่า',
-    labelEn: 'Settings',
-    href: '/settings',
-    icon: Settings,
-    keywords: ['settings', 'config', 'ตั้งค่า', 'การตั้งค่า'],
-  },
-];
+// Keywords for each navigation item (to enhance search)
+const navKeywords: Record<string, string[]> = {
+  '/': ['home', 'หน้าหลัก', 'dashboard'],
+  '/dma': ['dma', 'area', 'พื้นที่', 'แผนที่'],
+  '/alerts': ['alert', 'notification', 'แจ้งเตือน', 'เตือน'],
+  '/chat': ['ai', 'chat', 'ถาม', 'แชท', 'waris'],
+  '/reports': ['report', 'รายงาน', 'สรุป'],
+  '/documents': ['document', 'file', 'เอกสาร', 'ไฟล์'],
+  '/settings': ['settings', 'config', 'ตั้งค่า', 'การตั้งค่า'],
+  '/data-import': ['import', 'upload', 'นำเข้า', 'อัพโหลด'],
+  '/ai-insights': ['ai', 'insights', 'วิเคราะห์', 'ข้อมูลเชิงลึก'],
+  '/model-evaluation': ['model', 'evaluation', 'ประเมิน', 'โมเดล'],
+  '/admin/audit': ['audit', 'security', 'ตรวจสอบ', 'ความปลอดภัย'],
+};
 
 // Quick actions
 const quickActions = [
@@ -206,28 +162,42 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       <CommandList>
         <CommandEmpty>ไม่พบผลลัพธ์</CommandEmpty>
 
-        {/* Navigation */}
-        <CommandGroup heading="นำทาง">
-          {navigationItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <CommandItem
-                key={item.href}
-                value={`${item.label} ${item.labelEn} ${item.keywords.join(' ')}`}
-                onSelect={() => handleNavigation(item.href)}
-                className="gap-3 group"
-              >
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted/50 ring-1 ring-border/30 transition-all duration-200 group-data-[selected=true]:bg-[var(--pwa-cyan)]/10 group-data-[selected=true]:ring-[var(--pwa-cyan)]/30">
-                  <Icon className="h-4 w-4 text-muted-foreground transition-colors group-data-[selected=true]:text-[var(--pwa-cyan)]" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-medium">{item.label}</span>
-                  <span className="text-xs text-muted-foreground/70">{item.labelEn}</span>
-                </div>
-              </CommandItem>
-            );
-          })}
-        </CommandGroup>
+        {/* Navigation - Grouped */}
+        {navGroups.map((group) => {
+          const GroupIcon = group.icon;
+          return (
+            <CommandGroup
+              key={group.id}
+              heading={
+                <span className="flex items-center gap-2">
+                  <GroupIcon className="h-3.5 w-3.5" />
+                  {group.label}
+                </span>
+              }
+            >
+              {group.items.map((item) => {
+                const Icon = item.icon;
+                const keywords = navKeywords[item.href] || [];
+                return (
+                  <CommandItem
+                    key={item.href}
+                    value={`${item.label} ${item.labelEn} ${keywords.join(' ')}`}
+                    onSelect={() => handleNavigation(item.href)}
+                    className="gap-3 group"
+                  >
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted/50 ring-1 ring-border/30 transition-all duration-200 group-data-[selected=true]:bg-[var(--pwa-cyan)]/10 group-data-[selected=true]:ring-[var(--pwa-cyan)]/30">
+                      <Icon className="h-4 w-4 text-muted-foreground transition-colors group-data-[selected=true]:text-[var(--pwa-cyan)]" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{item.label}</span>
+                      <span className="text-xs text-muted-foreground/70">{item.labelEn}</span>
+                    </div>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          );
+        })}
 
         <CommandSeparator className="bg-gradient-to-r from-transparent via-border/50 to-transparent" />
 
