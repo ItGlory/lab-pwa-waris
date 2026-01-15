@@ -5,11 +5,13 @@ TOR Reference: Section 4.3
 """
 
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List, Dict, Any
 import logging
 
-from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, BackgroundTasks
+from fastapi import APIRouter, UploadFile, File, HTTPException
 from pydantic import BaseModel
+
+from services.etl_scheduler import get_scheduler
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +28,9 @@ class SyncRequest(BaseModel):
 
 class ETLStatusResponse(BaseModel):
     status: str
+    is_running: bool
+    current_job: Optional[Dict[str, Any]]
+    pending_jobs: int
     last_sync: Optional[str]
     last_sync_th: Optional[str]
     records_processed: int
@@ -37,37 +42,58 @@ class ETLResultResponse(BaseModel):
     success: bool
     message: str
     message_th: str
-    stats: dict
+    job_id: Optional[str]
+    stats: Dict[str, Any]
     timestamp: str
 
 
-# In-memory status tracking (replace with Redis in production)
-etl_status = {
-    "status": "idle",
-    "last_sync": None,
-    "records_processed": 0,
-    "next_scheduled_sync": "02:00",
-    "errors": 0,
-}
+class JobResponse(BaseModel):
+    id: str
+    job_type: str
+    status: str
+    source_type: str
+    created_at: str
+    started_at: Optional[str]
+    completed_at: Optional[str]
+    records_processed: int
+    records_failed: int
+    error_message: Optional[str]
 
 
 @router.get("/status", response_model=ETLStatusResponse)
 async def get_etl_status():
     """Get current ETL pipeline status"""
+    scheduler = get_scheduler()
+    status = scheduler.get_status()
+    history = scheduler.get_history(limit=1)
+
+    # Get last sync info from history
+    last_sync = None
+    total_records = 0
+    total_errors = 0
+
+    if history:
+        last_job = history[0]
+        last_sync = last_job.get("completed_at") or last_job.get("started_at")
+        total_records = last_job.get("records_processed", 0)
+        total_errors = last_job.get("records_failed", 0)
+
     return ETLStatusResponse(
-        status=etl_status["status"],
-        last_sync=etl_status["last_sync"],
-        last_sync_th=format_thai_datetime(etl_status["last_sync"]) if etl_status["last_sync"] else None,
-        records_processed=etl_status["records_processed"],
-        next_scheduled_sync=etl_status["next_scheduled_sync"],
-        errors=etl_status["errors"],
+        status="running" if status["current_job"] else "idle",
+        is_running=status["is_running"],
+        current_job=status["current_job"],
+        pending_jobs=status["pending_jobs"],
+        last_sync=last_sync,
+        last_sync_th=format_thai_datetime(last_sync) if last_sync else None,
+        records_processed=total_records,
+        next_scheduled_sync=status["next_scheduled_sync"],
+        errors=total_errors,
     )
 
 
 @router.post("/upload", response_model=ETLResultResponse)
 async def upload_data_file(
     file: UploadFile = File(...),
-    background_tasks: BackgroundTasks = None
 ):
     """
     Upload CSV/Excel file for data import
@@ -78,12 +104,15 @@ async def upload_data_file(
 
     Required columns:
     - dma_id: DMA identifier
-    - inflow or flow_in: Water inflow (m³)
-    - outflow or flow_out: Water outflow (m³)
+    - inflow or flow_in: Water inflow (m3)
+    - outflow or flow_out: Water outflow (m3)
     - reading_date or timestamp: Reading timestamp
 
     Optional columns:
     - pressure: Pressure reading (bar)
+
+    Thai column names are supported:
+    - รหัส DMA, ปริมาณน้ำเข้า, ปริมาณน้ำออก, วันที่, ความดัน
     """
     # Validate file type
     allowed_types = [".csv", ".xlsx", ".xls"]
@@ -103,49 +132,45 @@ async def upload_data_file(
         # Read file content
         content = await file.read()
 
-        # For CSV, decode to string
-        if file_ext == ".csv":
-            content_str = content.decode("utf-8")
-            records_count = content_str.count("\n") - 1  # Exclude header
-        else:
-            records_count = 0  # Will be counted during processing
+        # Validate file size (max 50MB)
+        max_size = 50 * 1024 * 1024
+        if len(content) > max_size:
+            raise HTTPException(
+                status_code=400,
+                detail={
+                    "message": f"File too large. Maximum size is 50MB.",
+                    "message_th": "ไฟล์มีขนาดใหญ่เกินไป ขนาดสูงสุดคือ 50MB"
+                }
+            )
 
-        # Update status
-        etl_status["status"] = "processing"
-        etl_status["last_sync"] = datetime.now().isoformat()
+        # Queue file import job
+        scheduler = get_scheduler()
+        job = await scheduler.queue_file_import(
+            filename=file.filename,
+            file_content=content,
+            file_type=file_ext.lstrip("."),
+        )
 
-        # TODO: Process file in background
-        # For now, simulate processing
-        etl_status["records_processed"] += max(records_count, 0)
-        etl_status["status"] = "completed"
-
-        logger.info(f"File uploaded: {file.filename}, ~{records_count} records")
+        logger.info(f"File upload queued: {file.filename}, job_id={job.id}")
 
         return ETLResultResponse(
             success=True,
-            message=f"File uploaded successfully: {file.filename}",
-            message_th=f"อัพโหลดไฟล์สำเร็จ: {file.filename}",
+            message=f"File queued for processing: {file.filename}",
+            message_th=f"ไฟล์เข้าคิวรอประมวลผล: {file.filename}",
+            job_id=job.id,
             stats={
                 "filename": file.filename,
                 "size_bytes": len(content),
-                "estimated_records": records_count,
-                "status": "queued_for_processing"
+                "file_type": file_ext,
+                "status": "queued",
             },
             timestamp=datetime.now().isoformat()
         )
 
-    except UnicodeDecodeError:
-        raise HTTPException(
-            status_code=400,
-            detail={
-                "message": "File encoding error. Please use UTF-8 encoding.",
-                "message_th": "ไฟล์มีปัญหาการเข้ารหัส กรุณาใช้ UTF-8"
-            }
-        )
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"File upload error: {e}")
-        etl_status["status"] = "error"
-        etl_status["errors"] += 1
         raise HTTPException(
             status_code=500,
             detail={
@@ -156,19 +181,15 @@ async def upload_data_file(
 
 
 @router.post("/sync", response_model=ETLResultResponse)
-async def trigger_sync(
-    request: SyncRequest,
-    background_tasks: BackgroundTasks = None
-):
+async def trigger_sync(request: SyncRequest):
     """
     Manually trigger data sync from DMAMA
 
     source_type options:
     - "api": Sync from DMAMA REST API
     - "database": Sync from DMAMA database
-    - "file": Import from file
     """
-    valid_sources = ["api", "database", "file"]
+    valid_sources = ["api", "database"]
 
     if request.source_type not in valid_sources:
         raise HTTPException(
@@ -180,79 +201,136 @@ async def trigger_sync(
             }
         )
 
-    # Update status
-    etl_status["status"] = "syncing"
-    etl_status["last_sync"] = datetime.now().isoformat()
+    try:
+        scheduler = get_scheduler()
+        job = await scheduler.queue_manual_sync(
+            source_type=request.source_type,
+            source_url=request.source_url,
+            start_date=request.start_date,
+            end_date=request.end_date,
+        )
 
-    # TODO: Implement actual sync in background
-    # For now, simulate sync
-    simulated_records = 100
+        logger.info(f"Sync triggered: source={request.source_type}, job_id={job.id}")
 
-    etl_status["records_processed"] += simulated_records
-    etl_status["status"] = "completed"
+        return ETLResultResponse(
+            success=True,
+            message=f"Sync job queued from {request.source_type}",
+            message_th=f"เริ่มการซิงค์จาก {request.source_type}",
+            job_id=job.id,
+            stats={
+                "source_type": request.source_type,
+                "source_url": request.source_url,
+                "start_date": request.start_date,
+                "end_date": request.end_date,
+                "status": "queued",
+            },
+            timestamp=datetime.now().isoformat()
+        )
 
-    logger.info(f"Sync triggered: source={request.source_type}")
-
-    return ETLResultResponse(
-        success=True,
-        message=f"Sync triggered from {request.source_type}",
-        message_th=f"เริ่มการซิงค์จาก {request.source_type}",
-        stats={
-            "source_type": request.source_type,
-            "source_url": request.source_url,
-            "start_date": request.start_date,
-            "end_date": request.end_date,
-            "status": "in_progress"
-        },
-        timestamp=datetime.now().isoformat()
-    )
+    except Exception as e:
+        logger.error(f"Sync trigger error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "message": f"Sync error: {str(e)}",
+                "message_th": "เกิดข้อผิดพลาดในการซิงค์ข้อมูล"
+            }
+        )
 
 
-@router.get("/history")
-async def get_sync_history(limit: int = 10):
-    """Get ETL sync history"""
-    # TODO: Fetch from database
-    # For now, return mock data
+@router.get("/jobs/{job_id}")
+async def get_job_status(job_id: str):
+    """Get status of a specific ETL job"""
+    scheduler = get_scheduler()
+    job = scheduler.get_job(job_id)
+
+    if not job:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "message": f"Job not found: {job_id}",
+                "message_th": f"ไม่พบงาน: {job_id}"
+            }
+        )
+
     return {
         "success": True,
-        "data": [
-            {
-                "id": "sync-001",
-                "source_type": "api",
-                "started_at": "2026-01-14T02:00:00Z",
-                "completed_at": "2026-01-14T02:15:00Z",
-                "records_processed": 15000,
-                "status": "completed"
-            },
-            {
-                "id": "sync-002",
-                "source_type": "file",
-                "started_at": "2026-01-13T14:30:00Z",
-                "completed_at": "2026-01-13T14:32:00Z",
-                "records_processed": 500,
-                "status": "completed"
-            }
-        ],
+        "data": job.to_dict(),
         "message": "Success",
         "message_th": "สำเร็จ"
     }
 
 
-@router.delete("/reset")
-async def reset_etl_status():
-    """Reset ETL status (admin only)"""
-    global etl_status
-    etl_status = {
-        "status": "idle",
-        "last_sync": None,
-        "records_processed": 0,
-        "next_scheduled_sync": "02:00",
-        "errors": 0,
-    }
+@router.get("/history")
+async def get_sync_history(limit: int = 10):
+    """Get ETL sync history"""
+    scheduler = get_scheduler()
+    history = scheduler.get_history(limit=limit)
+
     return {
         "success": True,
-        "message": "ETL status reset",
-        "message_th": "รีเซ็ตสถานะ ETL แล้ว"
+        "data": history,
+        "total": len(history),
+        "message": "Success",
+        "message_th": "สำเร็จ"
+    }
+
+
+@router.post("/scheduler/start")
+async def start_scheduler():
+    """Start the ETL scheduler (admin only)"""
+    scheduler = get_scheduler()
+
+    if scheduler.is_running:
+        return {
+            "success": True,
+            "message": "Scheduler already running",
+            "message_th": "ตัวกำหนดเวลากำลังทำงานอยู่แล้ว"
+        }
+
+    await scheduler.start()
+
+    return {
+        "success": True,
+        "message": "Scheduler started",
+        "message_th": "เริ่มตัวกำหนดเวลาแล้ว"
+    }
+
+
+@router.post("/scheduler/stop")
+async def stop_scheduler():
+    """Stop the ETL scheduler (admin only)"""
+    scheduler = get_scheduler()
+
+    if not scheduler.is_running:
+        return {
+            "success": True,
+            "message": "Scheduler not running",
+            "message_th": "ตัวกำหนดเวลาไม่ได้ทำงาน"
+        }
+
+    await scheduler.stop()
+
+    return {
+        "success": True,
+        "message": "Scheduler stopped",
+        "message_th": "หยุดตัวกำหนดเวลาแล้ว"
+    }
+
+
+@router.get("/template/csv")
+async def get_csv_template():
+    """Get sample CSV template for data import"""
+    from connectors.dmama_parsers import generate_sample_csv, generate_sample_csv_thai
+
+    return {
+        "success": True,
+        "templates": {
+            "english": generate_sample_csv(),
+            "thai": generate_sample_csv_thai(),
+        },
+        "message": "CSV templates",
+        "message_th": "แม่แบบ CSV"
     }
 
 

@@ -22,6 +22,9 @@ export async function GET() {
     // Return mock data if backend is unavailable
     return NextResponse.json({
       status: 'idle',
+      is_running: true,
+      current_job: null,
+      pending_jobs: 0,
       last_sync: new Date().toISOString(),
       last_sync_th: '15 ม.ค. 2569 10:30',
       records_processed: 15000,

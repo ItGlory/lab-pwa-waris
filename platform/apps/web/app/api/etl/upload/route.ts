@@ -43,11 +43,12 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'File uploaded successfully (simulated)',
       message_th: 'อัปโหลดไฟล์สำเร็จ (จำลอง)',
+      job_id: `sim-${Date.now()}`,
       stats: {
         filename: 'uploaded-file.csv',
         size_bytes: 0,
         estimated_records: 100,
-        status: 'queued_for_processing',
+        status: 'queued',
       },
       timestamp: new Date().toISOString(),
     });

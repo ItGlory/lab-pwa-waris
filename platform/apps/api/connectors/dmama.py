@@ -7,29 +7,40 @@ TOR Reference: Section 4.3
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 import logging
-import csv
-import io
+import asyncio
 
 import httpx
 
 from .base import DataConnector
+from .dmama_parsers import (
+    parse_csv_content,
+    parse_excel_content,
+    ParseResult,
+)
 
 logger = logging.getLogger(__name__)
 
 
+# Retry configuration
+MAX_RETRIES = 3
+RETRY_DELAY = 1.0  # seconds
+
+
 class DMAMAAPIConnector(DataConnector):
-    """Connector for DMAMA REST API"""
+    """Connector for DMAMA REST API with retry support"""
 
     def __init__(
         self,
         base_url: str,
         api_key: Optional[str] = None,
-        timeout: float = 30.0
+        timeout: float = 30.0,
+        max_retries: int = MAX_RETRIES,
     ):
         super().__init__()
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.timeout = timeout
+        self.max_retries = max_retries
         self.client: Optional[httpx.AsyncClient] = None
 
     async def connect(self) -> None:
@@ -55,33 +66,49 @@ class DMAMAAPIConnector(DataConnector):
         endpoint: str,
         params: Optional[Dict] = None
     ) -> List[Dict[str, Any]]:
-        """Fetch data from DMAMA API endpoint"""
+        """Fetch data from DMAMA API endpoint with retry"""
         if not self.is_connected or not self.client:
             raise ConnectionError("Not connected to DMAMA API")
 
-        try:
-            response = await self.client.get(endpoint, params=params)
-            response.raise_for_status()
+        last_error: Optional[Exception] = None
 
-            data = response.json()
+        for attempt in range(self.max_retries):
+            try:
+                response = await self.client.get(endpoint, params=params)
+                response.raise_for_status()
 
-            # Handle common response formats
-            if isinstance(data, list):
-                records = data
-            elif isinstance(data, dict):
-                records = data.get("data", data.get("items", data.get("results", [])))
-            else:
-                records = []
+                data = response.json()
 
-            self._log_fetch(len(records), f"API {endpoint}")
-            return records
+                # Handle common response formats
+                if isinstance(data, list):
+                    records = data
+                elif isinstance(data, dict):
+                    records = data.get("data", data.get("items", data.get("results", [])))
+                else:
+                    records = []
 
-        except httpx.HTTPStatusError as e:
-            logger.error(f"API error {e.response.status_code}: {e.response.text}")
-            raise
-        except Exception as e:
-            logger.error(f"API fetch failed: {e}")
-            raise
+                self._log_fetch(len(records), f"API {endpoint}")
+                return records
+
+            except httpx.HTTPStatusError as e:
+                logger.error(f"API error {e.response.status_code}: {e.response.text}")
+                # Don't retry on 4xx errors
+                if 400 <= e.response.status_code < 500:
+                    raise
+                last_error = e
+            except httpx.TimeoutException as e:
+                logger.warning(f"API timeout (attempt {attempt + 1}/{self.max_retries})")
+                last_error = e
+            except Exception as e:
+                logger.error(f"API fetch failed: {e}")
+                last_error = e
+
+            # Wait before retry with exponential backoff
+            if attempt < self.max_retries - 1:
+                wait_time = RETRY_DELAY * (2 ** attempt)
+                await asyncio.sleep(wait_time)
+
+        raise last_error or ConnectionError("API fetch failed after retries")
 
     async def fetch_dmas(self, region_id: Optional[str] = None) -> List[Dict]:
         """Fetch DMA list from DMAMA"""
@@ -205,12 +232,13 @@ class DMAMADBConnector(DataConnector):
 
 
 class DMAMAFileConnector(DataConnector):
-    """Connector for file-based data import (CSV/Excel)"""
+    """Connector for file-based data import (CSV/Excel) with Thai encoding support"""
 
     def __init__(self, file_path: Optional[str] = None):
         super().__init__()
         self.file_path = file_path
         self.data: List[Dict] = []
+        self.last_parse_result: Optional[ParseResult] = None
 
     async def connect(self) -> None:
         """Prepare file connector (no actual connection needed)"""
@@ -222,22 +250,39 @@ class DMAMAFileConnector(DataConnector):
         file_path: str,
         params: Optional[Dict] = None
     ) -> List[Dict[str, Any]]:
-        """Read and parse file"""
+        """Read and parse file with automatic encoding detection"""
         path = Path(file_path)
 
         if not path.exists():
             raise FileNotFoundError(f"File not found: {file_path}")
 
         try:
+            # Read file as bytes for encoding detection
+            with open(path, "rb") as f:
+                content = f.read()
+
             if path.suffix.lower() == ".csv":
-                records = await self._read_csv(path, params)
+                result = parse_csv_content(
+                    content,
+                    encoding=params.get("encoding") if params else None,
+                    delimiter=params.get("delimiter") if params else None,
+                )
             elif path.suffix.lower() in [".xlsx", ".xls"]:
-                records = await self._read_excel(path, params)
+                result = parse_excel_content(
+                    content,
+                    sheet_name=params.get("sheet_name") if params else None,
+                )
             else:
                 raise ValueError(f"Unsupported file type: {path.suffix}")
 
-            self._log_fetch(len(records), f"File {path.name}")
-            return records
+            self.last_parse_result = result
+
+            if not result.success:
+                logger.error(f"File parsing failed: {result.errors}")
+                raise ValueError(f"File parsing failed: {result.errors[0] if result.errors else 'Unknown error'}")
+
+            self._log_fetch(len(result.records), f"File {path.name}")
+            return result.records
 
         except Exception as e:
             logger.error(f"File read failed: {e}")
@@ -245,54 +290,46 @@ class DMAMAFileConnector(DataConnector):
 
     async def fetch_from_content(
         self,
-        content: str,
-        file_type: str = "csv"
+        content: bytes,
+        file_type: str = "csv",
+        encoding: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
-        """Parse data from file content (uploaded file)"""
+        """Parse data from file content (uploaded file) with encoding detection"""
         if file_type.lower() == "csv":
-            reader = csv.DictReader(io.StringIO(content))
-            records = [dict(row) for row in reader]
+            result = parse_csv_content(content, encoding=encoding)
+        elif file_type.lower() in ["xlsx", "xls"]:
+            result = parse_excel_content(content)
         else:
             raise ValueError(f"Unsupported content type: {file_type}")
 
-        self._log_fetch(len(records), "Uploaded content")
-        return records
+        self.last_parse_result = result
 
-    async def _read_csv(
+        if not result.success:
+            logger.error(f"Content parsing failed: {result.errors}")
+            raise ValueError(f"Parsing failed: {result.errors[0] if result.errors else 'Unknown error'}")
+
+        self._log_fetch(len(result.records), "Uploaded content")
+        return result.records
+
+    async def fetch_from_string(
         self,
-        path: Path,
-        params: Optional[Dict] = None
-    ) -> List[Dict]:
-        """Read CSV file"""
-        encoding = params.get("encoding", "utf-8") if params else "utf-8"
-        delimiter = params.get("delimiter", ",") if params else ","
+        content: str,
+        file_type: str = "csv"
+    ) -> List[Dict[str, Any]]:
+        """Parse data from string content (for backward compatibility)"""
+        return await self.fetch_from_content(
+            content.encode("utf-8"),
+            file_type=file_type,
+            encoding="utf-8",
+        )
 
-        records = []
-        with open(path, "r", encoding=encoding) as f:
-            reader = csv.DictReader(f, delimiter=delimiter)
-            for row in reader:
-                records.append(dict(row))
-
-        return records
-
-    async def _read_excel(
-        self,
-        path: Path,
-        params: Optional[Dict] = None
-    ) -> List[Dict]:
-        """Read Excel file"""
-        try:
-            import pandas as pd
-        except ImportError:
-            raise ImportError("pandas is required for Excel support")
-
-        sheet_name = params.get("sheet_name", 0) if params else 0
-        df = pd.read_excel(path, sheet_name=sheet_name)
-
-        return df.to_dict("records")
+    def get_parse_result(self) -> Optional[ParseResult]:
+        """Get the last parse result with detailed statistics"""
+        return self.last_parse_result
 
     async def close(self) -> None:
         """Close file connector"""
         self.is_connected = False
         self.data = []
+        self.last_parse_result = None
         logger.info("File connector closed")

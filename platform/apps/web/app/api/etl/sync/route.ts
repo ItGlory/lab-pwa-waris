@@ -28,9 +28,10 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Sync triggered (simulated)',
       message_th: 'เริ่มการซิงค์แล้ว (จำลอง)',
+      job_id: `sim-${Date.now()}`,
       stats: {
         source_type: 'api',
-        status: 'in_progress',
+        status: 'queued',
       },
       timestamp: new Date().toISOString(),
     });

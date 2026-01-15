@@ -16,10 +16,21 @@ from core.config import settings
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan events."""
     # Startup
-    print("🚀 Starting WARIS API...")
+    print("Starting WARIS API...")
+
+    # Start ETL scheduler
+    from services.etl_scheduler import start_scheduler, stop_scheduler
+    await start_scheduler()
+    print("ETL Scheduler started")
+
     yield
+
     # Shutdown
-    print("👋 Shutting down WARIS API...")
+    print("Shutting down WARIS API...")
+
+    # Stop ETL scheduler
+    await stop_scheduler()
+    print("ETL Scheduler stopped")
 
 
 app = FastAPI(
