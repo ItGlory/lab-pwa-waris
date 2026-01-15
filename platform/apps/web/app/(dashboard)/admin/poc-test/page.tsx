@@ -1012,31 +1012,32 @@ function POCTestPageContent() {
                         <div
                           className={cn(
                             'relative rounded-2xl px-3 py-2 sm:px-4 sm:py-3',
-                            'max-w-[92%] sm:max-w-[75%]',
-                            'min-w-0',
+                            'w-[85vw] max-w-[320px] sm:w-auto sm:max-w-[75%]',
+                            'overflow-hidden',
                             message.role === 'user'
                               ? 'bg-gradient-to-br from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] text-white'
                               : 'bg-muted/80'
                           )}
-                          style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
                         >
-                          <MarkdownRenderer
-                                            content={message.content}
-                                            isUserMessage={message.role === 'user'}
-                                          />
+                          <div className="overflow-hidden" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                            <MarkdownRenderer
+                              content={message.content}
+                              isUserMessage={message.role === 'user'}
+                            />
+                          </div>
 
                           {/* Images Section for Assistant - from URL meta tags */}
                           {message.role === 'assistant' && message.images && message.images.length > 0 && (
-                            <div className="mt-2 sm:mt-3 space-y-2">
+                            <div className="mt-2 sm:mt-3 space-y-2 overflow-hidden">
                               {message.images.map((img, idx) => (
                                 <a
                                   key={idx}
                                   href={img.source_url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="block rounded-lg overflow-hidden border bg-background/50 hover:border-[var(--pwa-cyan)] transition-all"
+                                  className="block rounded-lg overflow-hidden border bg-background/50"
                                 >
-                                  <div className="relative aspect-video w-full bg-muted">
+                                  <div className="relative aspect-video w-full bg-muted overflow-hidden">
                                     <img
                                       src={img.url}
                                       alt={img.title || 'Article image'}
@@ -1046,10 +1047,10 @@ function POCTestPageContent() {
                                       }}
                                     />
                                   </div>
-                                  <div className="p-2">
-                                    <p className="text-xs font-medium text-foreground line-clamp-1 flex items-center gap-1">
+                                  <div className="p-2 overflow-hidden">
+                                    <p className="text-xs font-medium text-foreground flex items-center gap-1 overflow-hidden">
                                       <ImageIcon className="h-3 w-3 text-[var(--pwa-cyan)] shrink-0" />
-                                      <span className="truncate">{img.title}</span>
+                                      <span className="truncate block">{img.title}</span>
                                     </p>
                                   </div>
                                 </a>
