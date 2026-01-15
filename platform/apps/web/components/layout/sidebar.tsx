@@ -21,6 +21,9 @@ import {
   BarChart3,
   Cpu,
   Cog,
+  Users,
+  BookOpen,
+  GraduationCap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -153,6 +156,33 @@ const navGroups: NavGroup[] = [
         labelEn: 'Settings',
         href: '/settings',
         icon: Settings,
+      },
+    ],
+  },
+  {
+    id: 'admin',
+    label: 'ผู้ดูแลระบบ',
+    labelEn: 'Administration',
+    icon: Shield,
+    defaultOpen: false,
+    items: [
+      {
+        label: 'จัดการผู้ใช้',
+        labelEn: 'User Management',
+        href: '/admin/users',
+        icon: Users,
+      },
+      {
+        label: 'ฐานความรู้',
+        labelEn: 'Knowledge Base',
+        href: '/admin/knowledge-base',
+        icon: BookOpen,
+      },
+      {
+        label: 'ฝึกสอนโมเดล',
+        labelEn: 'Model Training',
+        href: '/admin/training',
+        icon: GraduationCap,
       },
     ],
   },
