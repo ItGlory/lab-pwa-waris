@@ -27,6 +27,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { MarkdownRenderer } from '@/components/chat/markdown-renderer';
 
 interface Message {
   id: string;
@@ -382,7 +383,10 @@ export default function ChatPage() {
                           : 'bg-muted/80 text-foreground backdrop-blur-sm border border-border/50'
                       )}
                     >
-                      <div className="whitespace-pre-wrap text-sm">{message.content}</div>
+                      <MarkdownRenderer
+                        content={message.content}
+                        isUserMessage={message.role === 'user'}
+                      />
                       {message.content && message.role === 'assistant' && (
                         <Button
                           variant="ghost"
