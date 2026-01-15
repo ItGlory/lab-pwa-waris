@@ -39,6 +39,15 @@ import {
   BarChart3,
   Hash,
   Layers,
+  MessageSquare,
+  HelpCircle,
+  ShieldCheck,
+  Play,
+  Terminal,
+  FileQuestion,
+  BookMarked,
+  Send,
+  Loader2,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -256,6 +265,181 @@ const mockStats: KBStats = {
   pending: 2,
 };
 
+// KM-specific interfaces
+interface KMDocument {
+  id: string;
+  title: string;
+  filename: string;
+  category: string;
+  keywords: string[];
+  updated: string;
+  faq_count: number;
+  word_count: number;
+  status: 'valid' | 'warning' | 'error';
+  issues: string[];
+}
+
+interface KMValidationResult {
+  total_files: number;
+  valid_files: number;
+  warning_files: number;
+  error_files: number;
+  total_faq: number;
+  total_words: number;
+  issues: Array<{
+    file: string;
+    type: 'error' | 'warning';
+    message: string;
+  }>;
+}
+
+interface SearchResult {
+  title: string;
+  file_path: string;
+  content: string;
+  score: number;
+  is_faq: boolean;
+  question?: string;
+}
+
+// Mock KM data
+const mockKMDocuments: KMDocument[] = [
+  {
+    id: 'km-001',
+    title: 'พื้นฐานน้ำสูญเสีย (NRW Basics)',
+    filename: '01-nrw-basics.md',
+    category: 'water-loss',
+    keywords: ['NRW', 'น้ำสูญเสีย', 'Real Losses', 'Apparent Losses'],
+    updated: '2567-01-15',
+    faq_count: 8,
+    word_count: 1250,
+    status: 'valid',
+    issues: [],
+  },
+  {
+    id: 'km-002',
+    title: 'น้ำสูญเสียทางกายภาพ (Physical Loss)',
+    filename: '02-physical-loss.md',
+    category: 'water-loss',
+    keywords: ['Real Losses', 'รั่ว', 'ท่อแตก', 'ILI'],
+    updated: '2567-01-15',
+    faq_count: 6,
+    word_count: 980,
+    status: 'valid',
+    issues: [],
+  },
+  {
+    id: 'km-003',
+    title: 'น้ำสูญเสียเชิงพาณิชย์ (Commercial Loss)',
+    filename: '03-commercial-loss.md',
+    category: 'water-loss',
+    keywords: ['Apparent Losses', 'มิเตอร์', 'ลักน้ำ'],
+    updated: '2567-01-15',
+    faq_count: 5,
+    word_count: 870,
+    status: 'warning',
+    issues: ['FAQ count < 5 recommended'],
+  },
+  {
+    id: 'km-004',
+    title: 'พื้นฐาน DMA (DMA Basics)',
+    filename: '01-dma-basics.md',
+    category: 'dma-management',
+    keywords: ['DMA', 'พื้นที่จ่ายน้ำ', 'District Metered Area'],
+    updated: '2567-01-15',
+    faq_count: 7,
+    word_count: 1100,
+    status: 'valid',
+    issues: [],
+  },
+  {
+    id: 'km-005',
+    title: 'การติดตาม DMA (DMA Monitoring)',
+    filename: '02-monitoring.md',
+    category: 'dma-management',
+    keywords: ['MNF', 'SCADA', 'Data Logger'],
+    updated: '2567-01-15',
+    faq_count: 4,
+    word_count: 920,
+    status: 'warning',
+    issues: ['Missing cross-references'],
+  },
+  {
+    id: 'km-006',
+    title: 'คำศัพท์ภาษาพูด (Colloquial Terms)',
+    filename: '03-colloquial-terms.md',
+    category: 'glossary',
+    keywords: ['คำพูด', 'synonym', 'mapping'],
+    updated: '2567-01-15',
+    faq_count: 10,
+    word_count: 750,
+    status: 'valid',
+    issues: [],
+  },
+  {
+    id: 'km-007',
+    title: 'การแก้ไขปัญหา (Troubleshooting)',
+    filename: '01-troubleshooting.md',
+    category: 'scenarios',
+    keywords: ['แก้ปัญหา', 'decision tree', 'วิเคราะห์'],
+    updated: '2567-01-15',
+    faq_count: 12,
+    word_count: 1450,
+    status: 'valid',
+    issues: [],
+  },
+  {
+    id: 'km-008',
+    title: 'คำแนะนำตามสถานการณ์ (Recommendations)',
+    filename: '02-recommendations.md',
+    category: 'scenarios',
+    keywords: ['คำแนะนำ', 'suggestion', 'แนะนำ'],
+    updated: '2567-01-15',
+    faq_count: 5,
+    word_count: 1080,
+    status: 'valid',
+    issues: [],
+  },
+];
+
+const mockKMValidation: KMValidationResult = {
+  total_files: 19,
+  valid_files: 17,
+  warning_files: 2,
+  error_files: 0,
+  total_faq: 88,
+  total_words: 14947,
+  issues: [
+    { file: '03-commercial-loss.md', type: 'warning', message: 'FAQ count is less than recommended (5)' },
+    { file: '02-monitoring.md', type: 'warning', message: 'Missing cross-references to related documents' },
+  ],
+};
+
+const mockSearchResults: SearchResult[] = [
+  {
+    title: 'พื้นฐานน้ำสูญเสีย (NRW Basics)',
+    file_path: 'docs/km/water-loss/01-nrw-basics.md',
+    content: 'NRW (Non-Revenue Water) หรือ น้ำสูญเสีย คือปริมาณน้ำที่ผลิตได้แต่ไม่สามารถจำหน่ายและเก็บเงินได้...',
+    score: 0.92,
+    is_faq: false,
+  },
+  {
+    title: 'FAQ: NRW คืออะไร?',
+    file_path: 'docs/km/water-loss/01-nrw-basics.md',
+    content: 'NRW (Non-Revenue Water) คือน้ำที่ผลิตได้แต่ไม่สามารถจำหน่ายได้...',
+    score: 0.95,
+    is_faq: true,
+    question: 'NRW คืออะไร? น้ำสูญเสียหมายถึงอะไร?',
+  },
+  {
+    title: 'คำศัพท์: NRW',
+    file_path: 'docs/km/glossary/01-thai-english.md',
+    content: 'NRW (Non-Revenue Water) = น้ำสูญเสีย, น้ำไม่ก่อรายได้',
+    score: 0.88,
+    is_faq: false,
+  },
+];
+
 export default function KnowledgeBasePage() {
   const [loading, setLoading] = React.useState(true);
   const [documents, setDocuments] = React.useState<Document[]>([]);
@@ -268,18 +452,85 @@ export default function KnowledgeBasePage() {
   const [isReindexing, setIsReindexing] = React.useState(false);
   const [uploadProgress, setUploadProgress] = React.useState(0);
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [selectedDocument, setSelectedDocument] = React.useState<Document | null>(null);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = React.useState(false);
   const docsPerPage = 10;
+
+  // KM-specific state
+  const [kmDocuments, setKMDocuments] = React.useState<KMDocument[]>([]);
+  const [kmValidation, setKMValidation] = React.useState<KMValidationResult | null>(null);
+  const [searchQuery2, setSearchQuery2] = React.useState('');
+  const [searchResults, setSearchResults] = React.useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = React.useState(false);
+  const [isValidating, setIsValidating] = React.useState(false);
+  const [isIndexing, setIsIndexing] = React.useState(false);
+  const [kmCategoryFilter, setKMCategoryFilter] = React.useState<string>('all');
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
       setDocuments(mockDocuments);
       setCategories(mockCategories);
       setStats(mockStats);
+      setKMDocuments(mockKMDocuments);
+      setKMValidation(mockKMValidation);
       setLoading(false);
     }, 800);
 
     return () => clearTimeout(timer);
   }, []);
+
+  const handleKMSearch = async () => {
+    if (!searchQuery2.trim()) return;
+    setIsSearching(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setSearchResults(mockSearchResults);
+    setIsSearching(false);
+  };
+
+  const handleValidate = async () => {
+    setIsValidating(true);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    setKMValidation(mockKMValidation);
+    setIsValidating(false);
+  };
+
+  const handleIndexKM = async () => {
+    setIsIndexing(true);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    setIsIndexing(false);
+  };
+
+  const filteredKMDocs = kmDocuments.filter((doc) =>
+    kmCategoryFilter === 'all' || doc.category === kmCategoryFilter
+  );
+
+  const kmCategories = [...new Set(kmDocuments.map((d) => d.category))];
+
+  const getKMStatusBadge = (status: KMDocument['status']) => {
+    switch (status) {
+      case 'valid':
+        return (
+          <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0">
+            <CheckCircle className="h-3 w-3 mr-1" />
+            Valid
+          </Badge>
+        );
+      case 'warning':
+        return (
+          <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0">
+            <AlertTriangle className="h-3 w-3 mr-1" />
+            Warning
+          </Badge>
+        );
+      case 'error':
+        return (
+          <Badge className="bg-gradient-to-r from-red-500 to-red-600 text-white border-0">
+            <XCircle className="h-3 w-3 mr-1" />
+            Error
+          </Badge>
+        );
+    }
+  };
 
   const filteredDocuments = documents.filter((doc) => {
     const matchesSearch =
@@ -382,6 +633,22 @@ export default function KnowledgeBasePage() {
       month: 'short',
       day: 'numeric',
     });
+  };
+
+  const formatDateTime = (date: string) => {
+    if (!date) return '-';
+    return new Date(date).toLocaleString('th-TH', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const handleViewDocument = (doc: Document) => {
+    setSelectedDocument(doc);
+    setIsDetailDialogOpen(true);
   };
 
   if (loading) {
@@ -537,6 +804,14 @@ export default function KnowledgeBasePage() {
               <Settings2 className="h-4 w-4" />
               ตั้งค่า RAG
             </TabsTrigger>
+            <TabsTrigger value="km-docs" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all">
+              <BookMarked className="h-4 w-4" />
+              KM Docs
+            </TabsTrigger>
+            <TabsTrigger value="km-test" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white data-[state=active]:shadow-md transition-all">
+              <MessageSquare className="h-4 w-4" />
+              ทดสอบ RAG
+            </TabsTrigger>
           </TabsList>
 
           {/* Documents Tab */}
@@ -602,8 +877,9 @@ export default function KnowledgeBasePage() {
                       {paginatedDocs.map((doc, index) => (
                         <tr
                           key={doc.id}
-                          className="border-b border-border/30 hover:bg-muted/30 transition-colors animate-slide-up-fade"
+                          className="border-b border-border/30 hover:bg-muted/30 transition-colors animate-slide-up-fade cursor-pointer"
                           style={{ animationDelay: `${index * 30}ms` }}
+                          onClick={() => handleViewDocument(doc)}
                         >
                           <td className="p-4">
                             <div className="flex items-center gap-3">
@@ -643,7 +919,7 @@ export default function KnowledgeBasePage() {
                               {formatDate(doc.uploaded_at)}
                             </span>
                           </td>
-                          <td className="p-4">
+                          <td className="p-4" onClick={(e) => e.stopPropagation()}>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" size="sm">
@@ -651,7 +927,7 @@ export default function KnowledgeBasePage() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleViewDocument(doc)}>
                                   <Eye className="h-4 w-4 mr-2" />
                                   ดูรายละเอียด
                                 </DropdownMenuItem>
@@ -867,7 +1143,622 @@ export default function KnowledgeBasePage() {
               </Button>
             </div>
           </TabsContent>
+
+          {/* KM Documents Tab */}
+          <TabsContent value="km-docs" className="space-y-4 animate-blur-in">
+            {/* KM Stats */}
+            {kmValidation && (
+              <div className="grid gap-4 md:grid-cols-6">
+                <Card className="group relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl transition-all">
+                  <CardContent className="relative p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-muted-foreground">ไฟล์ทั้งหมด</p>
+                        <p className="text-2xl font-bold">{kmValidation.total_files}</p>
+                      </div>
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10">
+                        <FileText className="h-5 w-5 text-emerald-500" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="group relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl transition-all">
+                  <CardContent className="relative p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-muted-foreground">Valid</p>
+                        <p className="text-2xl font-bold text-emerald-600">{kmValidation.valid_files}</p>
+                      </div>
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/10">
+                        <CheckCircle className="h-5 w-5 text-emerald-500" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="group relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl transition-all">
+                  <CardContent className="relative p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-muted-foreground">Warnings</p>
+                        <p className="text-2xl font-bold text-amber-600">{kmValidation.warning_files}</p>
+                      </div>
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/10">
+                        <AlertTriangle className="h-5 w-5 text-amber-500" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="group relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl transition-all">
+                  <CardContent className="relative p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-muted-foreground">Errors</p>
+                        <p className="text-2xl font-bold text-red-600">{kmValidation.error_files}</p>
+                      </div>
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/20 to-red-600/10">
+                        <XCircle className="h-5 w-5 text-red-500" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="group relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl transition-all">
+                  <CardContent className="relative p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-muted-foreground">FAQ ทั้งหมด</p>
+                        <p className="text-2xl font-bold">{kmValidation.total_faq}</p>
+                      </div>
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/10">
+                        <HelpCircle className="h-5 w-5 text-blue-500" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="group relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg hover:shadow-xl transition-all">
+                  <CardContent className="relative p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-muted-foreground">คำทั้งหมด</p>
+                        <p className="text-2xl font-bold">{kmValidation.total_words.toLocaleString()}</p>
+                      </div>
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-600/10">
+                        <Hash className="h-5 w-5 text-purple-500" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* KM Actions */}
+            <Card className="backdrop-blur-sm bg-background/80 border-border/50">
+              <CardContent className="p-4">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                  <div className="flex items-center gap-2">
+                    <Select value={kmCategoryFilter} onValueChange={setKMCategoryFilter}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="หมวดหมู่" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">ทุกหมวดหมู่</SelectItem>
+                        {kmCategories.map((cat) => (
+                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={handleValidate}
+                      disabled={isValidating}
+                      className="gap-2"
+                    >
+                      <ShieldCheck className={`h-4 w-4 ${isValidating ? 'animate-spin' : ''}`} />
+                      {isValidating ? 'กำลังตรวจสอบ...' : 'Validate All'}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={handleIndexKM}
+                      disabled={isIndexing}
+                      className="gap-2"
+                    >
+                      <Database className={`h-4 w-4 ${isIndexing ? 'animate-spin' : ''}`} />
+                      {isIndexing ? 'กำลัง Index...' : 'Re-index for RAG'}
+                    </Button>
+                    <Button className="gap-2 bg-gradient-to-r from-emerald-500 to-teal-500">
+                      <Plus className="h-4 w-4" />
+                      สร้างเอกสารใหม่
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Issues Alert */}
+            {kmValidation && kmValidation.issues.length > 0 && (
+              <Card className="backdrop-blur-sm bg-amber-500/10 border-amber-500/30">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="font-medium text-amber-600">พบปัญหาที่ต้องแก้ไข ({kmValidation.issues.length})</p>
+                      <ul className="mt-2 space-y-1">
+                        {kmValidation.issues.map((issue, i) => (
+                          <li key={i} className="text-sm text-muted-foreground">
+                            <span className="font-medium">{issue.file}:</span> {issue.message}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* KM Documents Table */}
+            <Card className="relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-lg">
+              <CardContent className="relative p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-border/50 bg-muted/30">
+                        <th className="text-left p-4 font-medium text-sm">เอกสาร</th>
+                        <th className="text-left p-4 font-medium text-sm">หมวดหมู่</th>
+                        <th className="text-left p-4 font-medium text-sm">Keywords</th>
+                        <th className="text-left p-4 font-medium text-sm">FAQ</th>
+                        <th className="text-left p-4 font-medium text-sm">คำ</th>
+                        <th className="text-left p-4 font-medium text-sm">สถานะ</th>
+                        <th className="text-left p-4 font-medium text-sm">อัปเดต</th>
+                        <th className="text-left p-4 font-medium text-sm"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredKMDocs.map((doc, index) => (
+                        <tr
+                          key={doc.id}
+                          className="border-b border-border/30 hover:bg-muted/30 transition-colors animate-slide-up-fade"
+                          style={{ animationDelay: `${index * 30}ms` }}
+                        >
+                          <td className="p-4">
+                            <div className="flex items-center gap-3">
+                              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted/50">
+                                <FileText className="h-5 w-5 text-emerald-500" />
+                              </div>
+                              <div>
+                                <p className="font-medium">{doc.title}</p>
+                                <p className="text-xs text-muted-foreground">{doc.filename}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="p-4">
+                            <Badge variant="outline" className="gap-1">
+                              <Folder className="h-3 w-3" />
+                              {doc.category}
+                            </Badge>
+                          </td>
+                          <td className="p-4">
+                            <div className="flex flex-wrap gap-1 max-w-[200px]">
+                              {doc.keywords.slice(0, 3).map((kw, i) => (
+                                <Badge key={i} variant="secondary" className="text-xs">
+                                  {kw}
+                                </Badge>
+                              ))}
+                              {doc.keywords.length > 3 && (
+                                <Badge variant="secondary" className="text-xs">
+                                  +{doc.keywords.length - 3}
+                                </Badge>
+                              )}
+                            </div>
+                          </td>
+                          <td className="p-4">
+                            <div className="flex items-center gap-1 text-sm">
+                              <HelpCircle className="h-4 w-4 text-blue-500" />
+                              <span>{doc.faq_count}</span>
+                            </div>
+                          </td>
+                          <td className="p-4">
+                            <span className="text-sm">{doc.word_count.toLocaleString()}</span>
+                          </td>
+                          <td className="p-4">
+                            {getKMStatusBadge(doc.status)}
+                          </td>
+                          <td className="p-4">
+                            <span className="text-sm text-muted-foreground">{doc.updated}</span>
+                          </td>
+                          <td className="p-4">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem>
+                                  <Eye className="h-4 w-4 mr-2" />
+                                  ดูเนื้อหา
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <ExternalLink className="h-4 w-4 mr-2" />
+                                  เปิดใน Editor
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <ShieldCheck className="h-4 w-4 mr-2" />
+                                  Validate
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem>
+                                  <RefreshCw className="h-4 w-4 mr-2" />
+                                  Re-index
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* RAG Test Tab */}
+          <TabsContent value="km-test" className="space-y-4 animate-blur-in">
+            <div className="grid gap-4 md:grid-cols-2">
+              {/* Search Input */}
+              <Card className="backdrop-blur-sm bg-background/80 border-border/50 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Search className="h-5 w-5 text-blue-500" />
+                    ทดสอบค้นหา RAG
+                  </CardTitle>
+                  <CardDescription>
+                    ทดสอบการค้นหาจาก Knowledge Base
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>คำถามหรือคำค้นหา</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="เช่น NRW คืออะไร? หรือ วิธีลดน้ำสูญเสีย"
+                        value={searchQuery2}
+                        onChange={(e) => setSearchQuery2(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleKMSearch()}
+                      />
+                      <Button
+                        onClick={handleKMSearch}
+                        disabled={isSearching || !searchQuery2.trim()}
+                        className="gap-2 bg-gradient-to-r from-blue-500 to-cyan-500"
+                      >
+                        {isSearching ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Send className="h-4 w-4" />
+                        )}
+                        ค้นหา
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground">ตัวอย่างคำถาม</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {['NRW คืออะไร', 'วิธีลดน้ำสูญเสีย', 'DMA มีประโยชน์อย่างไร', 'ILI คำนวณอย่างไร'].map((q) => (
+                        <Button
+                          key={q}
+                          variant="outline"
+                          size="sm"
+                          className="text-xs"
+                          onClick={() => {
+                            setSearchQuery2(q);
+                          }}
+                        >
+                          <FileQuestion className="h-3 w-3 mr-1" />
+                          {q}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* CLI Commands */}
+              <Card className="backdrop-blur-sm bg-background/80 border-border/50 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Terminal className="h-5 w-5 text-emerald-500" />
+                    CLI Commands
+                  </CardTitle>
+                  <CardDescription>
+                    คำสั่งจัดการ KM ผ่าน Terminal
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="p-3 rounded-lg bg-zinc-900 text-zinc-100 font-mono text-sm space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-emerald-400">$</span>
+                      <span>python km_cli.py validate</span>
+                      <Button variant="ghost" size="sm" className="h-6 px-2 ml-auto text-zinc-400 hover:text-zinc-100">
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    <p className="text-zinc-500 text-xs pl-4">ตรวจสอบเอกสารทั้งหมด</p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-zinc-900 text-zinc-100 font-mono text-sm space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-emerald-400">$</span>
+                      <span>python km_cli.py index</span>
+                      <Button variant="ghost" size="sm" className="h-6 px-2 ml-auto text-zinc-400 hover:text-zinc-100">
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    <p className="text-zinc-500 text-xs pl-4">Index เอกสารสำหรับ RAG</p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-zinc-900 text-zinc-100 font-mono text-sm space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-emerald-400">$</span>
+                      <span>python km_cli.py search &quot;คำค้นหา&quot;</span>
+                      <Button variant="ghost" size="sm" className="h-6 px-2 ml-auto text-zinc-400 hover:text-zinc-100">
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    <p className="text-zinc-500 text-xs pl-4">ค้นหาความรู้</p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-zinc-900 text-zinc-100 font-mono text-sm space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-emerald-400">$</span>
+                      <span>python km_cli.py stats</span>
+                      <Button variant="ghost" size="sm" className="h-6 px-2 ml-auto text-zinc-400 hover:text-zinc-100">
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    <p className="text-zinc-500 text-xs pl-4">แสดงสถิติ</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Search Results */}
+            {searchResults.length > 0 && (
+              <Card className="backdrop-blur-sm bg-background/80 border-border/50 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-amber-500" />
+                    ผลการค้นหา ({searchResults.length} รายการ)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {searchResults.map((result, index) => (
+                    <div
+                      key={index}
+                      className="p-4 rounded-lg border border-border/50 hover:border-blue-500/50 transition-colors animate-slide-up-fade"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            {result.is_faq ? (
+                              <Badge className="bg-gradient-to-r from-purple-500 to-purple-600 text-white border-0">
+                                <HelpCircle className="h-3 w-3 mr-1" />
+                                FAQ
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline">
+                                <FileText className="h-3 w-3 mr-1" />
+                                Document
+                              </Badge>
+                            )}
+                            <span className="text-sm font-medium">{result.title}</span>
+                          </div>
+                          {result.is_faq && result.question && (
+                            <p className="text-sm text-purple-600 dark:text-purple-400 mb-2">
+                              Q: {result.question}
+                            </p>
+                          )}
+                          <p className="text-sm text-muted-foreground">{result.content}</p>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            📁 {result.file_path}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <div className={`text-lg font-bold ${
+                            result.score > 0.9 ? 'text-emerald-500' :
+                            result.score > 0.7 ? 'text-amber-500' :
+                            'text-gray-500'
+                          }`}>
+                            {(result.score * 100).toFixed(0)}%
+                          </div>
+                          <p className="text-xs text-muted-foreground">relevance</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
         </Tabs>
+
+        {/* Document Detail Dialog */}
+        <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            {selectedDocument && (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted/50">
+                      {getFileIcon(selectedDocument.file_type)}
+                    </div>
+                    <div>
+                      <span>{selectedDocument.title_th}</span>
+                      <p className="text-sm font-normal text-muted-foreground mt-0.5">
+                        {selectedDocument.title}
+                      </p>
+                    </div>
+                  </DialogTitle>
+                </DialogHeader>
+
+                <div className="space-y-6 py-4">
+                  {/* Status & Basic Info */}
+                  <div className="flex items-center gap-3 flex-wrap">
+                    {getStatusBadge(selectedDocument.status)}
+                    <Badge variant="outline" className="gap-1">
+                      <Folder className="h-3 w-3" />
+                      {categories.find((c) => c.id === selectedDocument.category)?.name_th || selectedDocument.category}
+                    </Badge>
+                    <Badge variant="secondary" className="gap-1">
+                      {selectedDocument.file_type.toUpperCase()}
+                    </Badge>
+                  </div>
+
+                  {/* Description */}
+                  {selectedDocument.description && (
+                    <div className="space-y-2">
+                      <Label className="text-muted-foreground">คำอธิบาย</Label>
+                      <p className="text-sm bg-muted/30 rounded-lg p-3">
+                        {selectedDocument.description}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Tags */}
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground">Tags</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedDocument.tags.map((tag, i) => (
+                        <Badge key={i} variant="outline" className="gap-1">
+                          <Tag className="h-3 w-3" />
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* File Info Grid */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <Card className="bg-muted/20 border-border/50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10">
+                            <FileText className="h-5 w-5 text-blue-500" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground">ชื่อไฟล์</p>
+                            <p className="text-sm font-medium truncate max-w-[180px]" title={selectedDocument.filename}>
+                              {selectedDocument.filename}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-muted/20 border-border/50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10">
+                            <Database className="h-5 w-5 text-purple-500" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground">ขนาดไฟล์</p>
+                            <p className="text-sm font-medium">{formatFileSize(selectedDocument.file_size)}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-muted/20 border-border/50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
+                            <Layers className="h-5 w-5 text-emerald-500" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground">Chunks</p>
+                            <p className="text-sm font-medium">
+                              {selectedDocument.chunks > 0 ? selectedDocument.chunks.toLocaleString() : '-'}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-muted/20 border-border/50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10">
+                            <Zap className="h-5 w-5 text-amber-500" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground">Vectors</p>
+                            <p className="text-sm font-medium">
+                              {selectedDocument.vectors > 0 ? selectedDocument.vectors.toLocaleString() : '-'}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Timeline */}
+                  <div className="space-y-3">
+                    <Label className="text-muted-foreground">ประวัติ</Label>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3 text-sm">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/10">
+                          <Upload className="h-4 w-4 text-blue-500" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium">อัปโหลดโดย {selectedDocument.uploaded_by}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatDateTime(selectedDocument.uploaded_at)}
+                          </p>
+                        </div>
+                      </div>
+                      {selectedDocument.last_indexed && (
+                        <div className="flex items-center gap-3 text-sm">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10">
+                            <CheckCircle className="h-4 w-4 text-emerald-500" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-medium">Indexed ล่าสุด</p>
+                            <p className="text-xs text-muted-foreground">
+                              {formatDateTime(selectedDocument.last_indexed)}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <DialogFooter className="gap-2 sm:gap-0">
+                  <Button variant="outline" className="gap-2">
+                    <Download className="h-4 w-4" />
+                    ดาวน์โหลด
+                  </Button>
+                  <Button variant="outline" className="gap-2">
+                    <RefreshCw className="h-4 w-4" />
+                    Re-index
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="gap-2"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    ลบ
+                  </Button>
+                </DialogFooter>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* Upload Dialog */}
         <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>

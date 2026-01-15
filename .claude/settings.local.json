@@ -88,7 +88,28 @@
       "Bash(./node_modules/.bin/tsc:*)",
       "Bash(/Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/apps/web/node_modules/.bin/tsc:*)",
       "Bash(export PATH=\"/usr/local/bin:/usr/bin:/bin:$PATH\")",
-      "Bash(/usr/bin/env npm install @radix-ui/react-collapsible)"
+      "Bash(/usr/bin/env npm install @radix-ui/react-collapsible)",
+      "Bash(export PATH=\"/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin:$PATH\")",
+      "Bash(SHELL=/bin/zsh)",
+      "Bash(npm run lint:*)",
+      "Bash(SHELL=/bin/bash bash:*)",
+      "Bash(PATH=\"/usr/local/bin:/opt/homebrew/bin:$PATH\")",
+      "Bash(/opt/homebrew/bin/npx next lint)",
+      "Bash(npx next lint:*)",
+      "Bash(export PATH=\"$HOME/.nvm/versions/node/v22.16.0/bin:$PATH\")",
+      "Bash(export PATH=\"$HOME/.nvm/versions/node/v24.12.0/bin:$PATH\")",
+      "Bash($HOME/.nvm/versions/node/v24.12.0/bin/npx next lint --dir /Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/apps/web)",
+      "Bash(/Users/fero/.nvm/versions/node/v24.12.0/bin/npx next lint --dir /Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/apps/web)",
+      "Bash(PATH=\"/Users/fero/.nvm/versions/node/v24.12.0/bin:$PATH\" /Users/fero/.nvm/versions/node/v24.12.0/bin/node /Users/fero/.nvm/versions/node/v24.12.0/bin/npx next lint:*)",
+      "Bash(PATH=\"/Users/fero/.nvm/versions/node/v24.12.0/bin:$PATH\" node:*)",
+      "Bash(PATH=\"/Users/fero/.nvm/versions/node/v24.12.0/bin:/usr/bin:/bin:$PATH\" node:*)",
+      "Bash(PATH=\"/Users/fero/.nvm/versions/node/v24.12.0/bin:/usr/bin:/bin:$PATH\")",
+      "Bash(node ./node_modules/.bin/next lint:*)",
+      "Bash(PATH=\"/Users/fero/.nvm/versions/node/v24.12.0/bin:/usr/bin:/bin:$PATH\" node -e \"process.chdir\\(''/Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/apps/web''\\); require\\(''child_process''\\).execSync\\(''node ./node_modules/next/dist/bin/next lint'', {stdio: ''inherit''}\\)\")",
+      "Bash(PATH=\"/Users/fero/.nvm/versions/node/v24.12.0/bin:/usr/bin:/bin:$PATH\" node /Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/apps/web/node_modules/typescript/bin/tsc:*)",
+      "Bash(PATH=\"/Users/fero/.nvm/versions/node/v24.12.0/bin:/usr/bin:/bin:$PATH\" npm install:*)",
+      "Bash(PATH=\"/Users/fero/.nvm/versions/node/v24.12.0/bin:/usr/bin:/bin:$PATH\" curl -k https://waris.local:8443/)",
+      "Bash(PATH=\"/Users/fero/.nvm/versions/node/v24.12.0/bin:/usr/bin:/bin:$PATH\" docker logs:*)"
     ]
   }
 }

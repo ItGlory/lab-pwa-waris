@@ -265,3 +265,299 @@ async def rag_chat_stream(request: RAGChatRequest):
             "Connection": "keep-alive",
         },
     )
+
+
+# =============================================================================
+# KM (Knowledge Management) Endpoints for docs/km/
+# =============================================================================
+
+class KMDocumentResponse(BaseModel):
+    id: str
+    title: str
+    filename: str
+    category: str
+    keywords: List[str]
+    updated: str
+    faq_count: int
+    word_count: int
+    status: str
+    issues: List[str]
+
+
+class KMValidationResponse(BaseModel):
+    total_files: int
+    valid_files: int
+    warning_files: int
+    error_files: int
+    total_faq: int
+    total_words: int
+    issues: List[dict]
+
+
+class KMStatsResponse(BaseModel):
+    total_files: int
+    total_words: int
+    total_faq: int
+    categories: dict
+    last_indexed: Optional[str]
+    indexed_files: int
+
+
+@router.get("/km/documents")
+async def list_km_documents(
+    category: Optional[str] = None,
+    status: Optional[str] = None,
+):
+    """
+    List all KM documents from docs/km/
+
+    Returns document metadata including validation status.
+    """
+    try:
+        # In production, this would read from the actual km directory
+        # Mock implementation - replace with actual file reading
+        km_categories = [
+            "water-loss",
+            "dma-management",
+            "pwa-operations",
+            "standards",
+            "glossary",
+            "scenarios",
+        ]
+
+        # This would be replaced with actual file scanning
+        mock_docs = [
+            {
+                "id": "km-001",
+                "title": "พื้นฐานน้ำสูญเสีย (NRW Basics)",
+                "filename": "01-nrw-basics.md",
+                "category": "water-loss",
+                "keywords": ["NRW", "น้ำสูญเสีย", "Real Losses"],
+                "updated": "2567-01-15",
+                "faq_count": 8,
+                "word_count": 1250,
+                "status": "valid",
+                "issues": [],
+            },
+            {
+                "id": "km-002",
+                "title": "น้ำสูญเสียทางกายภาพ (Physical Loss)",
+                "filename": "02-physical-loss.md",
+                "category": "water-loss",
+                "keywords": ["Real Losses", "รั่ว", "ILI"],
+                "updated": "2567-01-15",
+                "faq_count": 6,
+                "word_count": 980,
+                "status": "valid",
+                "issues": [],
+            },
+        ]
+
+        # Apply filters
+        filtered_docs = mock_docs
+        if category:
+            filtered_docs = [d for d in filtered_docs if d["category"] == category]
+        if status:
+            filtered_docs = [d for d in filtered_docs if d["status"] == status]
+
+        return {
+            "success": True,
+            "data": filtered_docs,
+            "total": len(filtered_docs),
+            "categories": km_categories,
+        }
+
+    except Exception as e:
+        logger.error(f"Failed to list KM documents: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/km/stats")
+async def get_km_stats():
+    """
+    Get KM statistics
+
+    Returns document counts, word counts, FAQ counts by category.
+    """
+    try:
+        # Mock stats - replace with actual calculation
+        stats = {
+            "total_files": 19,
+            "total_words": 14947,
+            "total_faq": 88,
+            "categories": {
+                "water-loss": {"files": 4, "faq": 24, "words": 4100},
+                "dma-management": {"files": 3, "faq": 18, "words": 3200},
+                "pwa-operations": {"files": 3, "faq": 15, "words": 2800},
+                "standards": {"files": 2, "faq": 10, "words": 1600},
+                "glossary": {"files": 3, "faq": 12, "words": 1847},
+                "scenarios": {"files": 2, "faq": 9, "words": 1400},
+            },
+            "last_indexed": "2026-01-15T10:00:00Z",
+            "indexed_files": 19,
+        }
+
+        return {
+            "success": True,
+            "data": stats,
+        }
+
+    except Exception as e:
+        logger.error(f"Failed to get KM stats: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/km/validate")
+async def validate_km_documents():
+    """
+    Validate all KM documents
+
+    Checks frontmatter, FAQ sections, cross-references, and Thai content.
+    """
+    try:
+        # Mock validation result - replace with actual km_validator.py call
+        validation_result = {
+            "total_files": 19,
+            "valid_files": 17,
+            "warning_files": 2,
+            "error_files": 0,
+            "total_faq": 88,
+            "total_words": 14947,
+            "issues": [
+                {
+                    "file": "03-commercial-loss.md",
+                    "type": "warning",
+                    "message": "FAQ count is less than recommended (5)",
+                },
+                {
+                    "file": "02-monitoring.md",
+                    "type": "warning",
+                    "message": "Missing cross-references to related documents",
+                },
+            ],
+        }
+
+        return {
+            "success": True,
+            "data": validation_result,
+        }
+
+    except Exception as e:
+        logger.error(f"Validation failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/km/index")
+async def index_km_for_rag(background_tasks: BackgroundTasks):
+    """
+    Index KM documents for RAG
+
+    Runs km_indexer.py in background to chunk, embed, and store documents.
+    """
+    async def run_km_indexing():
+        try:
+            # In production, this would call km_indexer.py
+            logger.info("Starting KM indexing for RAG...")
+
+            # Import and run the indexer
+            # from scripts.km_indexer import KMIndexer
+            # indexer = KMIndexer(km_root)
+            # indexer.index_all()
+
+            logger.info("KM indexing completed")
+
+        except Exception as e:
+            logger.error(f"KM indexing failed: {e}")
+
+    background_tasks.add_task(run_km_indexing)
+
+    return {
+        "success": True,
+        "message": "KM indexing started in background",
+    }
+
+
+@router.get("/km/document/{doc_id}")
+async def get_km_document(doc_id: str):
+    """
+    Get single KM document content
+
+    Returns full document with parsed frontmatter and FAQ sections.
+    """
+    try:
+        # Mock document - replace with actual file reading
+        document = {
+            "id": doc_id,
+            "title": "พื้นฐานน้ำสูญเสีย (NRW Basics)",
+            "filename": "01-nrw-basics.md",
+            "category": "water-loss",
+            "keywords": ["NRW", "น้ำสูญเสีย", "Real Losses", "Apparent Losses"],
+            "updated": "2567-01-15",
+            "content": "# พื้นฐานน้ำสูญเสีย\n\n## คำจำกัดความ\n\nNRW (Non-Revenue Water)...",
+            "faq": [
+                {
+                    "question": "NRW คืออะไร?",
+                    "answer": "NRW (Non-Revenue Water) คือน้ำที่ผลิตได้แต่ไม่สามารถจำหน่ายได้...",
+                },
+            ],
+            "related_documents": [
+                {"title": "น้ำสูญเสียทางกายภาพ", "path": "../water-loss/02-physical-loss.md"},
+            ],
+        }
+
+        return {
+            "success": True,
+            "data": document,
+        }
+
+    except Exception as e:
+        logger.error(f"Failed to get KM document: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/km/search")
+async def search_km(
+    query: str,
+    top_k: int = 5,
+    include_faq: bool = True,
+):
+    """
+    Search KM documents
+
+    Uses vector similarity for semantic search over KM content.
+    Optionally includes FAQ matches.
+    """
+    try:
+        # Mock search results - replace with actual Milvus search
+        results = [
+            {
+                "title": "FAQ: NRW คืออะไร?",
+                "file_path": "docs/km/water-loss/01-nrw-basics.md",
+                "content": "NRW (Non-Revenue Water) คือน้ำที่ผลิตได้แต่ไม่สามารถจำหน่ายได้...",
+                "score": 0.95,
+                "is_faq": True,
+                "question": "NRW คืออะไร? น้ำสูญเสียหมายถึงอะไร?",
+            },
+            {
+                "title": "พื้นฐานน้ำสูญเสีย (NRW Basics)",
+                "file_path": "docs/km/water-loss/01-nrw-basics.md",
+                "content": "NRW (Non-Revenue Water) หรือ น้ำสูญเสีย คือปริมาณน้ำที่ผลิตได้...",
+                "score": 0.92,
+                "is_faq": False,
+            },
+        ]
+
+        # Filter out FAQ if not requested
+        if not include_faq:
+            results = [r for r in results if not r.get("is_faq")]
+
+        return {
+            "success": True,
+            "query": query,
+            "results": results[:top_k],
+            "total": len(results),
+        }
+
+    except Exception as e:
+        logger.error(f"KM search failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

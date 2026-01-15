@@ -43,6 +43,9 @@ const navKeywords: Record<string, string[]> = {
   '/ai-insights': ['ai', 'insights', 'วิเคราะห์', 'ข้อมูลเชิงลึก'],
   '/model-evaluation': ['model', 'evaluation', 'ประเมิน', 'โมเดล'],
   '/admin/audit': ['audit', 'security', 'ตรวจสอบ', 'ความปลอดภัย'],
+  '/admin/users': ['user', 'management', 'ผู้ใช้', 'จัดการ', 'admin'],
+  '/admin/knowledge-base': ['knowledge', 'base', 'ฐานความรู้', 'เอกสาร', 'ความรู้'],
+  '/admin/training': ['train', 'model', 'ฝึก', 'สอน', 'โมเดล', 'learning'],
 };
 
 // Quick actions

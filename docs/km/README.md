@@ -41,6 +41,10 @@ docs/km/
 │   ├── 02-technical-terms.md   - คำศัพท์เทคนิค
 │   └── 03-colloquial-terms.md  - คำศัพท์ภาษาพูดและคำพ้อง
 │
+├── scenarios/               # สถานการณ์และคำแนะนำ
+│   ├── 01-troubleshooting.md   - การแก้ไขปัญหาน้ำสูญเสีย
+│   └── 02-recommendations.md   - คำแนะนำตามสถานการณ์
+│
 └── common-questions.md      # รวมคำถามที่พบบ่อย (FAQ Index)
 ```
 
@@ -87,6 +91,13 @@ docs/km/
 | 01-thai-english | คำศัพท์หลัก, หน่วยวัด, ตัวย่อ |
 | 02-technical-terms | คำศัพท์วิศวกรรม, SCADA, สถิติ |
 | 03-colloquial-terms | คำภาษาพูด, คำพ้องความหมาย, Search Query Mapping |
+
+### Scenarios (สถานการณ์)
+
+| ไฟล์ | เนื้อหาหลัก |
+|-----|------------|
+| 01-troubleshooting | การแก้ไขปัญหา, Decision Tree, วิเคราะห์สาเหตุ |
+| 02-recommendations | คำแนะนำตามสถานการณ์, การเลือกอุปกรณ์, เป้าหมาย |
 
 ### Special Documents (เอกสารพิเศษ)
 
