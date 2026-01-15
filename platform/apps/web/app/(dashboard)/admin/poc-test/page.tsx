@@ -46,6 +46,7 @@ import {
 } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
+import { MarkdownRenderer } from '@/components/chat/markdown-renderer';
 
 interface Source {
   title: string;
@@ -1025,7 +1026,10 @@ function POCTestPageContent() {
                               : 'bg-muted/80'
                           )}
                         >
-                          <div className="whitespace-pre-wrap text-sm">{message.content}</div>
+                          <MarkdownRenderer
+                                            content={message.content}
+                                            isUserMessage={message.role === 'user'}
+                                          />
 
                           {/* Sources Section for Assistant */}
                           {message.role === 'assistant' && message.sources && message.sources.length > 0 && (

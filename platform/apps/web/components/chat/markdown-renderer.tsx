@@ -13,7 +13,7 @@ interface MarkdownRendererProps {
 
 export function MarkdownRenderer({ content, className, isUserMessage = false }: MarkdownRendererProps) {
   return (
-    <div className={cn('prose prose-sm max-w-none', className)}>
+    <div className={cn('prose prose-sm max-w-none dark:prose-invert', className)}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -21,7 +21,7 @@ export function MarkdownRenderer({ content, className, isUserMessage = false }: 
         h1: ({ children }) => (
           <h1 className={cn(
             'text-base font-bold mt-3 mb-2 first:mt-0',
-            isUserMessage ? 'text-white' : 'text-slate-900 dark:text-white'
+            isUserMessage ? 'text-white' : 'text-foreground'
           )}>
             {children}
           </h1>
@@ -29,7 +29,7 @@ export function MarkdownRenderer({ content, className, isUserMessage = false }: 
         h2: ({ children }) => (
           <h2 className={cn(
             'text-sm font-bold mt-3 mb-1.5 first:mt-0',
-            isUserMessage ? 'text-white' : 'text-slate-900 dark:text-white'
+            isUserMessage ? 'text-white' : 'text-foreground'
           )}>
             {children}
           </h2>
@@ -37,7 +37,7 @@ export function MarkdownRenderer({ content, className, isUserMessage = false }: 
         h3: ({ children }) => (
           <h3 className={cn(
             'text-sm font-semibold mt-2 mb-1 first:mt-0',
-            isUserMessage ? 'text-white' : 'text-slate-900 dark:text-white'
+            isUserMessage ? 'text-white' : 'text-foreground'
           )}>
             {children}
           </h3>
@@ -46,7 +46,7 @@ export function MarkdownRenderer({ content, className, isUserMessage = false }: 
         p: ({ children }) => (
           <p className={cn(
             'text-sm leading-relaxed mb-2 last:mb-0',
-            isUserMessage ? 'text-white' : 'text-slate-700 dark:text-slate-200'
+            isUserMessage ? 'text-white' : 'text-foreground'
           )}>
             {children}
           </p>
@@ -55,7 +55,7 @@ export function MarkdownRenderer({ content, className, isUserMessage = false }: 
         ul: ({ children }) => (
           <ul className={cn(
             'list-disc list-inside space-y-1 mb-2 ml-1',
-            isUserMessage ? 'text-white marker:text-white/70' : 'text-slate-700 dark:text-slate-200 marker:text-[var(--pwa-cyan)]'
+            isUserMessage ? 'text-white marker:text-white/70' : 'text-foreground marker:text-[var(--pwa-cyan)]'
           )}>
             {children}
           </ul>
@@ -63,13 +63,13 @@ export function MarkdownRenderer({ content, className, isUserMessage = false }: 
         ol: ({ children }) => (
           <ol className={cn(
             'list-decimal list-inside space-y-1 mb-2 ml-1',
-            isUserMessage ? 'text-white marker:text-white/70' : 'text-slate-700 dark:text-slate-200 marker:text-[var(--pwa-cyan)]'
+            isUserMessage ? 'text-white marker:text-white/70' : 'text-foreground marker:text-[var(--pwa-cyan)]'
           )}>
             {children}
           </ol>
         ),
         li: ({ children }) => (
-          <li className="text-sm leading-relaxed">{children}</li>
+          <li className={cn('text-sm leading-relaxed', isUserMessage ? 'text-white' : 'text-foreground')}>{children}</li>
         ),
         // Code
         code: ({ className, children, ...props }) => {
@@ -112,7 +112,7 @@ export function MarkdownRenderer({ content, className, isUserMessage = false }: 
             'border-l-3 pl-3 my-2 italic',
             isUserMessage
               ? 'border-white/50 text-white/90'
-              : 'border-[var(--pwa-cyan)] text-slate-600 dark:text-slate-400'
+              : 'border-[var(--pwa-cyan)] text-muted-foreground'
           )}>
             {children}
           </blockquote>
@@ -137,7 +137,7 @@ export function MarkdownRenderer({ content, className, isUserMessage = false }: 
         strong: ({ children }) => (
           <strong className={cn(
             'font-semibold',
-            isUserMessage ? 'text-white' : 'text-slate-900 dark:text-white'
+            isUserMessage ? 'text-white' : 'text-foreground'
           )}>
             {children}
           </strong>
@@ -151,7 +151,7 @@ export function MarkdownRenderer({ content, className, isUserMessage = false }: 
           <div className="my-2 overflow-x-auto">
             <table className={cn(
               'min-w-full text-xs border-collapse',
-              isUserMessage ? 'text-white' : 'text-slate-700 dark:text-slate-200'
+              isUserMessage ? 'text-white' : 'text-foreground'
             )}>
               {children}
             </table>
@@ -159,7 +159,7 @@ export function MarkdownRenderer({ content, className, isUserMessage = false }: 
         ),
         thead: ({ children }) => (
           <thead className={cn(
-            isUserMessage ? 'bg-white/10' : 'bg-slate-100 dark:bg-slate-800'
+            isUserMessage ? 'bg-white/10' : 'bg-muted'
           )}>
             {children}
           </thead>
@@ -168,22 +168,28 @@ export function MarkdownRenderer({ content, className, isUserMessage = false }: 
         tr: ({ children }) => (
           <tr className={cn(
             'border-b',
-            isUserMessage ? 'border-white/20' : 'border-slate-200 dark:border-slate-700'
+            isUserMessage ? 'border-white/20' : 'border-border'
           )}>
             {children}
           </tr>
         ),
         th: ({ children }) => (
-          <th className="px-2 py-1.5 text-left font-semibold">{children}</th>
+          <th className={cn(
+            'px-2 py-1.5 text-left font-semibold',
+            isUserMessage ? 'text-white' : 'text-foreground'
+          )}>{children}</th>
         ),
         td: ({ children }) => (
-          <td className="px-2 py-1.5">{children}</td>
+          <td className={cn(
+            'px-2 py-1.5',
+            isUserMessage ? 'text-white' : 'text-foreground'
+          )}>{children}</td>
         ),
         // Horizontal rule
         hr: () => (
           <hr className={cn(
             'my-3',
-            isUserMessage ? 'border-white/30' : 'border-slate-200 dark:border-slate-700'
+            isUserMessage ? 'border-white/30' : 'border-border'
           )} />
         ),
       }}
