@@ -3,8 +3,6 @@
 import * as React from 'react';
 import {
   Send,
-  Bot,
-  User,
   Loader2,
   Trash2,
   Copy,
@@ -16,10 +14,8 @@ import {
   ExternalLink,
   ChevronDown,
   ChevronUp,
-  Search,
   RefreshCw,
   CheckCircle2,
-  XCircle,
   AlertCircle,
   Brain,
   Calculator,
@@ -28,16 +24,12 @@ import {
   Lightbulb,
   Target,
   Award,
-  Play,
-  Pause,
-  RotateCcw,
   ImageIcon,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -1008,44 +1000,25 @@ function POCTestPageContent() {
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-3 sm:space-y-4">
+                  <div className="space-y-3 sm:space-y-4 w-full overflow-x-hidden">
                     {messages.map((message) => (
                       <div
                         key={message.id}
                         className={cn(
-                          'flex gap-2 sm:gap-3 w-full',
-                          message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
+                          'flex w-full min-w-0',
+                          message.role === 'user' ? 'justify-end' : 'justify-start'
                         )}
                       >
-                        <Avatar
-                          className={cn(
-                            'h-6 w-6 sm:h-8 sm:w-8 shrink-0 hidden sm:flex',
-                            message.role === 'assistant'
-                              ? 'bg-gradient-to-br from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)]'
-                              : ''
-                          )}
-                        >
-                          <AvatarFallback
-                            className={message.role === 'assistant' ? 'bg-transparent text-white' : ''}
-                          >
-                            {message.role === 'assistant' ? (
-                              <Bot className="h-4 w-4" />
-                            ) : (
-                              <User className="h-4 w-4" />
-                            )}
-                          </AvatarFallback>
-                        </Avatar>
-
                         <div
                           className={cn(
-                            'group relative rounded-2xl px-3 py-2 sm:px-4 sm:py-3',
-                            'max-w-[90%] sm:max-w-[80%]',
-                            'break-words overflow-hidden overflow-wrap-anywhere',
-                            '[word-break:break-word]',
+                            'relative rounded-2xl px-3 py-2 sm:px-4 sm:py-3',
+                            'max-w-[92%] sm:max-w-[75%]',
+                            'min-w-0',
                             message.role === 'user'
-                              ? 'bg-gradient-to-br from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] text-white ml-auto'
+                              ? 'bg-gradient-to-br from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] text-white'
                               : 'bg-muted/80'
                           )}
+                          style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
                         >
                           <MarkdownRenderer
                                             content={message.content}
