@@ -18,6 +18,7 @@ import {
   Upload,
   Brain,
   Gauge,
+  Shield,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -91,6 +92,12 @@ const navItems: NavItem[] = [
     labelEn: 'Model Evaluation',
     href: '/model-evaluation',
     icon: Gauge,
+  },
+  {
+    label: 'System Audit',
+    labelEn: 'System Audit',
+    href: '/admin/audit',
+    icon: Shield,
   },
 ];
 
