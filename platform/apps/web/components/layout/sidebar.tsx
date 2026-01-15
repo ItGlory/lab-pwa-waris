@@ -17,6 +17,7 @@ import {
   Droplets,
   Upload,
   Brain,
+  Gauge,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -84,6 +85,12 @@ const navItems: NavItem[] = [
     labelEn: 'AI Insights',
     href: '/ai-insights',
     icon: Brain,
+  },
+  {
+    label: 'ประเมินโมเดล',
+    labelEn: 'Model Evaluation',
+    href: '/model-evaluation',
+    icon: Gauge,
   },
 ];
 
