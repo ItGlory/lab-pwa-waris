@@ -116,11 +116,11 @@ const mockReports: Report[] = [
 ];
 
 const typeConfig = {
-  daily: { label: 'รายวัน', color: 'bg-blue-100 text-blue-700' },
-  weekly: { label: 'รายสัปดาห์', color: 'bg-purple-100 text-purple-700' },
-  monthly: { label: 'รายเดือน', color: 'bg-emerald-100 text-emerald-700' },
-  annual: { label: 'รายปี', color: 'bg-amber-100 text-amber-700' },
-  custom: { label: 'กำหนดเอง', color: 'bg-slate-100 text-slate-700' },
+  daily: { label: 'รายวัน', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' },
+  weekly: { label: 'รายสัปดาห์', color: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' },
+  monthly: { label: 'รายเดือน', color: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' },
+  annual: { label: 'รายปี', color: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' },
+  custom: { label: 'กำหนดเอง', color: 'bg-muted text-muted-foreground' },
 };
 
 const categoryConfig = {
@@ -277,7 +277,7 @@ export default function ReportsPage() {
       {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">รายงาน</h1>
+          <h1 className="text-2xl font-bold text-foreground">รายงาน</h1>
           <p className="text-muted-foreground">Reports</p>
         </div>
         <Button className="gap-2">
@@ -326,7 +326,7 @@ export default function ReportsPage() {
                 placeholder="ค้นหารายงาน..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 bg-white"
+                className="pl-9 bg-background"
               />
             </div>
 
@@ -402,7 +402,7 @@ export default function ReportsPage() {
                 return (
                   <div
                     key={report.id}
-                    className="flex flex-col gap-4 rounded-lg border border-slate-200 bg-white p-4 transition-shadow hover:shadow-md sm:flex-row sm:items-center"
+                    className="flex flex-col gap-4 rounded-lg border border-slate-200 bg-background p-4 transition-shadow hover:shadow-md sm:flex-row sm:items-center"
                   >
                     {/* Icon */}
                     <div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-primary/10">
@@ -411,7 +411,7 @@ export default function ReportsPage() {
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-slate-900">{report.title_th}</h3>
+                      <h3 className="font-semibold text-foreground">{report.title_th}</h3>
                       <div className="mt-1 flex flex-wrap items-center gap-2 text-sm">
                         <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${typeInfo.color}`}>
                           {typeInfo.label}
@@ -474,7 +474,7 @@ export default function ReportsPage() {
       {/* PDF Preview Modal */}
       {previewReport && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="relative flex h-[90vh] w-full max-w-4xl flex-col rounded-lg bg-white shadow-xl">
+          <div className="relative flex h-[90vh] w-full max-w-4xl flex-col rounded-lg bg-card shadow-xl">
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b px-4 py-3">
               <div className="flex items-center gap-3">
@@ -485,7 +485,7 @@ export default function ReportsPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 rounded-lg border bg-slate-50 px-2 py-1">
+                <div className="flex items-center gap-1 rounded-lg border border-border bg-muted px-2 py-1">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -528,9 +528,9 @@ export default function ReportsPage() {
             </div>
 
             {/* PDF Content */}
-            <div className="flex-1 overflow-auto bg-slate-100 p-4">
+            <div className="flex-1 overflow-auto bg-muted p-4">
               <div
-                className="mx-auto bg-white shadow-lg"
+                className="mx-auto bg-card shadow-lg"
                 style={{
                   width: `${(21 * zoom) / 100}cm`,
                   minHeight: `${(29.7 * zoom) / 100}cm`,

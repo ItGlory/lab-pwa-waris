@@ -252,7 +252,7 @@ export function Sidebar({
                 'group flex items-center gap-3 rounded-xl px-3 py-2.5',
                 'text-white/70 transition-all duration-200',
                 'hover:bg-white/10 hover:text-white press-effect',
-                pathname === '/settings' && [
+                pathname?.startsWith('/settings') && [
                   'bg-gradient-to-r from-[var(--pwa-blue-deep)] to-[var(--pwa-blue-deep)]/80',
                   'text-white font-medium',
                 ]

@@ -330,7 +330,7 @@ export default function DataImportPage() {
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-white">
+                    <SelectContent>
                       {sourceTypes.map((source) => (
                         <SelectItem key={source.value} value={source.value}>
                           <div className="flex items-center gap-2">
@@ -690,7 +690,7 @@ export default function DataImportPage() {
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-white">
+                    <SelectContent>
                       <SelectItem value="00:00">00:00</SelectItem>
                       <SelectItem value="02:00">02:00</SelectItem>
                       <SelectItem value="04:00">04:00</SelectItem>
@@ -704,7 +704,7 @@ export default function DataImportPage() {
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-white">
+                    <SelectContent>
                       <SelectItem value="enabled">เปิดใช้งาน</SelectItem>
                       <SelectItem value="disabled">ปิดใช้งาน</SelectItem>
                     </SelectContent>

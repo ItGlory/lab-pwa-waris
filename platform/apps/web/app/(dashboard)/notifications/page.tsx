@@ -72,9 +72,9 @@ const severityConfig = {
   },
   info: {
     icon: Info,
-    color: 'text-slate-500',
-    bg: 'bg-slate-100 dark:bg-slate-800',
-    dot: 'bg-slate-500',
+    color: 'text-muted-foreground',
+    bg: 'bg-muted',
+    dot: 'bg-muted-foreground',
     label_th: 'ข้อมูล',
   },
 };

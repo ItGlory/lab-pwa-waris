@@ -20,7 +20,7 @@ import { useAlerts } from '@/hooks/use-alerts';
 import { formatNumber, formatPercent } from '@/lib/formatting';
 import { cn } from '@/lib/utils';
 
-// Status card with modern design
+// Status card with innovative glassmorphism design
 function StatusCard({
   label,
   labelTh,
@@ -34,19 +34,25 @@ function StatusCard({
 }) {
   const styles = {
     normal: {
-      gradient: 'status-gradient-normal',
+      gradient: 'from-emerald-500 via-emerald-500 to-teal-500',
       badge: 'success' as const,
       light: 'text-emerald-100',
+      glow: 'shadow-emerald-500/40',
+      ring: 'ring-emerald-400/30',
     },
     warning: {
-      gradient: 'status-gradient-warning',
+      gradient: 'from-amber-500 via-orange-500 to-amber-500',
       badge: 'warning' as const,
       light: 'text-amber-100',
+      glow: 'shadow-amber-500/40',
+      ring: 'ring-amber-400/30',
     },
     critical: {
-      gradient: 'status-gradient-critical',
+      gradient: 'from-red-500 via-rose-500 to-red-500',
       badge: 'critical' as const,
       light: 'text-red-100',
+      glow: 'shadow-red-500/40',
+      ring: 'ring-red-400/30',
     },
   };
 
@@ -55,23 +61,33 @@ function StatusCard({
   return (
     <div
       className={cn(
-        'group relative overflow-hidden rounded-xl p-4 text-white transition-all duration-300',
-        'hover:scale-[1.02] hover:shadow-lg',
-        style.gradient
+        'group relative overflow-hidden rounded-2xl p-5 text-white',
+        'bg-gradient-to-br',
+        style.gradient,
+        'shadow-xl transition-all duration-500 ease-out',
+        style.glow,
+        'hover:scale-[1.03] hover:shadow-2xl hover:-translate-y-1',
+        'ring-1',
+        style.ring,
+        'shine-effect'
       )}
     >
       {/* Animated background pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-white/20" />
-        <div className="absolute -bottom-4 -left-4 h-16 w-16 rounded-full bg-white/10" />
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute -right-6 -top-6 h-28 w-28 rounded-full bg-white/30 blur-2xl animate-float" />
+        <div className="absolute -bottom-6 -left-6 h-20 w-20 rounded-full bg-white/20 blur-xl" style={{ animationDelay: '2s' }} />
+        <div className="absolute right-1/3 top-1/2 h-16 w-16 rounded-full bg-white/10 blur-lg animate-float" style={{ animationDelay: '4s' }} />
       </div>
 
+      {/* Glassmorphism overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-white/10" />
+
       <div className="relative flex items-center justify-between">
-        <div>
-          <p className={cn('text-sm font-medium', style.light)}>{labelTh}</p>
-          <p className="text-3xl font-bold tabular-nums">{count}</p>
+        <div className="space-y-1">
+          <p className={cn('text-sm font-medium tracking-wide uppercase opacity-90', style.light)}>{labelTh}</p>
+          <p className="text-4xl font-black tabular-nums tracking-tight drop-shadow-lg">{count}</p>
         </div>
-        <Badge variant={style.badge} className="shadow-sm">
+        <Badge variant={style.badge} className="shadow-lg backdrop-blur-sm ring-1 ring-white/20">
           {label}
         </Badge>
       </div>
@@ -79,7 +95,7 @@ function StatusCard({
   );
 }
 
-// Regional item with progress bar
+// Regional item with enhanced progress bar
 function RegionalItem({
   name,
   dmaCount,
@@ -93,51 +109,81 @@ function RegionalItem({
   status: 'normal' | 'warning' | 'critical';
   index: number;
 }) {
-  const statusColors = {
-    normal: 'bg-emerald-500',
-    warning: 'bg-amber-500',
-    critical: 'bg-red-500',
+  const statusStyles = {
+    normal: {
+      bar: 'bg-gradient-to-r from-emerald-500 to-teal-400',
+      text: 'text-emerald-600 dark:text-emerald-400',
+      bg: 'bg-emerald-500/5',
+      ring: 'ring-emerald-500/10',
+      dot: 'bg-emerald-500',
+    },
+    warning: {
+      bar: 'bg-gradient-to-r from-amber-500 to-orange-400',
+      text: 'text-amber-600 dark:text-amber-400',
+      bg: 'bg-amber-500/5',
+      ring: 'ring-amber-500/10',
+      dot: 'bg-amber-500',
+    },
+    critical: {
+      bar: 'bg-gradient-to-r from-red-500 to-rose-400',
+      text: 'text-red-600 dark:text-red-400',
+      bg: 'bg-red-500/5',
+      ring: 'ring-red-500/10',
+      dot: 'bg-red-500',
+    },
   };
 
-  const textColors = {
-    normal: 'text-emerald-600 dark:text-emerald-400',
-    warning: 'text-amber-600 dark:text-amber-400',
-    critical: 'text-red-600 dark:text-red-400',
-  };
+  const style = statusStyles[status];
 
   return (
     <div
-      className="group rounded-lg border border-border/50 p-4 transition-all duration-300 hover:border-border hover:bg-muted/30 hover:shadow-sm"
+      className={cn(
+        'group relative overflow-hidden rounded-xl p-4',
+        'border border-border/30 bg-card',
+        'backdrop-blur-sm transition-all duration-300',
+        'hover:border-border/50 hover:shadow-lg hover:-translate-y-0.5',
+        'hover:shadow-md',
+        style.ring
+      )}
       style={{ animationDelay: `${index * 100}ms` }}
     >
-      <div className="flex items-center justify-between">
+      {/* Subtle background glow */}
+      <div className={cn('absolute -right-12 -top-12 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-50', style.bg)} />
+
+      <div className="relative flex items-center justify-between">
         <div className="min-w-0 flex-1">
-          <p className="font-medium truncate">{name}</p>
-          <p className="text-xs text-muted-foreground">{dmaCount} DMA</p>
+          <div className="flex items-center gap-2">
+            <span className={cn('h-2 w-2 rounded-full', style.dot)} />
+            <p className="font-semibold truncate">{name}</p>
+          </div>
+          <p className="ml-4 text-xs text-muted-foreground/70">{dmaCount} DMA</p>
         </div>
         <div className="text-right">
-          <p className={cn('text-lg font-bold tabular-nums', textColors[status])}>
+          <p className={cn('text-xl font-bold tabular-nums tracking-tight', style.text)}>
             {formatPercent(percentage)}
           </p>
-          <p className="text-xs text-muted-foreground">เฉลี่ยสูญเสีย</p>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground/60">เฉลี่ยสูญเสีย</p>
         </div>
       </div>
 
-      {/* Progress bar */}
-      <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+      {/* Enhanced progress bar */}
+      <div className="relative mt-4 h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
         <div
           className={cn(
             'h-full rounded-full transition-all duration-1000 ease-out progress-animated',
-            statusColors[status]
+            style.bar,
+            'shadow-sm'
           )}
           style={{ width: `${Math.min(percentage * 2, 100)}%` }}
         />
+        {/* Animated shimmer */}
+        <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
       </div>
     </div>
   );
 }
 
-// Alert summary stat card
+// Alert summary stat card with modern design
 function AlertStatCard({
   value,
   label,
@@ -152,20 +198,38 @@ function AlertStatCard({
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center rounded-xl p-4 text-center transition-all duration-300',
+        'group relative flex flex-col items-center justify-center rounded-2xl p-5 text-center',
+        'transition-all duration-500 ease-out overflow-hidden',
+        'hover:scale-[1.02] hover:-translate-y-0.5',
         accent
-          ? 'bg-gradient-to-br from-[var(--pwa-cyan-light)]/30 to-[var(--pwa-sky)]/20'
-          : 'bg-muted/50'
+          ? 'bg-gradient-to-br from-[var(--pwa-cyan)]/10 via-[var(--pwa-cyan-light)]/20 to-[var(--pwa-sky)]/10 ring-1 ring-[var(--pwa-cyan)]/20'
+          : 'bg-slate-100/50 dark:bg-slate-800/50 ring-1 ring-slate-200/50 dark:ring-slate-700/50'
       )}
     >
-      <Icon
-        className={cn(
-          'mb-2 h-5 w-5',
-          accent ? 'text-[var(--pwa-blue-deep)]' : 'text-muted-foreground'
-        )}
-      />
-      <p className="text-2xl font-bold tabular-nums">{value}</p>
-      <p className="text-xs text-muted-foreground">{label}</p>
+      {/* Decorative blob */}
+      {accent && (
+        <div className="absolute -right-4 -top-4 h-16 w-16 rounded-full bg-[var(--pwa-cyan)]/20 blur-2xl transition-all duration-500 group-hover:scale-150 group-hover:opacity-70" />
+      )}
+
+      <div className={cn(
+        'relative mb-3 flex h-10 w-10 items-center justify-center rounded-xl',
+        'transition-all duration-300 group-hover:scale-110',
+        accent
+          ? 'bg-gradient-to-br from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)] shadow-lg shadow-[var(--pwa-cyan)]/30'
+          : 'bg-slate-200/80 dark:bg-slate-700/80'
+      )}>
+        <Icon
+          className={cn(
+            'h-5 w-5',
+            accent ? 'text-white' : 'text-muted-foreground'
+          )}
+        />
+      </div>
+      <p className={cn(
+        'text-3xl font-black tabular-nums tracking-tight',
+        accent ? 'text-[var(--pwa-blue-deep)] dark:text-[var(--pwa-cyan)]' : ''
+      )}>{value}</p>
+      <p className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wider mt-1">{label}</p>
     </div>
   );
 }
@@ -179,20 +243,28 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="animate-fade-in">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold tracking-tight">แดชบอร์ดภาพรวม</h1>
+      {/* Page Header - Enhanced */}
+      <div className="animate-blur-in">
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
+              แดชบอร์ดภาพรวม
+            </h1>
+            <div className="absolute -bottom-1 left-0 h-1 w-16 rounded-full bg-gradient-to-r from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)]" />
+          </div>
           {!dashboardLoading && (
-            <div className="flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
-              <span className="status-dot bg-emerald-500 status-dot-pulse" />
-              Live
+            <div className="flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 px-3 py-1.5 text-xs font-semibold text-emerald-600 ring-1 ring-emerald-500/20 backdrop-blur-sm dark:from-emerald-500/20 dark:to-emerald-500/10 dark:text-emerald-400">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              </span>
+              LIVE
             </div>
           )}
         </div>
-        <p className="mt-1 text-muted-foreground">
+        <p className="mt-3 text-muted-foreground/80">
           ข้อมูลน้ำสูญเสียรวมทุกภูมิภาค • อัปเดตล่าสุด:{' '}
-          <span className="font-medium text-foreground">
+          <span className="font-semibold text-foreground">
             {dashboard?.last_updated
               ? new Date(dashboard.last_updated).toLocaleString('th-TH')
               : '-'}

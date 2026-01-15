@@ -201,8 +201,8 @@ export default function AlertsPage() {
     return (
       <div
         className={cn(
-          'flex gap-3 p-3 border-b border-slate-100 cursor-pointer hover:bg-slate-50 transition-colors',
-          isSelected && 'bg-blue-50 border-l-2 border-l-blue-500'
+          'flex gap-3 p-3 border-b border-border cursor-pointer hover:bg-muted/50 transition-colors',
+          isSelected && 'bg-primary/10 border-l-2 border-l-primary'
         )}
         onClick={() => setSelectedAlert(alert.id)}
       >
@@ -211,10 +211,10 @@ export default function AlertsPage() {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-sm text-slate-900 truncate">{alert.title_th}</span>
+            <span className="font-medium text-sm text-foreground truncate">{alert.title_th}</span>
           </div>
           <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-xs text-slate-500 truncate">{alert.dma_name}</span>
+            <span className="text-xs text-muted-foreground truncate">{alert.dma_name}</span>
             <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${status.bg} ${status.color}`}>
               {status.label}
             </span>
@@ -229,7 +229,7 @@ export default function AlertsPage() {
       {/* Compact Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <h1 className="text-xl font-bold text-slate-900">การแจ้งเตือน</h1>
+          <h1 className="text-xl font-bold text-foreground">การแจ้งเตือน</h1>
           {/* Compact Summary Badges */}
           <div className="hidden sm:flex items-center gap-1">
             {summaryCounts.critical > 0 && (
@@ -257,7 +257,7 @@ export default function AlertsPage() {
         </div>
         <div className="flex items-center gap-2">
           {/* View Toggle */}
-          <div className="flex rounded-lg border border-slate-200 bg-white p-0.5">
+          <div className="flex rounded-lg border border-slate-200 bg-background p-0.5">
             <Button
               variant={viewMode === 'list' ? 'default' : 'ghost'}
               size="sm"
@@ -294,14 +294,14 @@ export default function AlertsPage() {
 
       {/* Collapsible Filters */}
       {showFilters && (
-        <div className="flex flex-wrap items-center gap-2 p-3 bg-slate-50 rounded-lg">
+        <div className="flex flex-wrap items-center gap-2 p-3 bg-muted rounded-lg">
           <div className="relative flex-1 min-w-[150px] max-w-xs">
-            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="ค้นหา..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="h-8 pl-8 text-sm bg-white"
+              className="h-8 pl-8 text-sm bg-background"
             />
           </div>
           <Select value={severityFilter} onValueChange={setSeverityFilter}>
@@ -359,9 +359,9 @@ export default function AlertsPage() {
           </div>
 
           {/* Alert Sidebar */}
-          <div className="hidden lg:flex w-80 flex-col rounded-lg border border-slate-200 bg-white">
+          <div className="hidden lg:flex w-80 flex-col rounded-lg border border-border bg-card">
             <div className="flex items-center justify-between p-3 border-b border-slate-200">
-              <span className="text-sm font-medium text-slate-900">
+              <span className="text-sm font-medium text-foreground">
                 การแจ้งเตือน ({filteredAlerts.length})
               </span>
             </div>
@@ -381,7 +381,7 @@ export default function AlertsPage() {
               ) : filteredAlerts.length === 0 ? (
                 <div className="flex flex-col items-center justify-center p-6 text-center">
                   <CheckCircle className="h-8 w-8 text-emerald-500" />
-                  <p className="mt-2 text-sm text-slate-500">ไม่พบการแจ้งเตือน</p>
+                  <p className="mt-2 text-sm text-muted-foreground">ไม่พบการแจ้งเตือน</p>
                 </div>
               ) : (
                 filteredAlerts.map((alert) => (
@@ -392,7 +392,7 @@ export default function AlertsPage() {
 
             {/* Selected Alert Detail */}
             {selectedAlert && (
-              <div className="border-t border-slate-200 p-3 bg-slate-50">
+              <div className="border-t border-border p-3 bg-muted">
                 {(() => {
                   const alert = alerts.find((a) => a.id === selectedAlert);
                   if (!alert) return null;
@@ -402,7 +402,7 @@ export default function AlertsPage() {
                       <div className="flex items-start justify-between">
                         <div>
                           <p className="font-medium text-sm">{alert.title_th}</p>
-                          <p className="text-xs text-slate-500">{alert.dma_name}</p>
+                          <p className="text-xs text-muted-foreground">{alert.dma_name}</p>
                         </div>
                         <Button
                           variant="ghost"
@@ -413,7 +413,7 @@ export default function AlertsPage() {
                           <X className="h-3 w-3" />
                         </Button>
                       </div>
-                      <p className="text-xs text-slate-600">{alert.description_th}</p>
+                      <p className="text-xs text-muted-foreground">{alert.description_th}</p>
                       <div className="flex gap-2">
                         {alert.status === 'active' && (
                           <Button
@@ -525,7 +525,7 @@ export default function AlertsPage() {
                 <div className="flex flex-col items-center justify-center py-8">
                   <CheckCircle className="h-10 w-10 text-emerald-500" />
                   <p className="mt-3 font-medium">ไม่พบการแจ้งเตือน</p>
-                  <p className="text-sm text-slate-500">ไม่มีการแจ้งเตือนที่ตรงกับเงื่อนไข</p>
+                  <p className="text-sm text-muted-foreground">ไม่มีการแจ้งเตือนที่ตรงกับเงื่อนไข</p>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -538,14 +538,14 @@ export default function AlertsPage() {
                     return (
                       <div
                         key={alert.id}
-                        className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-white p-3 transition-shadow hover:shadow-sm sm:flex-row sm:items-start"
+                        className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-background p-3 transition-shadow hover:shadow-sm sm:flex-row sm:items-start"
                       >
                         <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${severity.bg}`}>
                           <SeverityIcon className="h-4 w-4 text-white" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="font-medium text-sm text-slate-900">{alert.title_th}</h3>
+                            <h3 className="font-medium text-sm text-foreground">{alert.title_th}</h3>
                             <Badge variant={severity.variant} className="text-[10px] h-5">
                               {severity.label}
                             </Badge>
@@ -554,8 +554,8 @@ export default function AlertsPage() {
                               {status.label}
                             </span>
                           </div>
-                          <p className="mt-1 text-xs text-slate-500 line-clamp-1">{alert.description_th}</p>
-                          <div className="mt-1.5 flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
+                          <p className="mt-1 text-xs text-muted-foreground line-clamp-1">{alert.description_th}</p>
+                          <div className="mt-1.5 flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground/70">
                             <Link
                               href={`/dma/${alert.dma_id}`}
                               className="flex items-center gap-0.5 text-blue-600 hover:underline"

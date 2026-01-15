@@ -168,7 +168,7 @@ function getFileIcon(type: Document['type']) {
     case 'folder':
       return <Folder className="h-5 w-5 text-amber-500" />;
     default:
-      return <File className="h-5 w-5 text-slate-500" />;
+      return <File className="h-5 w-5 text-muted-foreground" />;
   }
 }
 
@@ -325,7 +325,7 @@ export default function DocumentsPage() {
                 <SelectTrigger className="w-[140px]">
                   <SelectValue placeholder="เรียงตาม" />
                 </SelectTrigger>
-                <SelectContent className="bg-white">
+                <SelectContent>
                   <SelectItem value="date">วันที่อัปเดต</SelectItem>
                   <SelectItem value="name">ชื่อไฟล์</SelectItem>
                   <SelectItem value="size">ขนาดไฟล์</SelectItem>
@@ -425,7 +425,7 @@ export default function DocumentsPage() {
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-white">
+                        <DropdownMenuContent align="end">
                           <DropdownMenuItem>
                             <Eye className="mr-2 h-4 w-4" />
                             ดูตัวอย่าง
@@ -458,7 +458,7 @@ export default function DocumentsPage() {
             <Card key={doc.id} className="group hover:shadow-md transition-shadow">
               <CardContent className="p-4">
                 <div className="flex items-start justify-between">
-                  <div className="rounded-lg bg-slate-100 p-3">
+                  <div className="rounded-lg bg-muted p-3">
                     {getFileIcon(doc.type)}
                   </div>
                   <DropdownMenu>
@@ -471,7 +471,7 @@ export default function DocumentsPage() {
                         <MoreVertical className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-white">
+                    <DropdownMenuContent align="end">
                       <DropdownMenuItem>
                         <Eye className="mr-2 h-4 w-4" />
                         ดูตัวอย่าง

@@ -38,18 +38,18 @@ http:
         accessControlAllowCredentials: true
         accessControlMaxAge: 3600
 
-    # Rate Limiting
+    # Rate Limiting (increased for development)
     rate-limit:
       rateLimit:
-        average: 100
-        burst: 50
+        average: 500
+        burst: 200
         period: 1m
 
-    # API Rate Limiting (more restrictive)
+    # API Rate Limiting (increased for development)
     api-rate-limit:
       rateLimit:
-        average: 50
-        burst: 25
+        average: 300
+        burst: 100
         period: 1m
 
     # Compression

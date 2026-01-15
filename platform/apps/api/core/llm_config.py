@@ -153,12 +153,17 @@ WARIS_SYSTEM_PROMPT = """คุณคือผู้ช่วย AI ของร
 """
 
 # Guardrail rules
+# Note: Be careful with words that have dual meanings in Thai
+# e.g., "ความรุนแรง" can mean "violence" OR "severity" (alert severity)
+# We use more specific patterns to avoid blocking legitimate queries
 GUARDRAIL_BLOCKED_TOPICS = [
     "การเมือง",
     "ศาสนา",
-    "เพศ",
-    "ความรุนแรง",
+    "เรื่องเพศ",
+    "ความรุนแรงทางกาย",
+    "ทำร้ายร่างกาย",
     "สารเสพติด",
+    "ยาเสพติด",
 ]
 
 GUARDRAIL_ALLOWED_DOMAINS = [
@@ -176,6 +181,12 @@ GUARDRAIL_ALLOWED_DOMAINS = [
     "รายงาน",
     "แจ้งเตือน",
     "วิเคราะห์",
+    "ความรุนแรง",  # Alert severity level
+    "severity",
+    "critical",
+    "warning",
+    "สรุป",
+    "summary",
 ]
 
 

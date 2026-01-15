@@ -20,6 +20,11 @@ import {
   Wifi,
   HardDrive,
   Clock,
+  Brain,
+  Plus,
+  X,
+  Zap,
+  BookOpen,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -36,6 +41,9 @@ import {
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Slider } from '@/components/ui/slider';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface SystemStatus {
   name: string;
@@ -85,6 +93,26 @@ export default function SettingsPage() {
     debugMode: false,
   });
 
+  // AI Settings state
+  const [aiSettings, setAiSettings] = React.useState({
+    llmProvider: 'openrouter',
+    llmModel: 'qwen/qwen-2.5-72b-instruct',
+    temperature: 0.7,
+    maxTokens: 4096,
+    streamEnabled: true,
+    ragEnabled: true,
+    ragTopK: 5,
+    guardrailEnabled: true,
+  });
+  const [blockedTopics, setBlockedTopics] = React.useState([
+    'การเมือง', 'ศาสนา', 'เรื่องเพศ', 'ความรุนแรงทางกาย', 'สารเสพติด'
+  ]);
+  const [allowedDomains, setAllowedDomains] = React.useState([
+    'น้ำสูญเสีย', 'NRW', 'DMA', 'ท่อ', 'มิเตอร์', 'ความดัน', 'กปภ', 'ประปา', 'รายงาน', 'แจ้งเตือน'
+  ]);
+  const [newBlockedTopic, setNewBlockedTopic] = React.useState('');
+  const [newAllowedDomain, setNewAllowedDomain] = React.useState('');
+
   React.useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 600);
     return () => clearTimeout(timer);
@@ -103,6 +131,35 @@ export default function SettingsPage() {
     value: (typeof settings)[K]
   ) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const updateAiSetting = <K extends keyof typeof aiSettings>(
+    key: K,
+    value: (typeof aiSettings)[K]
+  ) => {
+    setAiSettings((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const addBlockedTopic = () => {
+    if (newBlockedTopic.trim() && !blockedTopics.includes(newBlockedTopic.trim())) {
+      setBlockedTopics([...blockedTopics, newBlockedTopic.trim()]);
+      setNewBlockedTopic('');
+    }
+  };
+
+  const removeBlockedTopic = (topic: string) => {
+    setBlockedTopics(blockedTopics.filter(t => t !== topic));
+  };
+
+  const addAllowedDomain = () => {
+    if (newAllowedDomain.trim() && !allowedDomains.includes(newAllowedDomain.trim())) {
+      setAllowedDomains([...allowedDomains, newAllowedDomain.trim()]);
+      setNewAllowedDomain('');
+    }
+  };
+
+  const removeAllowedDomain = (domain: string) => {
+    setAllowedDomains(allowedDomains.filter(d => d !== domain));
   };
 
   if (loading) {
@@ -154,7 +211,7 @@ export default function SettingsPage() {
         {/* Main Settings */}
         <div className="lg:col-span-2 space-y-6">
           <Tabs defaultValue="profile" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="profile" className="gap-2">
                 <User className="h-4 w-4 hidden sm:inline" />
                 โปรไฟล์
@@ -170,6 +227,10 @@ export default function SettingsPage() {
               <TabsTrigger value="system" className="gap-2">
                 <Settings className="h-4 w-4 hidden sm:inline" />
                 ระบบ
+              </TabsTrigger>
+              <TabsTrigger value="ai" className="gap-2">
+                <Brain className="h-4 w-4 hidden sm:inline" />
+                AI
               </TabsTrigger>
             </TabsList>
 
@@ -334,7 +395,7 @@ export default function SettingsPage() {
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-white">
+                      <SelectContent>
                         <SelectItem value="low">ทั้งหมด (รวมระดับต่ำ)</SelectItem>
                         <SelectItem value="medium">ปานกลางขึ้นไป</SelectItem>
                         <SelectItem value="high">สูงขึ้นไป</SelectItem>
@@ -388,7 +449,7 @@ export default function SettingsPage() {
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="bg-white">
+                        <SelectContent>
                           <SelectItem value="th">ไทย</SelectItem>
                           <SelectItem value="en">English</SelectItem>
                         </SelectContent>
@@ -403,7 +464,7 @@ export default function SettingsPage() {
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="bg-white">
+                        <SelectContent>
                           <SelectItem value="Asia/Bangkok">
                             กรุงเทพฯ (UTC+7)
                           </SelectItem>
@@ -420,7 +481,7 @@ export default function SettingsPage() {
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-white">
+                      <SelectContent>
                         <SelectItem value="buddhist">
                           พ.ศ. (15 ม.ค. 2568)
                         </SelectItem>
@@ -494,7 +555,7 @@ export default function SettingsPage() {
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="bg-white">
+                        <SelectContent>
                           <SelectItem value="15">ทุก 15 วินาที</SelectItem>
                           <SelectItem value="30">ทุก 30 วินาที</SelectItem>
                           <SelectItem value="60">ทุก 1 นาที</SelectItem>
@@ -513,7 +574,7 @@ export default function SettingsPage() {
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-white">
+                      <SelectContent>
                         <SelectItem value="90">90 วัน</SelectItem>
                         <SelectItem value="180">180 วัน</SelectItem>
                         <SelectItem value="365">1 ปี</SelectItem>
@@ -567,6 +628,253 @@ export default function SettingsPage() {
                       ล้างแคช
                     </Button>
                   </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* AI Tab */}
+            <TabsContent value="ai" className="space-y-4">
+              <Alert>
+                <Brain className="h-4 w-4" />
+                <AlertDescription>
+                  ตั้งค่า AI สำหรับผู้ดูแลระบบ - การเปลี่ยนแปลงจะมีผลทันทีกับการทำงานของ AI Assistant
+                </AlertDescription>
+              </Alert>
+
+              {/* LLM Settings */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Zap className="h-5 w-5" />
+                    ตั้งค่า LLM
+                  </CardTitle>
+                  <CardDescription>
+                    กำหนดค่าโมเดลภาษาขนาดใหญ่สำหรับ AI Assistant
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label>Provider</Label>
+                      <Select
+                        value={aiSettings.llmProvider}
+                        onValueChange={(v) => updateAiSetting('llmProvider', v)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="openrouter">OpenRouter</SelectItem>
+                          <SelectItem value="ollama">Ollama (Local)</SelectItem>
+                          <SelectItem value="auto">Auto (Fallback)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Model</Label>
+                      <Select
+                        value={aiSettings.llmModel}
+                        onValueChange={(v) => updateAiSetting('llmModel', v)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="qwen/qwen-2.5-72b-instruct">Qwen 2.5 72B (แนะนำ)</SelectItem>
+                          <SelectItem value="scb10x/llama3.1-typhoon2-70b-instruct">Typhoon 2 70B (ภาษาไทยดีเยี่ยม)</SelectItem>
+                          <SelectItem value="meta-llama/llama-3.1-70b-instruct">Llama 3.1 70B</SelectItem>
+                          <SelectItem value="mistralai/mixtral-8x22b-instruct">Mixtral 8x22B</SelectItem>
+                          <SelectItem value="qwen/qwen-2.5-7b-instruct">Qwen 2.5 7B (เบา)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label>Temperature: {aiSettings.temperature.toFixed(1)}</Label>
+                      <span className="text-xs text-muted-foreground">
+                        ค่าต่ำ = แม่นยำ, ค่าสูง = สร้างสรรค์
+                      </span>
+                    </div>
+                    <Slider
+                      value={[aiSettings.temperature]}
+                      onValueChange={(v) => updateAiSetting('temperature', v[0])}
+                      min={0}
+                      max={1}
+                      step={0.1}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label>Max Tokens: {aiSettings.maxTokens}</Label>
+                    </div>
+                    <Slider
+                      value={[aiSettings.maxTokens]}
+                      onValueChange={(v) => updateAiSetting('maxTokens', v[0])}
+                      min={256}
+                      max={8192}
+                      step={256}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Streaming Response</p>
+                      <p className="text-sm text-muted-foreground">
+                        แสดงคำตอบแบบเรียลไทม์
+                      </p>
+                    </div>
+                    <Switch
+                      checked={aiSettings.streamEnabled}
+                      onCheckedChange={(v) => updateAiSetting('streamEnabled', v)}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* RAG Settings */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BookOpen className="h-5 w-5" />
+                    ตั้งค่า RAG
+                  </CardTitle>
+                  <CardDescription>
+                    Retrieval-Augmented Generation สำหรับค้นหาความรู้
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">เปิดใช้งาน RAG</p>
+                      <p className="text-sm text-muted-foreground">
+                        ค้นหาข้อมูลจากฐานความรู้ก่อนตอบ
+                      </p>
+                    </div>
+                    <Switch
+                      checked={aiSettings.ragEnabled}
+                      onCheckedChange={(v) => updateAiSetting('ragEnabled', v)}
+                    />
+                  </div>
+
+                  {aiSettings.ragEnabled && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label>Top-K Results: {aiSettings.ragTopK}</Label>
+                        <span className="text-xs text-muted-foreground">
+                          จำนวนเอกสารที่ดึงมา
+                        </span>
+                      </div>
+                      <Slider
+                        value={[aiSettings.ragTopK]}
+                        onValueChange={(v) => updateAiSetting('ragTopK', v[0])}
+                        min={1}
+                        max={10}
+                        step={1}
+                      />
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Guardrails */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
+                    Guardrails
+                  </CardTitle>
+                  <CardDescription>
+                    กำหนดหัวข้อที่บล็อกและโดเมนที่อนุญาต
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">เปิดใช้งาน Guardrails</p>
+                      <p className="text-sm text-muted-foreground">
+                        กรองคำถามที่ไม่เกี่ยวข้องกับระบบ
+                      </p>
+                    </div>
+                    <Switch
+                      checked={aiSettings.guardrailEnabled}
+                      onCheckedChange={(v) => updateAiSetting('guardrailEnabled', v)}
+                    />
+                  </div>
+
+                  {aiSettings.guardrailEnabled && (
+                    <>
+                      <Separator />
+
+                      {/* Blocked Topics */}
+                      <div className="space-y-3">
+                        <Label className="text-destructive">หัวข้อที่บล็อก</Label>
+                        <div className="flex flex-wrap gap-2">
+                          {blockedTopics.map((topic) => (
+                            <Badge key={topic} variant="destructive" className="gap-1">
+                              {topic}
+                              <button
+                                onClick={() => removeBlockedTopic(topic)}
+                                className="ml-1 hover:bg-destructive/80 rounded-full"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </Badge>
+                          ))}
+                        </div>
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="เพิ่มหัวข้อที่ต้องการบล็อก..."
+                            value={newBlockedTopic}
+                            onChange={(e) => setNewBlockedTopic(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && addBlockedTopic()}
+                          />
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={addBlockedTopic}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Allowed Domains */}
+                      <div className="space-y-3">
+                        <Label className="text-emerald-600">โดเมนที่อนุญาต</Label>
+                        <div className="flex flex-wrap gap-2">
+                          {allowedDomains.map((domain) => (
+                            <Badge key={domain} variant="secondary" className="gap-1 bg-emerald-100 text-emerald-700">
+                              {domain}
+                              <button
+                                onClick={() => removeAllowedDomain(domain)}
+                                className="ml-1 hover:bg-emerald-200 rounded-full"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </Badge>
+                          ))}
+                        </div>
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="เพิ่มโดเมนที่อนุญาต..."
+                            value={newAllowedDomain}
+                            onChange={(e) => setNewAllowedDomain(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && addAllowedDomain()}
+                          />
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={addAllowedDomain}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

@@ -182,7 +182,7 @@ export default function AIInsightsPage() {
             <SelectTrigger className="w-[140px]">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-white">
+            <SelectContent>
               <SelectItem value="DMA-001">DMA-001</SelectItem>
               <SelectItem value="DMA-002">DMA-002</SelectItem>
               <SelectItem value="DMA-003">DMA-003</SelectItem>

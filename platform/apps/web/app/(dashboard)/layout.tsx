@@ -62,8 +62,11 @@ export default function DashboardLayout({
           alertCount={activeAlertCount}
           onMenuClick={() => setMobileMenuOpen(true)}
         />
-        <main className="flex-1 overflow-auto bg-gradient-to-br from-background to-muted/30 p-3 sm:p-4 lg:p-6 safe-area-inset">
-          <div className="mx-auto max-w-7xl animate-fade-in">
+        <main className="flex-1 overflow-auto bg-background p-3 sm:p-4 lg:p-6 safe-area-inset">
+          {/* Subtle grid pattern background */}
+          <div className="pointer-events-none fixed inset-0 bg-[url('/grid.svg')] bg-center opacity-[0.02] dark:opacity-[0.03]" />
+
+          <div className="relative mx-auto max-w-7xl animate-fade-in">
             {children}
           </div>
         </main>

@@ -16,7 +16,9 @@ logger = logging.getLogger(__name__)
 
 # RAG configuration
 DEFAULT_TOP_K = 5
-DEFAULT_MIN_SCORE = 0.7
+# Milvus COSINE returns similarity score 0-1 (higher = more similar)
+# Server mode typically returns lower scores than expected
+DEFAULT_MIN_SCORE = 0.1
 
 
 class RAGRetriever:

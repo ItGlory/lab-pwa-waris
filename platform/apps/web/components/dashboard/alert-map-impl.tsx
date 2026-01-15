@@ -168,8 +168,8 @@ export function AlertMapImpl({
       </MapContainer>
 
       {/* Legend */}
-      <div className="absolute bottom-4 left-4 z-[1000] rounded-lg bg-white p-3 shadow-lg">
-        <div className="mb-2 text-xs font-semibold text-slate-700">ระดับความรุนแรง</div>
+      <div className="absolute bottom-4 left-4 z-[1000] rounded-lg bg-card p-3 shadow-lg border border-border">
+        <div className="mb-2 text-xs font-semibold text-foreground">ระดับความรุนแรง</div>
         <div className="space-y-1">
           {[
             { severity: 'critical', label: 'วิกฤต' },

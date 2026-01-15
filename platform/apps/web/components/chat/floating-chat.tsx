@@ -20,6 +20,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useChat } from '@/hooks/use-chat';
+import { MarkdownRenderer } from './markdown-renderer';
 
 // Quick prompts for easy access
 const quickPrompts = [
@@ -93,12 +94,11 @@ export function FloatingChat() {
   return (
     <div
       className={cn(
-        'fixed z-50 flex flex-col overflow-hidden bg-white shadow-2xl transition-all duration-300 animate-scale-in',
-        'dark:bg-slate-900',
+        'fixed z-50 flex flex-col overflow-hidden bg-background shadow-2xl transition-all duration-300 animate-scale-in',
         // Mobile: full screen when open
         'inset-0 rounded-none border-0 safe-area-inset',
         // Tablet and up: floating window
-        'sm:inset-auto sm:bottom-4 sm:right-4 sm:rounded-2xl sm:border sm:border-slate-200 dark:sm:border-slate-700',
+        'sm:inset-auto sm:bottom-4 sm:right-4 sm:rounded-2xl sm:border sm:border-border',
         isExpanded
           ? 'sm:left-4 sm:top-4 md:left-auto md:top-auto md:h-[600px] md:w-[450px]'
           : 'sm:h-[450px] sm:w-[340px] md:h-[500px] md:w-[380px]'
@@ -201,22 +201,27 @@ export function FloatingChat() {
                 </Avatar>
                 <div
                   className={cn(
-                    'max-w-[80%] rounded-2xl px-3 py-2 text-sm transition-all duration-200',
+                    'max-w-[85%] rounded-2xl px-3 py-2 transition-all duration-200',
                     msg.role === 'user'
                       ? 'bg-gradient-to-br from-[var(--pwa-blue-deep)] to-[var(--pwa-cyan)] text-white'
                       : 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100'
                   )}
                 >
-                  <div className="whitespace-pre-wrap">{msg.content}</div>
-                  {isLoading &&
+                  {msg.content ? (
+                    <MarkdownRenderer
+                      content={msg.content}
+                      isUserMessage={msg.role === 'user'}
+                    />
+                  ) : (
+                    isLoading &&
                     msg.role === 'assistant' &&
-                    msg.id === messages[messages.length - 1]?.id &&
-                    !msg.content && (
-                      <div className="flex items-center gap-1 text-slate-500">
-                        <Loader2 className="h-3 w-3 animate-spin" />
+                    msg.id === messages[messages.length - 1]?.id && (
+                      <div className="flex items-center gap-1.5 text-slate-500 py-1">
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
                         <span className="text-xs">กำลังพิมพ์...</span>
                       </div>
-                    )}
+                    )
+                  )}
                 </div>
               </div>
             ))}
@@ -225,7 +230,7 @@ export function FloatingChat() {
       </ScrollArea>
 
       {/* Input */}
-      <div className="border-t bg-white dark:bg-slate-900 p-3">
+      <div className="border-t border-border bg-background p-3">
         <form onSubmit={handleSubmit} className="flex gap-2">
           <Input
             ref={inputRef}
@@ -233,7 +238,7 @@ export function FloatingChat() {
             onChange={(e) => setInput(e.target.value)}
             placeholder="พิมพ์ข้อความ..."
             disabled={isLoading}
-            className="flex-1 bg-slate-50 border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-white focus:ring-[var(--pwa-cyan)] focus:border-[var(--pwa-cyan)]"
+            className="flex-1 bg-muted/50 border-input focus:ring-[var(--pwa-cyan)] focus:border-[var(--pwa-cyan)]"
           />
           {isLoading ? (
             <Button

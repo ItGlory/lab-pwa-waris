@@ -261,7 +261,7 @@ export default function ChatPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">ถามตอบ AI</h1>
+          <h1 className="text-2xl font-bold text-foreground">ถามตอบ AI</h1>
           <p className="text-muted-foreground">
             AI Chat Assistant - Thai 70B+ LLM
           </p>
@@ -306,7 +306,7 @@ export default function ChatPage() {
                     <span>
                       ใช้ {status.active_provider === 'openrouter' ? 'OpenRouter' : 'Ollama'} -{' '}
                       {status.active_provider === 'openrouter'
-                        ? 'Typhoon 2 70B (Thai)'
+                        ? status.openrouter?.default_model
                         : status.ollama?.default_model}
                     </span>
                   </div>
@@ -359,7 +359,7 @@ export default function ChatPage() {
                         'group relative max-w-[80%] rounded-2xl px-4 py-3',
                         message.role === 'user'
                           ? 'bg-primary text-white'
-                          : 'bg-slate-100 text-slate-900'
+                          : 'bg-muted text-foreground'
                       )}
                     >
                       <div className="whitespace-pre-wrap text-sm">{message.content}</div>
@@ -394,7 +394,7 @@ export default function ChatPage() {
           </ScrollArea>
 
           {/* Input Area */}
-          <div className="border-t bg-white p-4">
+          <div className="border-t bg-background p-4">
             <form onSubmit={handleSubmit} className="flex gap-2">
               <Input
                 ref={inputRef}
@@ -402,7 +402,7 @@ export default function ChatPage() {
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="พิมพ์คำถามของคุณที่นี่..."
                 disabled={isLoading}
-                className="flex-1 bg-white"
+                className="flex-1 bg-background"
               />
               <Button type="submit" disabled={isLoading || !input.trim()} className="gap-2">
                 {isLoading ? (
@@ -414,8 +414,7 @@ export default function ChatPage() {
               </Button>
             </form>
             <p className="mt-2 text-center text-xs text-muted-foreground">
-              WARIS AI ใช้ Typhoon 2 70B (Thai) ผ่าน OpenRouter - ข้อมูลอาจไม่ถูกต้อง
-              กรุณาตรวจสอบก่อนนำไปใช้
+              WARIS AI - ข้อมูลที่ได้รับอาจไม่ถูกต้อง กรุณาตรวจสอบก่อนนำไปใช้
             </p>
           </div>
         </CardContent>

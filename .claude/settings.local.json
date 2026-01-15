@@ -73,7 +73,14 @@
       "Bash(MILVUS_USE_LITE=true /Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/apps/api/.venv/bin/python:*)",
       "Bash(MILVUS_USE_LITE=true MILVUS_DB_PATH=/Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/apps/api/milvus_data/waris.db /Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/apps/api/.venv/bin/python:*)",
       "Bash(MILVUS_USE_LITE=true MILVUS_DB_PATH=./milvus_data/waris.db /Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/apps/api/.venv/bin/python:*)",
-      "Bash(MILVUS_USE_LITE=true MILVUS_DB_PATH=/Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/apps/api/milvus_data/waris.db PYTHONPATH=/Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/apps/api /Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/apps/api/.venv/bin/python:*)"
+      "Bash(MILVUS_USE_LITE=true MILVUS_DB_PATH=/Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/apps/api/milvus_data/waris.db PYTHONPATH=/Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/apps/api /Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/apps/api/.venv/bin/python:*)",
+      "Bash(docker rmi:*)",
+      "Bash(SHELL=/bin/bash /bin/bash -c 'cd /Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/apps/web && npm install react-markdown remark-gfm --save')",
+      "Bash(export PATH=\"/opt/homebrew/bin:/usr/local/bin:$PATH\")",
+      "Bash(/opt/homebrew/bin/npm --version)",
+      "Bash(source:*)",
+      "Bash(docker cp:*)",
+      "Bash(find:*)"
     ]
   }
 }
