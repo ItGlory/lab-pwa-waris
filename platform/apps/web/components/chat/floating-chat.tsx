@@ -75,12 +75,12 @@ export function FloatingChat() {
         type="button"
         onClick={() => setIsOpen(true)}
         className={cn(
-          'group fixed bottom-4 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-2xl text-white',
+          'group fixed bottom-4 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-2xl text-white',
           'bg-gradient-to-br from-[var(--pwa-cyan)] to-[var(--pwa-blue-deep)]',
           'shadow-xl shadow-[var(--pwa-cyan)]/30',
           'hover:shadow-2xl hover:shadow-[var(--pwa-cyan)]/40 hover:scale-110',
           'transition-all duration-500 ease-out press-effect',
-          'sm:bottom-6 sm:right-6 sm:h-16 sm:w-16',
+          'sm:bottom-6 sm:right-6 sm:h-14 sm:w-14',
           'safe-area-inset',
           'ring-2 ring-white/20 hover:ring-white/40',
           'animate-breathing-glow'
@@ -94,7 +94,7 @@ export function FloatingChat() {
         {/* Inner glow */}
         <span className="absolute inset-0 rounded-2xl bg-white/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-        <MessageSquare className="relative h-6 w-6 sm:h-7 sm:w-7 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6" />
+        <MessageSquare className="relative h-5 w-5 sm:h-6 sm:w-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6" />
         <span className="sr-only">เปิดแชท</span>
 
         {/* Pulse ring effect */}

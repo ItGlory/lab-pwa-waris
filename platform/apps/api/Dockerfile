@@ -42,7 +42,10 @@ RUN pip install --no-cache-dir --upgrade pip && \
     httpx>=0.28.0 \
     orjson>=3.10.0 \
     python-dotenv>=1.0.0 \
-    email-validator>=2.0.0
+    email-validator>=2.0.0 \
+    pymilvus>=2.4.0 \
+    beautifulsoup4>=4.12.0 \
+    lxml>=5.0.0
 
 # Copy application code
 COPY . .
@@ -88,7 +91,9 @@ RUN pip install --no-cache-dir --upgrade pip && \
     httpx>=0.28.0 \
     orjson>=3.10.0 \
     email-validator>=2.0.0 \
-    pymilvus>=2.4.0
+    pymilvus>=2.4.0 \
+    beautifulsoup4>=4.12.0 \
+    lxml>=5.0.0
 
 # Copy application code
 COPY --chown=waris:waris . .

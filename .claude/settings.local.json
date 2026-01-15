@@ -123,7 +123,11 @@
       "Bash(ollama search:*)",
       "Bash(SHELL=/bin/bash /bin/bash:*)",
       "Bash(python scripts/km_indexer.py:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(/usr/local/bin/docker-compose:*)",
+      "Bash(/usr/local/bin/docker logs waris-api --tail 20)",
+      "Bash(/usr/local/bin/docker logs waris-api --tail 50)",
+      "Bash(/usr/local/bin/docker compose:*)"
     ]
   }
 }

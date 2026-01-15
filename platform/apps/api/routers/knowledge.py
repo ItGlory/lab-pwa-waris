@@ -664,50 +664,148 @@ def _keyword_search(query: str, documents: List[dict], top_k: int = 5) -> List[d
     return results[:top_k]
 
 
+async def _fetch_url_content(url: str) -> dict:
+    """Fetch content from external URL"""
+    import httpx
+    from bs4 import BeautifulSoup
+
+    try:
+        async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            }
+            response = await client.get(url, headers=headers)
+            response.raise_for_status()
+
+            # Parse HTML
+            soup = BeautifulSoup(response.text, "html.parser")
+
+            # Remove script and style elements
+            for element in soup(["script", "style", "nav", "footer", "header", "aside"]):
+                element.decompose()
+
+            # Get title
+            title = soup.title.string if soup.title else url
+
+            # Try to find main content
+            main_content = None
+
+            # Look for article or main content areas
+            for selector in ["article", "main", ".content", ".post-content", ".entry-content", "#content"]:
+                content_elem = soup.select_one(selector)
+                if content_elem:
+                    main_content = content_elem.get_text(separator="\n", strip=True)
+                    break
+
+            # Fallback to body
+            if not main_content:
+                body = soup.find("body")
+                if body:
+                    main_content = body.get_text(separator="\n", strip=True)
+                else:
+                    main_content = soup.get_text(separator="\n", strip=True)
+
+            # Clean up whitespace
+            lines = [line.strip() for line in main_content.split("\n") if line.strip()]
+            main_content = "\n".join(lines)
+
+            # Limit content size
+            if len(main_content) > 8000:
+                main_content = main_content[:8000] + "..."
+
+            return {
+                "success": True,
+                "url": url,
+                "title": title,
+                "content": main_content,
+            }
+
+    except Exception as e:
+        logger.error(f"Failed to fetch URL {url}: {e}")
+        return {
+            "success": False,
+            "url": url,
+            "title": url,
+            "content": "",
+            "error": str(e),
+        }
+
+
+def _extract_urls(text: str) -> List[str]:
+    """Extract URLs from text"""
+    import re
+    url_pattern = r'https?://[^\s<>"{}|\\^`\[\]]+'
+    return re.findall(url_pattern, text)
+
+
 @router.post("/chat/rag", response_model=RAGChatResponse)
 async def rag_chat(request: RAGChatRequest):
     """
-    RAG-enhanced chat using local index
+    RAG-enhanced chat using local index + web fetching
 
     For POC testing - uses keyword search on local index data.
+    Also supports fetching content from external URLs.
     """
     from services.llm import default_llm_service
 
     try:
-        # Load local index
-        documents = _load_local_index()
-
-        if not documents:
-            # Fallback: Try to read markdown files directly
-            documents = _load_km_documents_directly()
-
-        if not documents:
-            return RAGChatResponse(
-                answer="ขออภัย ยังไม่มีข้อมูลใน Knowledge Base กรุณารัน km_indexer.py ก่อน",
-                model=None,
-                provider=None,
-                sources=[],
-                context_used=False,
-            )
-
-        # Search for relevant documents
-        search_results = _keyword_search(request.message, documents, top_k=5)
-
-        # Build context from search results
         context_parts = []
         sources = []
 
-        for result in search_results:
-            if result["score"] > 0.1:
-                context_parts.append(f"--- {result['title']} ---")
-                context_parts.append(result["content"])
-                context_parts.append("")
+        # Check if message contains URLs - fetch external content
+        urls = _extract_urls(request.message)
 
-                sources.append({
-                    "title": result["title"],
-                    "source": result["source"],
-                    "score": result["score"],
-                })
+        if urls:
+            # Fetch content from URLs
+            for url in urls[:3]:  # Limit to 3 URLs
+                logger.info(f"Fetching URL: {url}")
+                result = await _fetch_url_content(url)
+
+                if result["success"] and result["content"]:
+                    context_parts.append(f"--- เนื้อหาจาก: {result['title']} ---")
+                    context_parts.append(f"URL: {result['url']}")
+                    context_parts.append(result["content"])
+                    context_parts.append("")
+
+                    sources.append({
+                        "title": result["title"],
+                        "source": result["url"],
+                        "score": 1.0,
+                    })
+                else:
+                    logger.warning(f"Failed to fetch URL: {url}")
+        else:
+            # No URLs - use local knowledge base
+            documents = _load_local_index()
+
+            if not documents:
+                # Fallback: Try to read markdown files directly
+                documents = _load_km_documents_directly()
+
+            if not documents:
+                return RAGChatResponse(
+                    answer="ขออภัย ยังไม่มีข้อมูลใน Knowledge Base กรุณารัน km_indexer.py ก่อน",
+                    model=None,
+                    provider=None,
+                    sources=[],
+                    context_used=False,
+                )
+
+            # Search for relevant documents
+            search_results = _keyword_search(request.message, documents, top_k=5)
+
+            # Build context from search results
+            for result in search_results:
+                if result["score"] > 0.1:
+                    context_parts.append(f"--- {result['title']} ---")
+                    context_parts.append(result["content"])
+                    context_parts.append("")
+
+                    sources.append({
+                        "title": result["title"],
+                        "source": result["source"],
+                        "score": result["score"],
+                    })
 
         context = "\n".join(context_parts)
 
@@ -718,8 +816,20 @@ async def rag_chat(request: RAGChatRequest):
         if request.conversation_history:
             messages.extend(request.conversation_history)
 
-        # System prompt with context
-        system_prompt = """คุณคือผู้ช่วย AI ของระบบ WARIS (Water Loss Intelligent Analysis and Reporting System) ของการประปาส่วนภูมิภาค (กปภ.)
+        # System prompt - different for URL vs KB queries
+        if urls:
+            system_prompt = """คุณคือผู้ช่วย AI ของระบบ WARIS (Water Loss Intelligent Analysis and Reporting System) ของการประปาส่วนภูมิภาค (กปภ.)
+
+คุณได้รับเนื้อหาจากบทความเว็บไซต์ด้านล่าง กรุณาตอบคำถามของผู้ใช้จากเนื้อหานี้
+
+กฎการตอบ:
+1. ตอบเป็นภาษาไทยเสมอ
+2. สรุปใจความสำคัญให้กระชับและตรงประเด็น
+3. หากผู้ใช้ขอสรุปเป็นข้อๆ ให้แสดงเป็นข้อย่อย
+4. ระบุแหล่งที่มา (URL) เสมอ
+5. หากเนื้อหาไม่เพียงพอ ให้แจ้งผู้ใช้"""
+        else:
+            system_prompt = """คุณคือผู้ช่วย AI ของระบบ WARIS (Water Loss Intelligent Analysis and Reporting System) ของการประปาส่วนภูมิภาค (กปภ.)
 
 หน้าที่หลักของคุณคือตอบคำถามเกี่ยวกับน้ำสูญเสีย โดยใช้ข้อมูลจากเอกสารมาตรฐานการปฏิบัติงาน
 
@@ -731,7 +841,7 @@ async def rag_chat(request: RAGChatRequest):
 5. หากเป็นคำถามเกี่ยวกับขั้นตอน ให้ตอบเป็นข้อๆ"""
 
         if context:
-            system_prompt += f"\n\nข้อมูลอ้างอิงจากฐานความรู้:\n{context}"
+            system_prompt += f"\n\nข้อมูลอ้างอิง:\n{context}"
 
         messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": request.message})
