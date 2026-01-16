@@ -56,6 +56,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatThaiDate, formatFileSize } from '@/lib/formatting';
 import { cn } from '@/lib/utils';
+import { PDFUploadProgress } from '@/components/pdf/pdf-upload-progress';
+import { usePDFUpload } from '@/hooks/use-pdf-upload';
 
 interface ETLStatus {
   status: string;
@@ -104,6 +106,13 @@ export default function DataImportPage() {
   const [showDetails, setShowDetails] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
+  // PDF Upload hook
+  const pdfUpload = usePDFUpload({
+    onComplete: () => {
+      fetchStatus();
+    },
+  });
+
   // Fetch ETL status
   const fetchStatus = React.useCallback(async () => {
     try {
@@ -147,6 +156,13 @@ export default function DataImportPage() {
     if (!files || files.length === 0) return;
 
     for (const file of Array.from(files)) {
+      // Check if it's a PDF file
+      if (file.name.toLowerCase().endsWith('.pdf')) {
+        // Use PDF upload with 4-stage progress
+        pdfUpload.uploadPDF(file, 'document');
+        continue;
+      }
+
       const newFile: UploadedFile = {
         id: `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         name: file.name,
@@ -481,13 +497,13 @@ export default function DataImportPage() {
                 ลากไฟล์มาวางที่นี่
               </h3>
               <p className="text-sm text-muted-foreground mb-4">
-                รองรับไฟล์ CSV และ Excel (.xlsx, .xls)
+                รองรับไฟล์ CSV, Excel (.xlsx, .xls) และ PDF
               </p>
               <input
                 ref={fileInputRef}
                 type="file"
                 className="hidden"
-                accept=".csv,.xlsx,.xls"
+                accept=".csv,.xlsx,.xls,.pdf"
                 multiple
                 onChange={(e) => handleFileUpload(e.target.files)}
               />
@@ -501,6 +517,34 @@ export default function DataImportPage() {
               </Button>
             </CardContent>
           </Card>
+
+          {/* PDF Upload Progress */}
+          {(pdfUpload.isUploading || pdfUpload.isComplete || pdfUpload.isError) && (
+            <div className="space-y-3">
+              <PDFUploadProgress
+                filename={pdfUpload.filename}
+                currentStage={pdfUpload.currentStage}
+                stageProgress={pdfUpload.stageProgress}
+                isComplete={pdfUpload.isComplete}
+                isError={pdfUpload.isError}
+                errorMessage={pdfUpload.errorMessage}
+                stats={pdfUpload.stats}
+              />
+              {(pdfUpload.isComplete || pdfUpload.isError) && (
+                <div className="flex justify-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={pdfUpload.reset}
+                    className="gap-2"
+                  >
+                    <Upload className="h-4 w-4" />
+                    อัปโหลด PDF เพิ่มเติม
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* File Template Download */}
           <Card className="relative overflow-hidden backdrop-blur-sm bg-background/80 border-border/50 shadow-md hover:shadow-lg transition-all duration-300">
