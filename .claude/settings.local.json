@@ -141,7 +141,17 @@
       "Bash(SHELL=/bin/bash /usr/local/bin/docker compose:*)",
       "Bash(/opt/homebrew/bin/docker compose -f /Users/fero/Desktop/Works/HX/PWA/lab-pwa-waris/platform/infra/docker/docker-compose.yml build api --no-cache)",
       "Bash(/opt/homebrew/bin/docker compose:*)",
-      "Bash(npx --version)"
+      "Bash(npx --version)",
+      "Bash(/opt/homebrew/bin/docker network ls)",
+      "Bash(open:*)",
+      "Bash(for i in {1..30})",
+      "Bash(do if docker info)",
+      "Bash(then echo \"Docker is ready!\")",
+      "Bash(break)",
+      "Bash(else echo \"Waiting for Docker... \\($i/30\\)\")",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash([ -d \"node_modules\" ])"
     ]
   }
 }
